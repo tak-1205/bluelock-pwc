@@ -1,0 +1,34 @@
+// ID正規化は必ずここ経由に統一
+export function normalizeId(raw) {
+  if (raw == null) return "";
+  let s = String(raw);
+
+  // 1) Unicode正規化（NFKC）
+  s = s.normalize("NFKC");
+
+  // 2) 制御(Cc)・フォーマット(Cf)の包括除去
+  //   例: ZWSP U+200B, ZWNJ U+200C, ZWJ U+200D, LRM U+200E, RLM U+200F,
+  //       BOM U+FEFF, VS U+FE0E/FE0F など
+  s = s.replace(/[\p{Cc}\p{Cf}]/gu, "");
+
+  // 3) 非標準空白類を通常空白へ
+  s = s
+    .replace(/\u00A0/g, " ") // NO-BREAK SPACE
+    .replace(/[\u2000-\u200A]/g, " ")
+    .replace(/\u202F/g, " ")
+    .replace(/\u205F/g, " ")
+    .replace(/\u3000/g, " "); // 全角空白
+
+  // 4) trim + 連続空白を1つに
+  s = s.trim().replace(/\s+/g, " ");
+
+  return s;
+}
+
+// 文字ごとのコードポイントを可視化（デバッグ用）
+export function explainCodepoints(str) {
+  return Array.from(String(str)).map((ch) => {
+    const cp = ch.codePointAt(0).toString(16).toUpperCase().padStart(4, "0");
+    return { ch, cp: "U+" + cp };
+  });
+}

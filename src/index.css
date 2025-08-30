@@ -1,0 +1,68 @@
+/* src/index.css —— Tailwind v4 最小構成。余計なCSSは入れない */
+@import "tailwindcss";
+
+/* CSS から見た相対パスでソースを宣言（これ超重要） */
+@source "../index.html";
+@source "./**/*.{js,jsx,ts,tsx}";
+
+/* ここでカスタマイズ（v4はCSS-first） */
+@theme {
+  /* 例: カスタムカラー/フォントなど */
+  /* --color-brand: #111827; */
+}
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+}
+
+/* 細いスクロールバー＆常時トラックの淡色表示（macの“自動非表示”でも手がかりに） */
+.scroll-thin { scrollbar-width: thin; }
+.scroll-thin::-webkit-scrollbar { width: 8px; }
+.scroll-thin::-webkit-scrollbar-track { background: #f5f5f5; border-radius: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 8px; }
+.scroll-thin:hover::-webkit-scrollbar-thumb { background: #a1a1aa; }
+
