@@ -18,6 +18,9 @@ import AdSlot from "./components/AdSlot";
 import AffiliateRail from "./components/AffiliateRail";
 import { affiliateItems } from "./data/affiliateItems";
 
+import Home from "./pages/Home.jsx";
+import Privacy from "./pages/Privacy.jsx";
+
 /** 効果テキスト：3行固定＋フェード＋スクロール手がかり */
 function EffectText({ children }) {
   const ref = useRef(null);
