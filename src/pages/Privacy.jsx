@@ -18,6 +18,7 @@ export default function Privacy() {
       </p>
       <p className="text-xs text-neutral-500">
       ※当サイトの一部リンクはアフィリエイトリンク（<span className="underline">PR</span>）です。
+      </p>
     </main>
   );
 }
