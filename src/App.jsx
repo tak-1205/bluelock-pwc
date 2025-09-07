@@ -1,25 +1,32 @@
 // src/App.jsx
-import CharacterSelector from "./components/CharacterSelector";
-import { characterList as characterListRaw } from "./data/characterList";
-import { matchSkills as matchSkillsRaw } from "./data/matchSkills";
-import { normalizeId, canonicalId } from "./utils/ids";
-import { Row, Section, Select, Toggle, Button, Badge, Chip, Pill } from "./components/UiBits";
-
+// 1) React
 import React, { useEffect, useRef, useState, useMemo } from "react";
-import { useLocation } from "react-router-dom";
-import Home from "./pages/Home";
 
-import { logCombo } from "./lib/logCombo";
-import Ranking from "./pages/Ranking";
-import SuggestionsBar from "./components/SuggestionsBar";
-import { suggestOneOffs } from "./utils/suggestOneOffs";
-import { countActivatedSkills } from "./utils/match";
-import AdSlot from "./components/AdSlot";
-import AffiliateRail from "./components/AffiliateRail";
-import { affiliateItems } from "./data/affiliateItems";
+// 2) Router
+import { Routes, Route, useLocation } from "react-router-dom";
 
+// 3) Pages（ページだけ）
 import Home from "./pages/Home.jsx";
 import Privacy from "./pages/Privacy.jsx";
+import Ranking from "./pages/Ranking.jsx"; // 使ってなければ後で削除OK
+
+// 4) UIコンポーネント
+import CharacterSelector from "./components/CharacterSelector";
+import SuggestionsBar from "./components/SuggestionsBar";
+import AffiliateRail from "./components/AffiliateRail";
+import AdSlot from "./components/AdSlot";
+import { Row, Section, Select, Toggle, Button, Badge, Chip, Pill } from "./components/UiBits";
+
+// 5) Utils
+import { normalizeId, canonicalId } from "./utils/ids";
+import { suggestOneOffs } from "./utils/suggestOneOffs";
+import { countActivatedSkills } from "./utils/match";
+import { logCombo } from "./lib/logCombo";
+
+// 6) Data
+import { characterList as characterListRaw } from "./data/characterList";
+import { matchSkills as matchSkillsRaw } from "./data/matchSkills";
+import { affiliateItems } from "./data/affiliateItems";
 
 /** 効果テキスト：3行固定＋フェード＋スクロール手がかり */
 function EffectText({ children }) {
