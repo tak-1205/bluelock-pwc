@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 
 // 2) Router
-import { Routes, Route, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 // 3) Pages（ページだけ）
 import Home from "./pages/Home.jsx";
@@ -134,6 +134,13 @@ const persist = {
 
 export default function App() {
   const location = useLocation();
+  // パスの末尾スラッシュを除去して正規化
+  const path = (location.pathname || "/").replace(/\/+$/, "") || "/";
+
+  // ★ まず /privacy /ranking / を優先的に振り分け（既存ロジックはこの下に温存）
+  if (path === "/privacy") return <Privacy />;
+  if (path === "/ranking") return <Ranking />;
+  if (path === "/") return <Home />;
 
   // ===== データ正規化 =====
   const characterList = useMemo(
@@ -456,11 +463,6 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  // ★ トップページ：パスが "/" のときは Home を表示して終了
-  if (location.pathname === "/") {
-    return <Home />;
-  }
 
   // ===== 2カラム レイアウト =====
   return (
