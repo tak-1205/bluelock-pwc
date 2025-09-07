@@ -1,0 +1,9 @@
+User-agent: *
+Disallow:
+
+# 任意（強調したいなら個別にも許可）
+User-agent: Mediapartners-Google
+Disallow:
+
+# 任意（用意できるなら）
+Sitemap: https://pwc-egoist.com/sitemap.xml

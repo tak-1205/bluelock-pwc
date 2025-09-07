@@ -6,12 +6,17 @@ import { normalizeId, canonicalId } from "./utils/ids";
 import { Row, Section, Select, Toggle, Button, Badge, Chip, Pill } from "./components/UiBits";
 
 import React, { useEffect, useRef, useState, useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import Home from "./pages/Home";
+
 import { logCombo } from "./lib/logCombo";
 import Ranking from "./pages/Ranking";
 import SuggestionsBar from "./components/SuggestionsBar";
 import { suggestOneOffs } from "./utils/suggestOneOffs";
 import { countActivatedSkills } from "./utils/match";
 import AdSlot from "./components/AdSlot";
+import AffiliateRail from "./components/AffiliateRail";
+import { affiliateItems } from "./data/affiliateItems";
 
 /** 効果テキスト：3行固定＋フェード＋スクロール手がかり */
 function EffectText({ children }) {
@@ -118,6 +123,8 @@ const persist = {
 };
 
 export default function App() {
+  const location = useLocation();
+
   // ===== データ正規化 =====
   const characterList = useMemo(
     () => (characterListRaw || []).map((c) => ({ ...c, id: normalizeId(c.id) })),
@@ -202,6 +209,9 @@ export default function App() {
   const selectedIds = useMemo(() => selectedCharacters.map((c) => normalizeId(c.id)), [selectedCharacters]);
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const selectedCanonicalSet = useMemo(() => new Set(selectedIds.map(canonicalId)), [selectedIds]);
+
+  // アフィリエイト表示のON/OFF（.env で VITE_FEATURE_AFF=on/off）
+　const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "on";
 
   // 提案（1人入れ替え）を表示するための state（計算は適用時に1回だけ）
   const [suggestions, setSuggestions] = useState([]);
@@ -437,6 +447,11 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // ★ トップページ：パスが "/" のときは Home を表示して終了
+  if (location.pathname === "/") {
+    return <Home />;
+  }
+
   // ===== 2カラム レイアウト =====
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-12 min-h-screen text-neutral-900">
@@ -446,6 +461,7 @@ export default function App() {
 
         <div className="space-y-3">
           <Row className="gap-2">
+            <a href="/" className="px-3 py-2 rounded-md border border-neutral-300 text-sm hover:bg-neutral-50">トップ</a>
             <Button onClick={handleApply}>適用</Button>
             <Button onClick={handleShare}>共有URL</Button>
             <Button variant="outline" onClick={() => setSelectedCharacters([])}>
@@ -555,6 +571,9 @@ export default function App() {
 <Section title="似た組み合わせの提案（1人入れ替え）">
   <SuggestionsBar items={suggestions} baseScore={suggestionsBase} />
 </Section>
+
+{/* アフィリエイト（PR）：グリッドの外に置く */}
+{SHOW_AFF && <AffiliateRail items={affiliateItems} />}
 
         {/* スキル一覧 */}
         <Section title={`発動するマッチスキル`}>
