@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Privacy from "./pages/Privacy.jsx";
 import Ranking from "./pages/Ranking.jsx";
-import Tool from "./pages/Tool.jsx"; // ← 新規追加
+import Tool from "./pages/Tool.jsx";
 
 export default function App() {
   const location = useLocation();
