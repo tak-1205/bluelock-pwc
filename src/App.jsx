@@ -7,11 +7,13 @@ import Home from "./pages/Home.jsx";
 import Privacy from "./pages/Privacy.jsx";
 import Ranking from "./pages/Ranking.jsx";
 import Tool from "./pages/Tool.jsx";
+import Character from "./pages/Character.jsx";
 
 export default function App() {
   const location = useLocation();
   const path = (location.pathname || "/").replace(/\/+$/, "") || "/";
 
+  if (path === "/character" || path.startsWith("/character/")) return <Character />;
   if (path === "/privacy") return <Privacy />;
   if (path === "/ranking") return <Ranking />;
   if (path === "/") return <Home />;

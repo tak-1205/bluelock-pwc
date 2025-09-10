@@ -1,36 +1,43 @@
 // src/hooks/useToolCore.js
-//役割：データ正規化、選択状態、URL同期、共有、提案生成、広告リフレッシュ、getCharacterById
-
 import { useEffect, useMemo, useState } from "react";
-import { normalizeId, canonicalId } from "../utils/ids";
-import { suggestOneOffs } from "../utils/suggestOneOffs";
-import { countActivatedSkills } from "../utils/match";
-import { logCombo } from "../lib/logCombo";
-import useStabilizedAction from "../hooks/useStabilizedAction";
-import { characterList as characterListRaw } from "../data/characterList";
-import { matchSkills as matchSkillsRaw } from "../data/matchSkills";
+import { normalizeId, canonicalId } from "../utils/ids.js";   // ← ここからだけ取得（重複定義しない）
+import { suggestOneOffs } from "../utils/suggestOneOffs.js";
+import { countActivatedSkills } from "../utils/match.js";
+import { logCombo } from "../lib/logCombo.js";
+import useStabilizedAction from "../hooks/useStabilizedAction.js";
+import { characterList as characterListRaw } from "../data/characterList.js";
+import { matchSkills as matchSkillsRaw } from "../data/matchSkills.js"; // ← named import
 
-export default function useToolCore() {
+export default function useToolCore() {                       // ← default export
   // ===== データ正規化 =====
   const characterList = useMemo(
     () => (characterListRaw || []).map((c) => ({ ...c, id: normalizeId(c.id) })),
     []
   );
+
   const matchSkills = useMemo(
     () =>
-      (matchSkillsRaw || []).map((s) => ({
-        ...s,
-        target1: normalizeId(s.target1),
-        target2: normalizeId(s.target2),
-        target3: normalizeId(s.target3),
-        target4: normalizeId(s.target4),
-        target5: normalizeId(s.target5),
-        activator1: normalizeId(s.activator1),
-        activator2: normalizeId(s.activator2),
-        activator3: normalizeId(s.activator3),
-        activator4: normalizeId(s.activator4),
-        activator5: normalizeId(s.activator5),
-      })),
+      (matchSkillsRaw || []).map((s) => {
+        // target1..5 → targets[] も持たせておく（下流の取り扱いを楽にする）
+        const targets = [s.target1, s.target2, s.target3, s.target4, s.target5]
+          .filter(Boolean)
+          .map(normalizeId);
+
+        return {
+          ...s,
+          targets, // ← 追加
+          target1: normalizeId(s.target1),
+          target2: normalizeId(s.target2),
+          target3: normalizeId(s.target3),
+          target4: normalizeId(s.target4),
+          target5: normalizeId(s.target5),
+          activator1: normalizeId(s.activator1),
+          activator2: normalizeId(s.activator2),
+          activator3: normalizeId(s.activator3),
+          activator4: normalizeId(s.activator4),
+          activator5: normalizeId(s.activator5),
+        };
+      }),
     []
   );
 
@@ -49,14 +56,9 @@ export default function useToolCore() {
 
   // ===== 選択状態 & URL 同期/共有 =====
   const [selectedCharacters, setSelectedCharacters] = useState([]);
-
   const encodeIds = (ids) => btoa(unescape(encodeURIComponent(JSON.stringify(ids))));
   const decodeIds = (encoded) => {
-    try {
-      return JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    } catch {
-      return [];
-    }
+    try { return JSON.parse(decodeURIComponent(escape(atob(encoded)))); } catch { return []; }
   };
 
   useEffect(() => {
@@ -129,26 +131,20 @@ export default function useToolCore() {
   const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "on";
 
   return {
-    // data
     characterList,
-    matchSkills,
-    // selection
+    matchSkills,                 // ← ここから渡す
     selectedCharacters,
     setSelectedCharacters,
     selectedIds,
     selectedSet,
     selectedCanonicalSet,
-    // actions
     handleSelectCharacters,
     handleApply,
     handleShare,
-    // proposals/ads
     suggestions,
     suggestionsBase,
     adKey,
-    // helpers
     getCharacterById,
-    // flags
     SHOW_AFF,
   };
 }
