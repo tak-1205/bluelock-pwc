@@ -44,7 +44,6 @@ export default function TwoColumnLayout({
             </label>
           </div>
 
-          {/* ▼ ここを差し替え：ロゴ + PWC EGOIST（原寸超え拡大なし） */}
           <div className="flex-1">
             {mobileBrand ? (
               mobileBrand
@@ -80,10 +79,12 @@ export default function TwoColumnLayout({
       <div className="drawer-side">
         <label htmlFor={drawerId} aria-label="close sidebar" className="drawer-overlay" />
         <aside className="min-h-full w-72 bg-base-200 border-r border-base-300">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-base-300">
-            <img src="/images/icon.png" alt="icon" width={24} height={24} />
-            <span className="font-semibold">PWC EGOIST</span>
-          </div>
+            <a href="/">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-base-300">
+                    <img src="/images/icon.png" alt="icon" width={24} height={24} />
+                    <span className="font-semibold">PWC EGOIST</span> 
+                </div>
+            </a>
           <nav className="menu p-4">{sidebar}</nav>
         </aside>
       </div>
