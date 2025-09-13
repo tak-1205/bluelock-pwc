@@ -13,6 +13,7 @@ import AdSlot from "../components/AdSlot.jsx";
 import SkillCard from "../components/tool/SkillCard.jsx";
 import { Row, Section, Select, Toggle, Button, Badge, Chip, Pill } from "../components/UiBits.jsx";
 import { triggerAdsRefresh } from "../lib/adBus.js"; // ★ 右カラム更新イベント
+import { buildImageCandidates, makeImageFallbackHandler } from "../lib/imagePath";
 
 export default function Tool() {
   const selectorDialogRef = useRef(null);
@@ -49,18 +50,22 @@ export default function Tool() {
   // ショートカット
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
         const el = document.getElementById("global-search");
         if (el) el.focus();
-      }
-      if (e.key.toLowerCase() === "g") setViewMode((v) => (v === "grid" ? "list" : "grid"));
-      if (e.key.toLowerCase() === "s")
+    };
+    if (selectedCharacters.length < 5) {
+        setSuggestions([]);
+        setSuggestionsBase(0);
+    };
+    if (e.key.toLowerCase() === "g") setViewMode((v) => (v === "grid" ? "list" : "grid"));
+    if (e.key.toLowerCase() === "s")
         setSortKey((v) => (v === "name-asc" ? "targets-desc" : v === "targets-desc" ? "activators-desc" : "name-asc"));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [setViewMode, setSortKey]);
+  }, [setViewMode, setSortKey, selectedCharacters]);
 
   return (
     <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
@@ -69,7 +74,7 @@ export default function Tool() {
         <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6 space-y-4">
           <Row className="justify-between items-start gap-3 flex-wrap">
             <div className="text-sm text-base-content/70">
-              選択中: <strong>{selectedCharacters.length}</strong> 人 / ヒット: <strong>{resultCount}</strong> 件
+              選択中: <strong>{selectedCharacters.length}</strong> 人  
             </div>
             <div className="flex gap-2">
               <button
@@ -80,44 +85,44 @@ export default function Tool() {
                 選手選択
               </button>
               <Button onClick={handleShare}>共有URL</Button>
-              <Button variant="outline" onClick={() => setSelectedCharacters([])}>選択クリア</Button>
+              <Button variant="outline" onClick={() => handleSelectCharacters([])}>選択クリア</Button>
             </div>
           </Row>
 
-          {/* 選択中プレビュー（アイコン） */}
-          {selectedCharacters.length > 0 && (
+            {/* 選択中プレビュー（アイコン） */}
+            {selectedCharacters.length > 0 && (
             <div className="mt-2">
-              <div className="flex flex-wrap gap-2">
-                {selectedCharacters.map((c) => {
-                  const id = c.id;
-                  const name = c.name || id;
-                  const candidates = Array.from(new Set([
-                    `/images/${id}.png`,
-                    `/images/${id.toLowerCase()}.png`,
-                  ]));
-                  const initialSrc = candidates[0];
-                  const handleError = (e) => {
-                    const el = e.currentTarget;
-                    const tried = (el.getAttribute("data-tried") || "").split("|").filter(Boolean);
-                    const next = candidates.find((p) => !tried.includes(p));
-                    if (next) {
-                      el.setAttribute("data-tried", [...tried, next].join("|"));
-                      el.src = next;
-                    } else {
-                      el.style.display = "none";
-                    }
-                  };
-                  return (
-                    <div key={id} className="avatar" title={name}>
-                      <div className="w-9 h-9 rounded-lg ring ring-base-300">
-                        <img src={initialSrc} data-tried={initialSrc} alt={name} onError={handleError} />
-                      </div>
+                <Section title="選択したキャラ">
+                    <div className="flex flex-wrap gap-2">
+                    {selectedCharacters.map((c) => {
+                        const candidates = buildImageCandidates(c.id);
+                        const initialSrc = candidates[0];
+                        const name = c.name || c.id;
+
+                        return (
+                        <div key={c.id} className="avatar" title={name}>
+                            <div className="w-20 h-20 rounded-lg ring ring-base-300">
+                            <img
+                                src={initialSrc}
+                                data-idx="0"
+                                alt={name}
+                                onError={makeImageFallbackHandler(candidates)}
+                                loading="lazy"
+                            />
+                            </div>
+                        </div>
+                        );
+                    })}
                     </div>
-                  );
-                })}
-              </div>
+                </Section>
             </div>
-          )}
+            )}
+
+            {/* 提案 */}
+            <div className="divider"></div>
+            <Section title="似た組み合わせの提案（1人入れ替え）">
+                <SuggestionsBar items={suggestions} baseScore={suggestionsBase} />
+            </Section>
 
           {/* モーダル：選手選択 */}
           <dialog ref={selectorDialogRef} className="modal">
@@ -153,11 +158,6 @@ export default function Tool() {
         </div>
       </Section>
 
-      {/* 提案 */}
-      <Section title="似た組み合わせの提案（1人入れ替え）">
-        <SuggestionsBar items={suggestions} baseScore={suggestionsBase} />
-      </Section>
-
       {/* スキル一覧 */}
       <Section title="発動するマッチスキル">
         {pagedSkills.length === 0 ? (
@@ -166,22 +166,25 @@ export default function Tool() {
           </div>
         ) : (
           <>
+            <div className="text-sm text-base-content/70">
+                ヒット: <strong>{resultCount}</strong> 件
+            </div>
             <ul
-              className={[
+            className={[
                 "p-0 m-0 list-none",
                 viewMode === "grid"
-                  ? "grid [grid-template-columns:repeat(auto-fill,minmax(240px,1fr))] gap-4"
-                  : "flex flex-col gap-3",
-              ].join(" ")}
+                ? "grid gap-4 md:grid-cols-2"     // 横型カードを2列で並べる
+                : "flex flex-col gap-3",           // リストは縦積み
+            ].join(" ")}
             >
               {pagedSkills.map((s, i) => (
                 <React.Fragment key={`${s.name}-${i}`}>
-                  <SkillCard s={s} getCharacterById={getCharacterById} showIds={showIds} />
-                  {import.meta.env.VITE_FEATURE_ADS === "on" && (i + 1) % 6 === 0 && (
-                    <li className="list-none">
-                      <AdSlot slot="1234567890" adKey={adKey} />
-                    </li>
-                  )}
+                <SkillCard s={s} getCharacterById={getCharacterById} showIds={showIds} />
+                    {import.meta.env.VITE_FEATURE_ADS === "on" && (i + 1) % 6 === 0 && (
+                        <li className="list-none md:col-span-2">
+                        <AdSlot slot={import.meta.env.VITE_AD_SLOT_INLINE || ""} adKey={adKey} />
+                        </li>
+                    )}
                 </React.Fragment>
               ))}
             </ul>

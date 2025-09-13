@@ -10,7 +10,7 @@
  */
 
 export const catalog /** @type {Record<string, AffItem>} */ = {
-  "amz-1": {
+  /*"amz-1": {
     id: "amz-1",
     title: "【Amazon】人気のゲーミングマウス",
     url: "https://example.com/amazon/mouse",
@@ -29,6 +29,6 @@ export const catalog /** @type {Record<string, AffItem>} */ = {
     title: "【楽天】ワイヤレスイヤホン",
     url: "https://example.com/rakuten/earbuds",
     source: "rakuten",
-  },
+  },*/
   // …必要に応じて追加
 };

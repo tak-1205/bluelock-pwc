@@ -1,17 +1,20 @@
+// src/layouts/SideMenu.jsx
 import { NavLink, Link } from "react-router-dom";
 
-/**
- * 共通サイドメニュー
- * - 既定の項目の前に挿入:  props.prepend
- * - 既定の項目の後ろに挿入: props.append
- * - さらに柔軟に: children（<li>...</li> をそのまま追記）
- *
- * 使い方:
- * <SideMenu append={<li><Link to="/new">新ページ</Link></li>} />
- * <SideMenu><li><Link to="/help">ヘルプ</Link></li></SideMenu>
- */
 export default function SideMenu({ prepend = null, append = null, children = null }) {
-  const liClass = "whitespace-nowrap"; // 長文回避用（必要に応じて調整）
+  const liClass = "whitespace-nowrap";
+
+  // 準備中項目（非リンク・非フォーカス・クリック不可）
+  const Pending = ({ label }) => (
+    <div
+      className="flex items-center gap-2 text-base-content/60 opacity-60 cursor-not-allowed select-none pointer-events-none"
+      aria-disabled="true"
+      role="note"
+    >
+      <span>{label}</span>
+      <span className="badge badge-ghost badge-sm">準備中</span>
+    </div>
+  );
 
   return (
     <>
@@ -24,19 +27,21 @@ export default function SideMenu({ prepend = null, append = null, children = nul
             Home
           </NavLink>
         </li>
+
         <li className={liClass}>
           <NavLink to="/tool" className={({ isActive }) => (isActive ? "active" : "")}>
             マッチスキル抽出
           </NavLink>
         </li>
-        {/* 
+
+        {/* 準備中（非リンク表示） */}
         <li className={liClass}>
-          <NavLink to="/ranking" className={({ isActive }) => (isActive ? "active" : "")}>
-            ランキング
-          </NavLink>
+          <Pending label="人気マッチスキル" />
         </li>
-         */}
-        
+        <li className={liClass}>
+          <Pending label="キャラ別一覧" />
+        </li>
+
         {children}
         {append}
       </ul>

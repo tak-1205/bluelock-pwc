@@ -1,40 +1,29 @@
 // src/layouts/TwoColumnLayout.jsx
 import React from "react";
+// （必要なら）import { Link } from "react-router-dom"; // ロゴをリンク化したいとき用
 
-/**
- * 3カラム共通レイアウト（daisyUI docs /components/card と同構成）
- * - 左: drawer-side（sidebar）… LG以上は常時表示、モバイルはハンバーガーで開閉
- * - 中央: children（本文）
- * - 右: right（広告など。省略可、指定時は xl 以上で表示＆ sticky）
- *
- * 使い方:
- * <TwoColumnLayout sidebar={<MyMenu/>} right={<MyAds/>}>
- *   <PageContent/>
- * </TwoColumnLayout>
- */
 export default function TwoColumnLayout({
   sidebar,
   children,
   right = null,
-  // 一番外側はご指定どおり
   containerClass = "bg-base-100 drawer mx-auto max-w-[100rem] lg:drawer-open",
-  // 追従の上オフセット（例: "top-4", "top-16"）
   stickyTopClass = "top-4",
-  // drawer のトグルID（重複防止用にページごとで変えてもOK）
   drawerId = "app-drawer",
-  // モバイル上部バーのタイトル
-  mobileTitle = "ブルーロックPWC",
+  // ↓ 既存：文字のタイトルは残すが、デフォルトは PWC EGOIST に
+  mobileTitle = "PWC EGOIST",
+  // ↓ 追加：任意でロゴ行を差し替えたい場合に使える（未指定なら既定のロゴ＋テキスト）
+  mobileBrand = null,
 }) {
-  const hasRight = Boolean(right);
+    // 右カラムの全体キルスイッチ（envでOFFなら列ごと作らない）
+    const RIGHT_ENABLED = (import.meta.env.VITE_FEATURE_RIGHT ?? "on") === "on";
+    const hasRight = RIGHT_ENABLED && Boolean(right);
 
   return (
     <div className={containerClass}>
-      {/* ===== Drawer toggle（左メニュー開閉） ===== */}
       <input id={drawerId} type="checkbox" className="drawer-toggle" />
 
-      {/* ====== 中央 + 右（本文＆追従広告） ====== */}
       <div className="drawer-content overflow-visible">
-        {/* モバイル：上部バー（ハンバーガー） */}
+        {/* モバイル：上部バー（ハンバーガー + ブランド） */}
         <div className="navbar bg-base-100 border-b border-base-200 lg:hidden">
           <div className="flex-none">
             <label
@@ -54,18 +43,30 @@ export default function TwoColumnLayout({
               </svg>
             </label>
           </div>
-          <div className="flex-1 px-2">{mobileTitle}</div>
+
+          {/* ▼ ここを差し替え：ロゴ + PWC EGOIST（原寸超え拡大なし） */}
+          <div className="flex-1">
+            {mobileBrand ? (
+              mobileBrand
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-3">
+                <img
+                  src="/images/icon.png"
+                  alt="icon"
+                  width={24}
+                  height={24}
+                  className="block h-auto w-[24px] max-w-[24px]"
+                />
+                <span className="font-semibold">{mobileTitle}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* コンテンツ領域（中央＋右の2カラム） */}
         <div className="px-4 md:px-6 py-6">
           <div className={`grid gap-6 ${hasRight ? "xl:grid-cols-[minmax(0,1fr)_20rem]" : ""}`}>
-            {/* ===== 中央：本文 ===== */}
-            <main className="min-w-0">
-              {children}
-            </main>
-
-            {/* ===== 右：追従広告（指定時のみ / xl以上で表示） ===== */}
+            <main className="min-w-0">{children}</main>
             {hasRight && (
               <aside className={`hidden xl:block sticky ${stickyTopClass} self-start space-y-4`}>
                 {right}
@@ -75,20 +76,15 @@ export default function TwoColumnLayout({
         </div>
       </div>
 
-      {/* ====== 左：メニュー（drawer-side） ====== */}
+      {/* 左：メニュー（drawer-side）—ここはそのまま。統一したい場合は同様に PWC EGOIST に変更可 */}
       <div className="drawer-side">
         <label htmlFor={drawerId} aria-label="close sidebar" className="drawer-overlay" />
         <aside className="min-h-full w-72 bg-base-200 border-r border-base-300">
-          {/* ロゴ行（必要なければ削除OK） */}
           <div className="flex items-center gap-2 px-4 py-3 border-b border-base-300">
             <img src="/images/icon.png" alt="icon" width={24} height={24} />
-            <span className="font-semibold">ブルーロックPWC</span>
+            <span className="font-semibold">PWC EGOIST</span>
           </div>
-
-          {/* メニュー本体：daisyUI menu（sidebar は断片を想定） */}
-          <nav className="menu p-4">
-            {sidebar}
-          </nav>
+          <nav className="menu p-4">{sidebar}</nav>
         </aside>
       </div>
     </div>

@@ -1,74 +1,76 @@
 // src/components/tool/SkillCard.jsx
 import React from "react";
 import EffectText from "../EffectText.jsx";
-import { Badge } from "../UiBits";
-import { normalizeId } from "../../utils/ids";
+import { buildImageCandidates, makeImageFallbackHandler } from "../../lib/imagePath";
 
 export default function SkillCard({ s, getCharacterById, showIds }) {
   const targets = [s.target1, s.target2, s.target3, s.target4, s.target5].filter(Boolean);
   const activators = [s.activator1, s.activator2, s.activator3, s.activator4, s.activator5].filter(Boolean);
 
-  const renderIcons = (ids) => {
-    const normed = ids.map(normalizeId);
+  const renderIcon = (rawId) => {
+    const displayId = String(rawId);
+    const candidates = buildImageCandidates(rawId);
+    const initialSrc = candidates[0];
+    const char = typeof getCharacterById === "function" ? getCharacterById(displayId) : null;
+    const alt = char?.name || displayId;
+
     return (
-      <div className="flex gap-1.5 flex-wrap">
-        {normed.map((rawId) => {
-          const char = getCharacterById(rawId);
-          const alt = char?.name || rawId;
-          const n = normalizeId(rawId);
-          const c = n; // ここでは n を優先（必要に応じて canonical に変更）
-          const candidates = Array.from(new Set([`/images/${c}.png`, `/images/${c.toLowerCase()}.png`]));
-          const initialSrc = candidates[0];
-
-          const handleError = (e) => {
-            const el = e.currentTarget;
-            const tried = el.getAttribute("data-tried")?.split("|") ?? [];
-            const next = candidates.find((p) => !tried.includes(p));
-            if (next) {
-              tried.push(next);
-              el.setAttribute("data-tried", tried.join("|"));
-              el.src = next;
-            } else {
-              el.style.display = "none";
-            }
-          };
-
-          return (
-            <div key={rawId} className="flex flex-col items-center">
-              <img
-                src={initialSrc}
-                data-tried={initialSrc}
-                alt={alt}
-                title={alt}
-                className="w-8 h-8 rounded-md object-cover"
-                onError={handleError}
-              />
-              {showIds && <span className="text-[10px] opacity-70 mt-0.5">{n}</span>}
-            </div>
-          );
-        })}
+      <div key={displayId} className="avatar">
+        <div className="w-10 h-10 rounded-lg ring ring-base-300">
+          <img
+            src={initialSrc}
+            data-idx="0"
+            alt={alt}
+            title={alt}
+            onError={makeImageFallbackHandler(candidates)}
+            loading="lazy"
+          />
+        </div>
+        {showIds && (
+          <span className="text-[10px] opacity-70 mt-0.5 block text-center">
+            {displayId}
+          </span>
+        )}
       </div>
     );
   };
 
   return (
-    <li className="border border-base-300 rounded-xl p-3 min-w-[200px] bg-base-100 shadow-sm hover:shadow transition">
-      <h3 className="m-0 text-base font-semibold">{s.name}</h3>
-      <div className="flex items-center gap-1.5">
-        <Badge tone="blue">対象 {targets.length}</Badge>
-        <Badge tone="green">発動者 {activators.length}</Badge>
+    <li className="card md:card-side bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition">
+      {/* 左：テキスト */}
+      <div className="card-body md:w-[60%]">
+        <div className="flex items-start gap-2 flex-wrap">
+          <h3 className="card-title text-base">{s.name}</h3>
+          <div className="ms-auto flex items-center gap-2">
+            <div className="badge badge-info badge-outline">対象 {targets.length}</div>
+            <div className="badge badge-success badge-outline">発動者 {activators.length}</div>
+          </div>
+        </div>
+        <div className="text-sm text-base-content/80">
+          <EffectText>{s.detail}</EffectText>
+        </div>
       </div>
 
-      <EffectText>{s.detail}</EffectText>
+      {/* 右：画像 */}
+      <figure className="p-4 md:w-[40%]">
+        <div className="grid gap-3">
+          <div>
+            <div className="text-xs text-base-content/60 mb-1">組み合わせ</div>
+            <div className="flex flex-wrap gap-1.5">
+              {targets.map(renderIcon)}
+            </div>
+          </div>
 
-      <div className="mt-2">
-        <div className="text-xs mb-1 text-base-content/70">組み合わせ</div>
-        {renderIcons(targets)}
-      </div>
-      <div className="mt-2">
-        <div className="text-xs mb-1 text-base-content/70">発動者</div>
-        {renderIcons(activators)}
-      </div>
+          <div className="divider my-1" />
+
+          <div>
+            <div className="text-xs text-base-content/60 mb-1">発動者</div>
+            <div className="flex flex-wrap gap-1.5">
+              {activators.map(renderIcon)}
+            </div>
+          </div>
+        </div>
+      </figure>
     </li>
   );
 }

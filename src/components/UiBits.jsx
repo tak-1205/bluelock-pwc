@@ -1,16 +1,81 @@
 // src/components/UiBits.jsx
 import React from "react";
 
+/* =========================
+   見出し（daisyUIトーン）
+   ========================= */
+export const H1 = ({ children, className = "" }) => (
+  <h1 className={`text-2xl md:text-3xl font-bold text-base-content ${className}`}>{children}</h1>
+);
+
+export const H2 = ({ children, className = "" }) => (
+  <h2 className={`text-xl md:text-2xl font-semibold text-base-content/90 ${className}`}>{children}</h2>
+);
+
+export const H3 = ({ children, className = "" }) => (
+  <h3 className={`text-lg md:text-xl font-semibold text-base-content/80 ${className}`}>{children}</h3>
+);
+
+/** ページ先頭のヒーロー風ヘッダ */
+export const PageHeader = ({ title, subtitle, rightSlot = null, className = "" }) => (
+  <header className={`hero bg-base-200 rounded-2xl p-4 md:p-6 ${className}`}>
+    <div className="hero-content w-full flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="space-y-1">
+        <H1 className="mb-1">{title}</H1>
+        {subtitle ? <p className="text-base-content/70">{subtitle}</p> : null}
+      </div>
+      {rightSlot ? <div className="shrink-0">{rightSlot}</div> : null}
+    </div>
+  </header>
+);
+
+/* =========================
+   レイアウト外枠（左右余白 + 最大幅）
+   ========================= */
+export const Shell = ({ children, className = "" }) => (
+  <div className={`max-w-screen-xl mx-auto px-4 md:px-6 ${className}`}>{children}</div>
+);
+
+/* =========================
+   カード（daisyUI）
+   ========================= */
+export const Card = ({ title, children, footer = null, className = "" }) => (
+  <div className={`card bg-base-100 shadow-lg rounded-2xl ${className}`}>
+    <div className="card-body">
+      {title ? <h3 className="card-title">{title}</h3> : null}
+      {children}
+    </div>
+    {footer ? <div className="card-actions justify-end p-4 pt-0">{footer}</div> : null}
+  </div>
+);
+
 /** 横並び */
 export const Row = ({ children, className = "" }) => (
   <div className={`flex items-center gap-3 ${className}`}>{children}</div>
 );
 
-/** セクション */
-export const Section = ({ title, children, className = "" }) => (
+/** セクション
+ *  - 後方互換：既存の {title, children, className} だけでも従来どおり動作
+ *  - 追加: desc（説明文）, rightSlot（右上エリア）, asCard（中身をcardで囲む）
+ */
+export const Section = ({ title, desc, rightSlot = null, asCard = false, children, className = "" }) => (
   <section className={`mt-4 ${className}`}>
-    {title && <h2 className="text-lg font-semibold mb-2 text-white">{title}</h2>}
-    {children}
+    {(title || desc || rightSlot) && (
+      <div className="mb-3 md:mb-4 flex items-start justify-between gap-3">
+        <div>
+          {title ? <h2 className="text-lg md:text-xl font-semibold">{title}</h2> : null}
+          {desc ? <p className="text-sm md:text-base text-base-content/70">{desc}</p> : null}
+        </div>
+        {rightSlot ? <div className="shrink-0">{rightSlot}</div> : null}
+      </div>
+    )}
+    {asCard ? (
+      <div className="card bg-base-100 shadow-lg rounded-2xl">
+        <div className="card-body p-4 md:p-6">{children}</div>
+      </div>
+    ) : (
+      children
+    )}
   </section>
 );
 

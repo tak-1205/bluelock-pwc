@@ -6,83 +6,137 @@ import RightAds from "../layouts/RightAds.jsx";
 
 export default function Home() {
   return (
-    <TwoColumnLayout  sidebar={<SideMenu />} right={<RightAds />}>
+    <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
+      {/* Hero（画像はPCで右、SPで上） */}
+      <section className="mx-auto max-w-5x">
 
-            <section className="mx-auto max-w-5xl px-4 py-10">
-              <h1 className="text-2xl md:text-3xl font-bold">【開発中】PWC </h1>
-              <p className="mt-2 text-neutral-700">
-                5人まで選ぶと、発動するマッチスキルを一覧。人気組み合わせランキングや「1人入れ替え提案」も対応。
-              </p>
+        {/* ビジュアルバナー（横長） */}
+        <div className="container mx-auto mt-2">
+          <div className="rounded-2xl overflow-hidden bg-base-200">
+            <img
+              src="/images/mv.JPG"
+              alt="キービジュアル"
+              className="w-full h-48 md:h-64 object-cover rounded-2xl"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
 
-              <div className="bg-base-200">
-                <div className="container mx-auto px-4 py-8">
-                  <div className="card card-side bg-base-100 shadow-sm">
-                    {/* 画像を右側にしたいので md 以上で order を反転 */}
-                    <figure className="p-6 md:order-2">
-                      <img
-                        src="https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
-                        alt="機能イメージ"
-                        className="max-w-sm rounded-lg shadow-2xl"
-                      />
-                    </figure>
+        {/* 追加：サイトの説明（幅を既存の container に合わせる） */}
+        <section className="mt-6">
+          <div className="container mx-auto">
+            <div className="card bg-base-100 shadow-sm">
+              <div className="card-body">
+                <h2 className="card-title text-xl">PWC EGOISTについて</h2>
+                <p className="text-sm text-base-content/70">
+                  2025年9月にオープンしたブルーロックPWCのデータベースサイトです。
+                </p>
+                <p className="text-sm text-base-content/70">
+                  これからコンテンツを順次追加予定です。
+                </p>
+                <p className="text-sm text-base-content/70">
+                  追加してほしい機能についてや、機能に不具合や間違いなどを見つけましたら、<a href="/contact/" className="font-bold">こちら</a>からご連絡ください。
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-                    <div className="card-body md:order-1">
-                      <h2 className="card-title text-3xl md:text-4xl">マッチスキル抽出ツール</h2>
-                      <p className="text-neutral-700">
-                        キャラを選択すると即時に発動スキルを抽出し、ランキングや入れ替え候補も提示します。
-                      </p>
-
-                      {/* 元の3カラム説明をカード内に配置 */}
-                      <div className="grid gap-4 md:grid-cols-3">
-                        <div className="card bg-base-100 shadow-md">
-                          <div className="card-body p-4">
-                            <h3 className="card-title text-sm">スキル抽出</h3>
-                            <p className="text-sm text-neutral-700">
-                              キャラ選択で即時に発動スキルを抽出。
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="card bg-base-100 shadow-md">
-                          <div className="card-body p-4">
-                            <h3 className="card-title text-sm">ランキング</h3>
-                            <p className="text-sm text-neutral-700">
-                              匿名集計で人気の組み合わせを集計。
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="card bg-base-100 shadow-md">
-                          <div className="card-body p-4">
-                            <h3 className="card-title text-sm">入れ替え提案</h3>
-                            <p className="text-sm text-neutral-700">
-                              4人一致 + 1人入替で発動数が増える候補を提示します。
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* ボタンは DaisyUI に置換 */}
-                      <div className="card-actions justify-end mt-2">
-                        <Link to="/tool" className="btn btn-primary">詳細へ</Link>
-                        {/*<Link to="/ranking" className="btn btn-outline">人気の組み合わせを見る</Link>*/}
-                      </div>
-                    </div>
+        {/* 追加：機能・コンテンツの説明（同じく container 揃え） */}
+        <section className="mt-6 mb-8">
+          <div className="container mx-auto">
+            <h2 className="text-xl font-bold mb-3">機能・コンテンツ</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {/* 稼働中 */}
+              <div className="card bg-base-100 shadow-sm">
+                <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
+                  <img
+                    src="/images/matchskill_img.png"
+                    alt="マッチスキル抽出ツール"
+                    className="max-h-full max-w-full object-contain"
+                    loading="lazy"
+                    onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
+                  />
+                </figure>
+                <div className="card-body">
+                  <h3 className="card-title">マッチスキル抽出ツール</h3>
+                  <p className="text-sm text-base-content/70">
+                    キャラを選択すると即時に発動スキルを抽出。検索・並び替え・表示切替にも対応。
+                  </p>
+                  <div className="card-actions justify-end">
+                    <Link to="/tool" className="btn btn-sm btn-primary">使ってみる</Link>
                   </div>
                 </div>
               </div>
 
-              <p className="mt-10 text-xs text-neutral-500">
-                ※本サイトは非公式のファンメイドツールです。原作・各権利者とは関係ありません。
-              </p>
-            </section>
-
-            <footer className="border-t border-neutral-200">
-              <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-neutral-600 flex gap-4">
-                <span>© {new Date().getFullYear()} pwc-egoist</span>
-                <Link to="/privacy" className="hover:underline">プライバシー</Link>
+              {/* 準備中その1 */}
+              <div className="card bg-base-100 shadow-sm">
+                <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
+                  <img
+                    src="/images/feature-ranking.png"
+                    alt="人気マッチスキル"
+                    className="max-h-full max-w-full object-contain"
+                    loading="lazy"
+                    onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
+                  />
+                </figure>
+                <div className="card-body">
+                  <h3 className="card-title">
+                    人気マッチスキル <span className="badge badge-ghost badge-sm">準備中</span>
+                  </h3>
+                  <p className="text-sm text-base-content/70">
+                    よく使われる組み合わせを匿名集計で可視化。（近日公開）
+                  </p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-sm btn-disabled">近日公開</button>
+                  </div>
+                </div>
               </div>
-            </footer>
-     </TwoColumnLayout>
+
+              {/* 準備中その2 */}
+              <div className="card bg-base-100 shadow-sm">
+                <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
+                  <img
+                    src="/images/feature-character.png"
+                    alt="キャラ別一覧"
+                    className="max-h-full max-w-full object-contain"
+                    loading="lazy"
+                    onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
+                  />
+                </figure>
+                <div className="card-body">
+                  <h3 className="card-title">
+                    キャラ別一覧 <span className="badge badge-ghost badge-sm">準備中</span>
+                  </h3>
+                  <p className="text-sm text-base-content/70">
+                    キャラごとの発動スキルや相性をまとめて確認。（準備中）
+                  </p>
+                  <div className="card-actions justify-end">
+                    <button className="btn btn-sm btn-disabled">準備中</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* 注意書き */}
+        <p className="mt-10 text-xs text-base-content/60">
+          ※本サイトは非公式のファンメイドサイトです。原作・各権利者とは関係ありません。
+        </p>
+      </section>
+      
+
+      {/* フッター（DaisyUI footer） */}
+      <footer className="footer bg-base-200 rounded-box p-4 mt-6 text-sm text-base-content/70">
+        <div className="mx-auto w-full max-w-5xl flex items-center justify-between">
+          <span>© {new Date().getFullYear()} pwc-egoist</span>
+          <Link to="/privacy" className="link link-hover">プライバシー</Link>
+          <Link to="/contact" className="link link-hover">お問い合わせ</Link>
+        </div>
+      </footer>
+    </TwoColumnLayout>
   );
 }

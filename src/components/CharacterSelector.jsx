@@ -56,7 +56,7 @@ function CharacterSelector({ selectedCharacters, onSelectCharacter }) {
         </div>
       )}
 
-      <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', listStyle: 'none', padding: 0 }}>
+      <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', listStyle: 'none', padding: 0 }}>
         {characterList.map((character) => {
           const isSelected = selectedCharacters.some((c) => c.id === character.id);
           const nameOnly = character.name.split('【')[0];
