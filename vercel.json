@@ -1,4 +1,8 @@
 {
+  "functions": {
+    "api/og.js": { "runtime": "edge" },
+    "api/share-combos.js": { "runtime": "edge" }
+  },
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
