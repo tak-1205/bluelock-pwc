@@ -11,40 +11,23 @@ export default function RightAds({ items, slots = {} }) {
   const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "on";
   const location = useLocation();
 
-  // ページ側から items を渡されたら優先。無ければレジストリで自動選択
   const effectiveItems =
     items && items.length ? items : getAffiliateItemsForPath(location.pathname);
 
-  // 広告リロード用キー（ルート変化や外部イベントで更新）
   const [adKey, setAdKey] = useState(0);
-
-  // ルートが変わったら1回リフレッシュ（AdSense）
-  useEffect(() => {
-    setAdKey((k) => k + 1);
-  }, [location.key]);
-
-  // 外部からの「更新して」イベント
+  useEffect(() => { setAdKey((k) => k + 1); }, [location.key]);
   useEffect(() => onAdsRefresh(() => setAdKey((k) => k + 1)), []);
 
-  const SLOT_TOP =
-    import.meta.env.VITE_AD_SLOT_SIDEBAR_TOP || slots.top || "";
-  const SLOT_MID =
-    import.meta.env.VITE_AD_SLOT_SIDEBAR_MID || slots.mid || "";
-  const SLOT_BOTTOM =
-    import.meta.env.VITE_AD_SLOT_SIDEBAR_BOTTOM || slots.bottom || "";
+  const SLOT_TOP = import.meta.env.VITE_AD_SLOT_SIDEBAR_TOP || slots.top || "";
+  const SLOT_MID = import.meta.env.VITE_AD_SLOT_SIDEBAR_MID || slots.mid || "";
+  const SLOT_BOTTOM = import.meta.env.VITE_AD_SLOT_SIDEBAR_BOTTOM || slots.bottom || "";
 
   const handleAffClick = (_e, item) => {
     try {
-      logAffClick({
-        id: item.id,
-        source: item.source,
-        path: location.pathname,
-        ts: Date.now(),
-      });
+      logAffClick({ id: item.id, source: item.source, path: location.pathname, ts: Date.now() });
     } catch {}
   };
 
-  // 審査中プレースホルダ（AdSlotは描画しない）
   const Placeholder = ({ minH = 250 }) => (
     <div className="card bg-base-100 shadow">
       <div className="card-body">
@@ -74,13 +57,11 @@ export default function RightAds({ items, slots = {} }) {
         <Placeholder minH={300} />
       )}
 
-      {/* アフィリエイト（キュレーション） */}
+      // （RightAds.jsx のアフィリエイト一覧部分のみ差し替え）
       {SHOW_AFF && effectiveItems.length > 0 && (
         <div className="card bg-base-100 shadow">
           <div className="card-body">
-            <div className="text-xs font-semibold text-base-content/70">
-              Sponsored
-            </div>
+            <div className="text-xs font-semibold text-base-content/70">Sponsored</div>
             <ul className="mt-2 space-y-3">
               {effectiveItems.map((item) => (
                 <li key={item.id}>
@@ -89,28 +70,35 @@ export default function RightAds({ items, slots = {} }) {
                     target="_blank"
                     rel="nofollow sponsored noopener"
                     onClick={(e) => handleAffClick(e, item)}
-                    className="flex items-center gap-3 hover:opacity-90 transition"
+                    className="block hover:opacity-90 transition"
                   >
                     {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-14 h-14 rounded-lg object-cover bg-base-200"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-14 h-14 rounded-lg bg-base-200" />
-                    )}
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium line-clamp-2">
-                        {item.title}
-                      </div>
-                      {item.badge && (
-                        <div className="badge badge-ghost badge-sm mt-1">
-                          {item.badge}
+                      // 画像あり：左56pxのサムネ枠＋テキストの2カラムで幅安定
+                      <div className="grid grid-cols-[3.5rem_1fr] gap-3 items-start">
+                        <figure className="w-14 h-14 grid place-items-center overflow-hidden">
+                          <img
+                            src={item.image}
+                            alt=""
+                            className="max-w-full max-h-full object-contain"
+                            loading="lazy"
+                          />
+                        </figure>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium line-clamp-2">{item.title}</div>
+                          {item.badge && (
+                            <div className="badge badge-ghost badge-sm mt-1">{item.badge}</div>
+                          )}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      // 画像なし：左詰めのテキストのみ（余白を作らない）
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium">{item.title}</div>
+                        {item.badge && (
+                          <div className="badge badge-ghost badge-sm mt-1">{item.badge}</div>
+                        )}
+                      </div>
+                    )}
                   </a>
                 </li>
               ))}
