@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
+    { "source": "/share/combos/:ids.png", "destination": "/api/og?ids=:ids" },
     { "source": "/share/combos/:ids", "destination": "/api/share-combos?ids=:ids" },
     { "source": "/(.*)", "destination": "/" }
   ]
