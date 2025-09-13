@@ -28,6 +28,7 @@ export default function Tool() {
     handleSelectCharacters,
     handleApply,       // 中央のインライン広告は従来通り adKey で更新
     handleShare,
+    handleShareX,
     suggestions,
     suggestionsBase,
     adKey,
@@ -92,6 +93,14 @@ export default function Tool() {
                 選手選択
               </button>
               <Button onClick={handleShare}>共有URL</Button>
+              <Button
+                className="gap-2"
+                onClick={handleShareX}
+                disabled={selectedCharacters.length !== 5}
+                title="選択5人・発動件数・共有URLをXに投稿"
+              >
+                Xで共有
+              </Button>
               <Button variant="outline" onClick={() => handleSelectCharacters([])}>選択クリア</Button>
             </div>
           </Row>
@@ -167,6 +176,9 @@ export default function Tool() {
 
       {/* スキル一覧 */}
       <Section title="発動するマッチスキル">
+        <p className="text-sm text-base-content/70 mb-5">
+          ※実際のマッチスキル数と異なり、間違っている場合があります。その場合は<a href="https://x.com/pwc_egoist" target="_brank" className="font-bold text-primary">Xアカウント</a>や<a href="/contact/" target="_brank" className="font-bold text-primary">お問い合わせフォーム</a>からご連絡頂けると幸いです。
+        </p>
         {pagedSkills.length === 0 ? (
           <div className="p-6 text-center border border-dashed border-base-300 rounded-xl text-sm text-base-content/70 bg-base-200/40">
             条件に一致するスキルがありません。<br />選手選択ボタンをクリックし、選択キャラを調整してください。
