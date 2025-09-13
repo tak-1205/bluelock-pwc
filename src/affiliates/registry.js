@@ -3,7 +3,7 @@ import { catalog } from "./catalog";
 
 export const picks = {
   // どのページにも適用される基本セット（何も見つからなかったときに使われる）
-  default: ["rak-2", "rak-5", "rak-6", "rak-7", "amz-1", "amz-2", "amz-3"],
+  default: ["rak-2", "rak-5", "rak-6", "rak-7", "rak-8", "amz-1", "amz-2", "amz-3"],
 
   // ページ別（完全一致 or 最長プレフィックス一致）
   byPath: {

@@ -44,7 +44,7 @@ export default function Home() {
                   これからコンテンツを順次追加予定です。
                 </p>
                 <p className="text-sm text-base-content/70">
-                  追加してほしい機能についてや、機能に不具合や間違いなどを見つけましたら、<a href="/contact/" className="font-bold">こちら</a>からご連絡ください。
+                  追加してほしい機能についてや、機能に不具合や間違いなどを見つけましたら、<a href="https://x.com/pwc_egoist" target="_brank" className="font-bold text-primary">Xアカウント</a>や<a href="/contact/" target="_brank" className="font-bold text-primary">お問い合わせフォーム</a>からご連絡ください。
                 </p>
               </div>
             </div>
@@ -70,7 +70,7 @@ export default function Home() {
                 <div className="card-body">
                   <h3 className="card-title">マッチスキル抽出ツール</h3>
                   <p className="text-sm text-base-content/70">
-                    キャラを選択すると即時に発動スキルを抽出。検索・並び替え・表示切替にも対応。
+                    キャラを選択すると即時に発動スキルと発動スキル数を抽出。
                   </p>
                   <div className="card-actions justify-end">
                     <Link to="/tool" className="btn btn-sm btn-primary">使ってみる</Link>
@@ -91,13 +91,13 @@ export default function Home() {
                 </figure>
                 <div className="card-body">
                   <h3 className="card-title">
-                    人気マッチスキル <span className="badge badge-ghost badge-sm">準備中</span>
+                    人気マッチスキル <span className="badge badge-ghost badge-sm">準備</span>
                   </h3>
                   <p className="text-sm text-base-content/70">
-                    よく使われる組み合わせを匿名集計で可視化。（近日公開）
+                    よく使われる組み合わせを集計し可視化。
                   </p>
                   <div className="card-actions justify-end">
-                    <button className="btn btn-sm btn-disabled">近日公開</button>
+                    <button className="btn btn-sm btn-disabled">準備</button>
                   </div>
                 </div>
               </div>
@@ -118,7 +118,7 @@ export default function Home() {
                     キャラ別一覧 <span className="badge badge-ghost badge-sm">準備中</span>
                   </h3>
                   <p className="text-sm text-base-content/70">
-                    キャラごとの発動スキルや相性をまとめて確認。（準備中）
+                    キャラごとの発動スキルを一覧表示。キャラの相性をまとめて確認。（準備中）
                   </p>
                   <div className="card-actions justify-end">
                     <button className="btn btn-sm btn-disabled">準備中</button>

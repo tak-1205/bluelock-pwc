@@ -48,13 +48,13 @@ export default function TwoColumnLayout({
             {mobileBrand ? (
               mobileBrand
             ) : (
-              <div className="flex items-center gap-2 px-4 py-3">
+              <div className="flex items-center gap-2">
                 <img
                   src="/images/icon.png"
                   alt="icon"
                   width={24}
                   height={24}
-                  className="block h-auto w-[24px] max-w-[24px]"
+                  className="block h-auto w-[64px] max-w-[64px]"
                 />
                 <span className="font-semibold">{mobileTitle}</span>
               </div>
@@ -81,7 +81,7 @@ export default function TwoColumnLayout({
         <aside className="min-h-full w-72 bg-base-200 border-r border-base-300">
             <a href="/">
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-base-300">
-                    <img src="/images/icon.png" alt="icon" width={24} height={24} />
+                    <img src="/images/icon.png" alt="icon" width={100} height={100} />
                     <span className="font-semibold">PWC EGOIST</span> 
                 </div>
             </a>

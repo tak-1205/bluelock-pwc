@@ -81,9 +81,17 @@ export const catalog /** @type {Record<string, AffItem>} */ = {
   "rak-7": {
     id: "rak-7",
     title: "【 ブルーロック 公式ライセンス商品 】フェイスタオル 漫画 キャラクター グッズ スポーツ 綿100% KOKKA コッカ 週間少年マガジン BLUELOCK",
-    url: "https://a.r10.to/h5dLBU",
+    url: "https://a.r10.to/h5dMKr",
     source: "rakuten",
     image: "https://hbb.afl.rakuten.co.jp/hgb/4c54b398.1cd87307.4c54b399.a5a2aa2f/?me_id=1333106&item_id=10001754&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fkokkaonlineshop%2Fcabinet%2F06291041%2F08790890%2Fbl-towel01-00.jpg%3F_ex%3D240x240&s=240x240&t=pict",
+    badge: "PR",
+  },
+  "rak-8": {
+    id: "rak-8",
+    title: "ブルーロックコレクションフィギュアリッチ ブシロードクリエイティブ 【全5種フルコンプセット＋DP台紙おまけ付き】 BLUELOCK COLLECTION FIGURE RICH グッズ フィギュア ガチャガチャ カプセルトイ【即納 在庫品】【数量限定】【フルコンプリート】",
+    url: "https://a.r10.to/hPvKJ3",
+    source: "rakuten",
+    image: "https://hbb.afl.rakuten.co.jp/hgb/4c5550bc.5228db1e.4c5550bd.4c1d6cef/?me_id=1238328&item_id=10044676&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fauc-treasuremarket%2Fcabinet%2Fphoto202304%2Fbluelockcfrichtop01.jpg%3F_ex%3D240x240&s=240x240&t=pict",
     badge: "PR",
   },
   
