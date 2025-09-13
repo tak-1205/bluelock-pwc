@@ -10,6 +10,9 @@ export default function RightAds({ items, slots = {} }) {
   const SHOW_ADS = import.meta.env.VITE_FEATURE_ADS === "on";
   const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "on";
   const location = useLocation();
+  const NOTHING_TO_SHOW = !SHOW_ADS && !SHOW_AFF;
+
+  if (NOTHING_TO_SHOW) return null; // ← 右カラムまるごと非表示（TwoColumnLayoutが2カラム化）
 
   const effectiveItems =
     items && items.length ? items : getAffiliateItemsForPath(location.pathname);
@@ -45,7 +48,7 @@ export default function RightAds({ items, slots = {} }) {
   return (
     <div className="space-y-4">
       {/* AdSense: 上段 */}
-      {SHOW_ADS && SLOT_TOP ? (
+      {SHOW_ADS && SLOT_TOP && (
         <div className="card bg-base-100 shadow">
           <div className="card-body">
             <div className="min-h-[300px]">
@@ -53,11 +56,8 @@ export default function RightAds({ items, slots = {} }) {
             </div>
           </div>
         </div>
-      ) : (
-        <Placeholder minH={300} />
       )}
 
-      // （RightAds.jsx のアフィリエイト一覧部分のみ差し替え）
       {SHOW_AFF && effectiveItems.length > 0 && (
         <div className="card bg-base-100 shadow">
           <div className="card-body">
@@ -108,7 +108,7 @@ export default function RightAds({ items, slots = {} }) {
       )}
 
       {/* AdSense: 中段 */}
-      {SHOW_ADS && SLOT_MID ? (
+      {SHOW_ADS && SLOT_MID && (
         <div className="card bg-base-100 shadow">
           <div className="card-body">
             <div className="min-h-[250px]">
@@ -116,12 +116,10 @@ export default function RightAds({ items, slots = {} }) {
             </div>
           </div>
         </div>
-      ) : (
-        <Placeholder minH={250} />
       )}
 
       {/* AdSense: 下段 */}
-      {SHOW_ADS && SLOT_BOTTOM ? (
+      {SHOW_ADS && SLOT_BOTTOM && (
         <div className="card bg-base-100 shadow">
           <div className="card-body">
             <div className="min-h-[250px]">
@@ -129,8 +127,6 @@ export default function RightAds({ items, slots = {} }) {
             </div>
           </div>
         </div>
-      ) : (
-        <Placeholder minH={250} />
       )}
     </div>
   );
