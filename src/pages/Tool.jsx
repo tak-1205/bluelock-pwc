@@ -1,5 +1,6 @@
 // src/pages/Tool.jsx
 import React, { useEffect, useRef } from "react";
+import SEO from "../components/SEO.jsx";
 import TwoColumnLayout from "../layouts/TwoColumnLayout.jsx";
 import SideMenu from "../layouts/SideMenu.jsx";
 import RightAds from "../layouts/RightAds.jsx";
@@ -68,7 +69,13 @@ export default function Tool() {
   }, [setViewMode, setSortKey, selectedCharacters]);
 
   return (
+    
     <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
+        <SEO
+        title="マッチスキル抽出ツール"
+        description="キャラ選択から発動スキルを即時抽出。並び替え・検索・入れ替え提案に対応。"
+        canonical="/tool"
+      />
       {/* コントロールパネル */}
       <Section>
         <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6 space-y-4">

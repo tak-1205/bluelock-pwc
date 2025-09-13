@@ -1,5 +1,6 @@
 // src/pages/Home.jsx
 import { Link } from "react-router-dom";
+import SEO from "../components/SEO.jsx";
 import TwoColumnLayout from "../layouts/TwoColumnLayout.jsx";
 import SideMenu from "../layouts/SideMenu.jsx";
 import RightAds from "../layouts/RightAds.jsx";
@@ -7,6 +8,13 @@ import RightAds from "../layouts/RightAds.jsx";
 export default function Home() {
   return (
     <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
+      <SEO
+        title="ホーム"
+        description="ブルーロックPWCのデータ・ツールを扱うPWC EGOIST。マッチスキル抽出などを提供。"
+        image="/images/kv2.png"
+        canonical="/"
+      />
+
       {/* Hero（画像はPCで右、SPで上） */}
       <section className="mx-auto max-w-5x">
 
