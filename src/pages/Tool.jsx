@@ -164,7 +164,11 @@ export default function Tool() {
             </ol>
             <div className="mt-3">
               <div className="text-xs text-base-content/60">
-                小技：<kbd className="kbd kbd-xs">/</kbd> 検索フォーカス、
+                キーボードで下記を押すと表示切り替えや並べ替え可能です。
+              </div>
+              <div className="text-xs text-base-content/60 mb-2">
+                小技：
+                <kbd className="kbd kbd-xs">/</kbd> 検索フォーカス、
                 <kbd className="kbd kbd-xs">G</kbd> 表示切替（グリッド/リスト）、
                 <kbd className="kbd kbd-xs">S</kbd> 並び替え切替。
               </div>
@@ -183,28 +187,48 @@ export default function Tool() {
       {/* コントロールパネル */}
       <Section>
         <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6 space-y-4">
-          <Row className="justify-between items-start gap-3 flex-wrap">
+          <Row className="gap-3 md:gap-4 flex-col md:flex-row md:items-start md:justify-between">
             <div className="text-sm text-base-content/70">
-              選択中: <strong>{selectedCharacters.length}</strong> 人  
+              選択中: <strong>{selectedCharacters.length}</strong> 人
             </div>
-            <div className="flex gap-2">
+          
+            {/* スマホ：2列グリッドで各ボタンをw-full / md以上：横並び */}
+            <div className="w-full md:w-auto grid grid-cols-2 gap-2 md:flex md:flex-wrap md:gap-2">
               <button
                 type="button"
-                className="btn btn-info"
+                className="btn btn-info btn-sm md:btn-md w-full md:w-auto"
                 onClick={() => selectorDialogRef.current?.showModal()}
+                aria-label="選手選択"
               >
                 選手選択
               </button>
-              <Button onClick={handleShare}>共有URL</Button>
+
               <Button
-                className="gap-2"
+                variant="outline"
+                onClick={() => handleSelectCharacters([])}
+                className="btn btn-sm md:btn-md w-full md:w-auto"
+                title="選択をクリア"
+              >
+                選択クリア
+              </Button>
+          
+              <Button
+                onClick={handleShare}
+                className="btn btn-sm md:btn-md w-full md:w-auto"
+                title="共有用URLをコピー"
+              >
+                共有URL
+              </Button>
+          
+              <Button
+                className="btn btn-sm md:btn-md w-full md:w-auto gap-2"
                 onClick={handleShareX}
                 disabled={selectedCharacters.length !== 5}
                 title="選択5人・発動件数・共有URLをXに投稿"
               >
                 Xで共有
               </Button>
-              <Button variant="outline" onClick={() => handleSelectCharacters([])}>選択クリア</Button>
+          
             </div>
           </Row>
 
