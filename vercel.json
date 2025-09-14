@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/og.js": { "runtime": "edge" },
+    "api/og.jsx": { "runtime": "edge" },
     "api/share-combos.js": { "runtime": "edge" }
   },
   "cleanUrls": true,
