@@ -4,11 +4,13 @@ import SEO from "../components/SEO.jsx";
 import TwoColumnLayout from "../layouts/TwoColumnLayout.jsx";
 import SideMenu from "../layouts/SideMenu.jsx";
 import RightAds from "../layouts/RightAds.jsx";
+import PageHeader from "../components/PageHeader.jsx";
 
 export default function Privacy() {
   return (
     <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
       <SEO title="プライバシーポリシー" canonical="/privacy" />
+      <PageHeader title="プライバシーポリシー" />
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body">
           <h1 className="card-title text-2xl md:text-3xl">プライバシーポリシー</h1>

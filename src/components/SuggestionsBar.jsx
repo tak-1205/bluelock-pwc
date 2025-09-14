@@ -1,5 +1,7 @@
 // src/components/SuggestionsBar.jsx
 import { buildImageCandidates, makeImageFallbackHandler } from "../lib/imagePath";
+import { Link } from "react-router-dom";
+
 
 export default function SuggestionsBar({ items, baseScore }) {
   if (!items || !items.length) return null;
@@ -55,9 +57,9 @@ export default function SuggestionsBar({ items, baseScore }) {
         const deltaClass = delta > 0 ? "text-success" : delta < 0 ? "text-error" : "text-base-content/60";
 
         return (
-          <a
+          <Link
             key={it.ids.join("-")}
-            href={`/?ids=${encodeIds(it.ids)}`}
+            to={`/tool?ids=${encodeIds(it.ids)}`}
             className="min-w-60 rounded-xl border p-3 hover:bg-base-100 transition"
             title="この組み合わせを開く"
           >
@@ -73,7 +75,7 @@ export default function SuggestionsBar({ items, baseScore }) {
               </span>
             </div>
 
-          </a>
+          </Link>
         );
       })}
     </div>

@@ -1,5 +1,8 @@
 // src/pages/Tool.jsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+
+import PageHeader from "../components/PageHeader.jsx";
 import SEO from "../components/SEO.jsx";
 import TwoColumnLayout from "../layouts/TwoColumnLayout.jsx";
 import SideMenu from "../layouts/SideMenu.jsx";
@@ -17,7 +20,11 @@ import { triggerAdsRefresh } from "../lib/adBus.js"; // ★ 右カラム更新�
 import { buildImageCandidates, makeImageFallbackHandler } from "../lib/imagePath";
 
 export default function Tool() {
+  // ★ まず最初に宣言（これより前で参照しない）
   const selectorDialogRef = useRef(null);
+  const location = useLocation();
+  const lastAppliedIdsRef = useRef("");     // 直近に処理した署名
+  const pendingApplySigRef = useRef("");    // state反映後に apply するための署名
 
   const {
     matchSkills,
@@ -25,6 +32,7 @@ export default function Tool() {
     setSelectedCharacters,
     selectedSet,
     selectedCanonicalSet,
+    selectedIds,
     handleSelectCharacters,
     handleApply,       // 中央のインライン広告は従来通り adKey で更新
     handleShare,
@@ -35,6 +43,8 @@ export default function Tool() {
     getCharacterById,
     SHOW_AFF,         // 中央のPRレールは今回使わないがフラグは保持
   } = useToolCore();
+  // ↑ 既存の分割に含まれていない場合は、下記のように selectedIds も受け取ってください
+  // const { ..., selectedIds, ... } = useToolCore();
 
   const pipeline = useSkillsPipeline({ matchSkills, selectedSet, selectedCanonicalSet });
   const {
@@ -69,14 +79,107 @@ export default function Tool() {
     return () => window.removeEventListener("keydown", onKey);
   }, [setViewMode, setSortKey, selectedCharacters]);
 
+  // /tool?ids=... を「ペイント前」に適用（ID→オブジェクト配列に変換して選択のみ反映）
+  useLayoutEffect(() => {
+    const params = new URLSearchParams(location.search || "");
+    const b64 = params.get("ids");
+    if (!b64) return;
+
+    // useToolCore と同じデコード（URL-safe Base64 も許容）
+    const decodeB64Json = (b) => {
+      const norm = b.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(b.length / 4) * 4, "=");
+      // JSONは encodeURIComponent でエンコードされている前提
+      return JSON.parse(decodeURIComponent(escape(atob(norm))));
+    };
+
+    try {
+      const arr = decodeB64Json(b64);
+      if (!Array.isArray(arr)) return;
+
+      // 文字列化＋空要素除去＋重複排除
+      const uniqIds = Array.from(new Set(arr.map((x) => String(x)).filter(Boolean)));
+      if (!uniqIds.length) return;
+
+      // ★ ID配列 → キャラ“オブジェクト配列”へ（ここが重要！）
+      const next = uniqIds.map((id) => getCharacterById?.(id)).filter(Boolean);
+      if (!next.length) return;
+
+      const signature = next.map((c) => c.id).join(",");
+      if (signature === lastAppliedIdsRef.current) return; // 同一ならスキップ
+      lastAppliedIdsRef.current = signature;
+
+      // 先に選択だけ反映。apply は state 反映後に別エフェクトで実行
+      pendingApplySigRef.current = signature;
+      handleSelectCharacters(next);
+    } catch {
+      /* 破損クエリは無視 */
+    }
+  }, [location.search, getCharacterById, handleSelectCharacters]);
+
+  useEffect(() => {
+    if (!selectedIds || selectedIds.length === 0) return;
+    const sig = selectedIds.join(",");
+    if (pendingApplySigRef.current && pendingApplySigRef.current === sig) {
+      pendingApplySigRef.current = "";
+      handleApply();
+    }
+  }, [selectedIds, handleApply]);
+
   return (
     
     <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
-        <SEO
+      <SEO
         title="マッチスキル抽出ツール"
         description="キャラ選択から発動スキルを即時抽出。並び替え・検索・入れ替え提案に対応。"
         canonical="/tool"
       />
+      <PageHeader
+        title="マッチスキル抽出ツール"
+        subtitle="キャラを選ぶだけで、発動するマッチスキルが分かります。入れ替え提案や共有にも対応。"
+      />
+      {/* 使い方ガイド */}
+      <Section>
+        <details className="collapse collapse-arrow bg-base-100 border border-base-300 rounded-box shadow-sm">
+          <summary className="collapse-title text-base font-semibold">
+            マッチスキル抽出ツールの使い方（かんたんガイド）
+          </summary>
+          <div className="collapse-content text-sm text-base-content/80 leading-relaxed">
+            <ol className="list-decimal pl-5 space-y-1">
+              <li>
+                <span className="font-medium">「選手選択」</span>を押し、モーダルでキャラを最大5人選んで
+                <span className="font-medium">「検索」</span>。
+              </li>
+              <li>
+                中央の「<span className="font-medium">発動するマッチスキル</span>」に結果が表示されます。
+                バッジの<span className="font-medium">対象</span>/<span className="font-medium">発動者</span>は一致数です。
+              </li>
+              <li>
+                下の「<span className="font-medium">似た組み合わせの提案</span>」をタップすると、
+                その組み合わせでこのページ（<code>/tool</code>）に切り替わります（<span className="font-medium">＋/−</span>は発動数の増減）。
+              </li>
+              <li>
+                共有は「<span className="font-medium">共有URL</span>」でURLコピー、
+                <span className="font-medium">Xで共有</span>は5人選択時に有効です。
+              </li>
+            </ol>
+            <div className="mt-3">
+              <div className="text-xs text-base-content/60">
+                小技：<kbd className="kbd kbd-xs">/</kbd> 検索フォーカス、
+                <kbd className="kbd kbd-xs">G</kbd> 表示切替（グリッド/リスト）、
+                <kbd className="kbd kbd-xs">S</kbd> 並び替え切替。
+              </div>
+              <div className="text-xs text-base-content/60 mt-1">
+                データの誤りや改善提案は
+                <a href="https://x.com/pwc_egoist" target="_blank" className="link link-primary mx-1">Xアカウント</a>
+                または
+                <a href="/contact/" className="link link-primary mx-1">お問い合わせ</a>
+                からお知らせください。
+              </div>
+            </div>
+          </div>
+        </details>
+      </Section>
+
       {/* コントロールパネル */}
       <Section>
         <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6 space-y-4">
@@ -102,6 +205,32 @@ export default function Tool() {
                 Xで共有
               </Button>
               <Button variant="outline" onClick={() => handleSelectCharacters([])}>選択クリア</Button>
+            </div>
+          </Row>
+
+          {/* 検索ボックス（/ でフォーカス） */}
+          <Row className="items-center gap-3 flex-wrap">
+            <div className="w-full md:w-auto">
+              <div className="join w-full md:w-96">
+                <input
+                  id="global-search"
+                  type="search"
+                  className="input input-bordered input-sm md:input-md join-item w-full"
+                  placeholder="スキル名・効果を検索"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                {query && (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm md:btn-md join-item"
+                    onClick={() => setQuery("")}
+                    aria-label="検索条件をクリア"
+                  >
+                    クリア
+                  </button>
+                )}
+              </div>
             </div>
           </Row>
 
@@ -137,6 +266,9 @@ export default function Tool() {
             {/* 提案 */}
             <div className="divider"></div>
             <Section title="似た組み合わせの提案（1人入れ替え）">
+                <p className="text-sm text-base-content/70 mb-5">
+                  提案内容をクリックすると、入れ替え後の発動マッチスキルを確認できます。
+                </p>
                 <SuggestionsBar items={suggestions} baseScore={suggestionsBase} />
             </Section>
 
