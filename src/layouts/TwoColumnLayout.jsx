@@ -49,16 +49,18 @@ export default function TwoColumnLayout({
             {mobileBrand ? (
               mobileBrand
             ) : (
-              <div className="flex items-center gap-2">
-                <img
-                  src="/images/icon.png"
-                  alt="icon"
-                  width={24}
-                  height={24}
-                  className="block h-auto w-[64px] max-w-[64px]"
-                />
-                <span className="font-semibold">{mobileTitle}</span>
-              </div>
+              <a href="/">
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/images/icon.png"
+                    alt="icon"
+                    width={24}
+                    height={24}
+                    className="block h-auto w-[64px] max-w-[64px]"
+                  />
+                  <span className="font-semibold">{mobileTitle}</span>
+                </div>
+              </a>
             )}
           </div>
         </div>

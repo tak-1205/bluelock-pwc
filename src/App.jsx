@@ -1,6 +1,7 @@
 // src/App.jsx
 import React from "react";
 import { useLocation } from "react-router-dom";
+import ScrollManager from "./components/ScrollManager.jsx";
 
 // ページ
 import Home from "./pages/Home.jsx";
@@ -14,13 +15,19 @@ export default function App() {
   const location = useLocation();
   const path = (location.pathname || "/").replace(/\/+$/, "") || "/";
 
-  if (path === "/character" || path.startsWith("/character/")) return <Character />;
-  if (path === "/privacy") return <Privacy />;
-  if (path === "/ranking") return <Ranking />;
-  if (path === "/") return <Home />;
-  if (path === "/tool") return <Tool />;
-  if (path === "/contact") return <Contact />;
+  let Page = Tool;
+  if (path === "/character" || path.startsWith("/character/")) Page = Character;
+  else if (path === "/privacy") Page = Privacy;
+  else if (path === "/ranking") Page = Ranking;
+  else if (path === "/") Page = Home;
+  else if (path === "/tool") Page = Tool;
+  else if (path === "/contact") Page = Contact;
 
-  // それ以外のパスに来たら /tool を表示（従来の挙動が「その他→ツール本体」の場合）
-  return <Tool />;
+  // ScrollManager を常に一緒に描画
+  return (
+    <>
+      <ScrollManager />
+      <Page />
+    </>
+  );
 }
