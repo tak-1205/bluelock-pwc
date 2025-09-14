@@ -1,4 +1,7 @@
 {
+  "functions": {
+    "api/og.jsx": { "runtime": "edge" }
+  },
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
