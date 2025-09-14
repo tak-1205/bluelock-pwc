@@ -130,21 +130,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 注意書き */}
-        <p className="mt-10 text-xs text-base-content/60">
-          ※本サイトは非公式のファンメイドサイトです。原作・各権利者とは関係ありません。
-        </p>
       </section>
       
-
-      {/* フッター（DaisyUI footer） */}
-      <footer className="footer bg-base-200 rounded-box p-4 mt-6 text-sm text-base-content/70">
-        <div className="mx-auto w-full max-w-5xl flex items-center justify-between">
-          <span>© {new Date().getFullYear()} pwc-egoist</span>
-          <Link to="/privacy" className="link link-hover">プライバシー</Link>
-          <Link to="/contact" className="link link-hover">お問い合わせ</Link>
-        </div>
-      </footer>
     </TwoColumnLayout>
   );
 }

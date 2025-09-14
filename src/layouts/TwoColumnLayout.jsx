@@ -1,5 +1,6 @@
 // src/layouts/TwoColumnLayout.jsx
 import React from "react";
+import SiteFooter from "./SiteFooter.jsx";
 // （必要なら）import { Link } from "react-router-dom"; // ロゴをリンク化したいとき用
 
 export default function TwoColumnLayout({
@@ -65,14 +66,27 @@ export default function TwoColumnLayout({
         {/* コンテンツ領域（中央＋右の2カラム） */}
         <div className="px-4 md:px-6 py-6">
           <div className={`grid gap-6 ${hasRight ? "xl:grid-cols-[minmax(0,1fr)_20rem]" : ""}`}>
-            <main className="min-w-0">{children}</main>
-            {hasRight && (
-              <aside className={`hidden xl:block sticky ${stickyTopClass} self-start space-y-4`}>
-                {right}
-              </aside>
-            )}
-          </div>
+           <main className="min-w-0">
+             {children}
+             {hasRight && (
+               // モバイル/タブレット：本文の下にインライン表示 
+               <div className="mt-6 xl:hidden">
+                 {right}
+               </div>
+             )}
+           </main>
+
+           {hasRight && (
+             // デスクトップ：右レール表示（従来） 
+             <aside className={`hidden xl:block sticky ${stickyTopClass} self-start space-y-4`}>
+               {right}
+             </aside>
+           )}
+         </div>
         </div>
+
+        {/* 共通フッター（全体幅） */}
+        <SiteFooter />
       </div>
 
       {/* 左：メニュー（drawer-side）—ここはそのまま。統一したい場合は同様に PWC EGOIST に変更可 */}
