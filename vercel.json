@@ -1,18 +1,8 @@
 {
-  "functions": {
-    "api/og.jsx": { "runtime": "edge" },
-    "api/share-combos.js": { "runtime": "edge" }
-  },
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/images/(.*)", "destination": "/images/$1" },
-
-    { "source": "/share/combos/:ids.png", "destination": "/api/og?ids=:ids" },
-    { "source": "/share/combos/:ids", "destination": "/api/share-combos?ids=:ids" },
-
-    { "source": "/(favicon.ico|robots.txt|sitemap.xml)", "destination": "/$1" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
