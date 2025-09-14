@@ -61,14 +61,14 @@ export default function Home() {
                 <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
                   <img
                     src="/images/matchskill_img.png"
-                    alt="マッチスキル抽出ツール"
+                    alt="チーム編成作成ツール"
                     className="max-h-full max-w-full object-contain"
                     loading="lazy"
                     onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
                   />
                 </figure>
                 <div className="card-body">
-                  <h3 className="card-title">マッチスキル抽出ツール</h3>
+                  <h3 className="card-title">チーム編成作成ツール</h3>
                   <p className="text-sm text-base-content/70">
                     キャラを選択すると即時に発動スキルと発動スキル数を抽出。
                   </p>
@@ -83,7 +83,7 @@ export default function Home() {
                 <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
                   <img
                     src="/images/feature-ranking.png"
-                    alt="人気マッチスキル"
+                    alt="人気チーム編成"
                     className="max-h-full max-w-full object-contain"
                     loading="lazy"
                     onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
@@ -91,7 +91,7 @@ export default function Home() {
                 </figure>
                 <div className="card-body">
                   <h3 className="card-title">
-                    人気マッチスキル <span className="badge badge-ghost badge-sm">準備</span>
+                    人気チーム編成 <span className="badge badge-ghost badge-sm">準備</span>
                   </h3>
                   <p className="text-sm text-base-content/70">
                     よく使われる組み合わせを集計し可視化。

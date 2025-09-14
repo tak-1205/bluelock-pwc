@@ -30,13 +30,13 @@ export default function SideMenu({ prepend = null, append = null, children = nul
 
         <li className={liClass}>
           <NavLink to="/tool" className={({ isActive }) => (isActive ? "active" : "")}>
-            マッチスキル抽出
+            チーム編成作成ツール
           </NavLink>
         </li>
 
         {/* 準備中（非リンク表示） */}
         <li className={liClass}>
-          <Pending label="人気マッチスキル" />
+          <Pending label="人気チーム編成ランキング" />
         </li>
         <li className={liClass}>
           <Pending label="キャラ別一覧" />

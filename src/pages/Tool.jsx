@@ -129,21 +129,22 @@ export default function Tool() {
     
     <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
       <SEO
-        title="マッチスキル抽出ツール"
+        title="チーム編成作成ツール"
         description="キャラ選択から発動スキルを即時抽出。並び替え・検索・入れ替え提案に対応。"
         canonical="/tool"
       />
       <PageHeader
-        title="マッチスキル抽出ツール"
+        title="チーム編成作成ツール"
         subtitle="キャラを選ぶだけで、発動するマッチスキルが分かります。入れ替え提案や共有にも対応。"
       />
-      {/* 使い方ガイド */}
-      <Section>
-        <details className="collapse collapse-arrow bg-base-100 border border-base-300 rounded-box shadow-sm">
-          <summary className="collapse-title text-base font-semibold">
-            マッチスキル抽出ツールの使い方（かんたんガイド）
-          </summary>
-          <div className="collapse-content text-sm text-base-content/80 leading-relaxed">
+     {/* 使い方（ガイド） */}
+     <Section title="使い方">
+       <div className="bg-base-100 rounded-box border border-base-300 shadow-sm">
+         <details className="collapse collapse-arrow">
+           <summary className="collapse-title text-base font-semibold">
+             チーム編成作成ツールの使い方（かんたんガイド）
+           </summary>
+           <div className="collapse-content text-sm text-base-content/80 leading-relaxed">
             <ol className="list-decimal pl-5 space-y-1">
               <li>
                 <span className="font-medium">「選手選択」</span>を押し、モーダルでキャラを最大5人選んで
@@ -182,11 +183,12 @@ export default function Tool() {
             </div>
           </div>
         </details>
+       </div>
       </Section>
 
-      {/* コントロールパネル */}
-      <Section>
-        <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6 space-y-4">
+     {/* 操作（コントロールパネル） */}
+     <Section title="ツール">
+        <div className="bg-base-100 rounded-box shadow-sm p-2 md:p-6 space-y-4">
           <Row className="gap-3 md:gap-4 flex-col md:flex-row md:items-start md:justify-between">
             <div className="text-sm text-base-content/70">
               選択中: <strong>{selectedCharacters.length}</strong> 人
@@ -258,11 +260,11 @@ export default function Tool() {
             </div>
           </Row>
 
-            {/* 選択中プレビュー（アイコン） */}
-            {selectedCharacters.length > 0 && (
-            <div className="mt-2">
-                <Section title="選択したキャラ">
-                    <div className="flex flex-wrap gap-2">
+         {/* 選択中（プレビュー） */}
+         {selectedCharacters.length > 0 && (
+           <Section title="選択したキャラ">
+             <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6">
+               <div className="flex flex-wrap gap-2">
                     {selectedCharacters.map((c) => {
                         const candidates = buildImageCandidates(c.id);
                         const initialSrc = candidates[0];
@@ -283,18 +285,19 @@ export default function Tool() {
                         );
                     })}
                     </div>
-                </Section>
-            </div>
+                </div>
+            </Section>
             )}
 
-            {/* 提案 */}
-            <div className="divider"></div>
-            <Section title="似た組み合わせの提案（1人入れ替え）">
-                <p className="text-sm text-base-content/70 mb-5">
-                  提案内容をクリックすると、入れ替え後の発動マッチスキルを確認できます。
-                </p>
-                <SuggestionsBar items={suggestions} baseScore={suggestionsBase} />
-            </Section>
+       {/* 提案 */}
+       <Section title="似た組み合わせのチーム編成提案">
+         <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6 space-y-3">
+           <p className="text-sm text-base-content/70">
+             提案をクリックすると、その組み合わせで結果に切り替わります（＋/− は発動数の増減）。
+           </p>
+           <SuggestionsBar items={suggestions} baseScore={suggestionsBase} />
+         </div>
+       </Section>
 
           {/* モーダル：選手選択 */}
           <dialog ref={selectorDialogRef} className="modal">
@@ -330,65 +333,67 @@ export default function Tool() {
         </div>
       </Section>
 
-      {/* スキル一覧 */}
-      <Section title="発動するマッチスキル">
-        <p className="text-sm text-base-content/70 mb-5">
-          ※実際のマッチスキル数と異なり、間違っている場合があります。その場合は<a href="https://x.com/pwc_egoist" target="_brank" className="font-bold text-primary">Xアカウント</a>や<a href="/contact/" target="_brank" className="font-bold text-primary">お問い合わせフォーム</a>からご連絡頂けると幸いです。
-        </p>
-        {pagedSkills.length === 0 ? (
-          <div className="p-6 text-center border border-dashed border-base-300 rounded-xl text-sm text-base-content/70 bg-base-200/40">
-            条件に一致するスキルがありません。<br />選手選択ボタンをクリックし、選択キャラを調整してください。
-          </div>
-        ) : (
-          <>
-            <div className="text-m text-base-content/70 mb-2">
-                マッチスキル数: <strong>{resultCount}</strong> 件
+       {/* 結果（スキル一覧） */}
+       <Section title="発動するマッチスキル">
+         <div className="bg-base-100 rounded-box shadow-sm p-2 md:p-6 space-y-4">
+          <p className="text-sm text-base-content/70 mb-5">
+            ※表示されるマッチスキルが間違っている場合があります。その場合は<a href="https://x.com/pwc_egoist" target="_brank" className="font-bold text-primary">Xアカウント</a>や<a href="/contact/" target="_brank" className="font-bold text-primary">お問い合わせフォーム</a>からご連絡頂けると幸いです。
+          </p>
+          {pagedSkills.length === 0 ? (
+            <div className="p-6 text-center border border-dashed border-base-300 rounded-xl text-sm text-base-content/70 bg-base-200/40">
+              条件に一致するスキルがありません。<br />選手選択ボタンをクリックし、選択キャラを調整してください。
             </div>
-              <ul
-                className={[
-                  "p-0 m-0 list-none",
-                  viewMode === "grid"
-                    ? [
-                        // ★ PCは常に2カラムに固定（md/ lg/ xl すべて2）
-                        "grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 items-stretch",
-                        // 子 <li> の等高・はみ出し防止
-                        "[&>li]:min-w-0 [&>li]:h-full",
-                        "[&>li_.card]:h-full",
-                        // ★ モバイルだけコンパクト（md以上は“元の見た目”寄りに戻す）
-                        "[&>li]:text-[13px] md:[&>li]:text-base",
-                        "[&>li_.card-body]:p-2 md:[&>li_.card-body]:p-6",
-                        "[&>li_.card-title]:text-sm md:[&>li_.card-title]:text-base",
-                        "[&>li_.badge]:scale-90 md:[&>li_.badge]:scale-100",
-                        // サムネ（SkillCardの .avatar 構造想定）
-                        "[&>li_.avatar>div]:w-8 [&>li_.avatar>div]:h-8 md:[&>li_.avatar>div]:w-16 md:[&>li_.avatar>div]:h-16",
-                        "[&>li_img]:max-w-full [&>li_img]:h-auto [&>li_img]:object-contain",
-                      ].join(" ")
-                    : "flex flex-col gap-3",
-                ].join(" ")}
-              >
-              {pagedSkills.map((s, i) => (
-                <React.Fragment key={`${s.name}-${i}`}>
-                  {/* SkillCard 側が <li class="card ..."> を返す想定なので、外側で <li> を作らない */}
-                  <SkillCard s={s} getCharacterById={getCharacterById} showIds={showIds} />
-                  {import.meta.env.VITE_FEATURE_ADS === "on" && (i + 1) % 6 === 0 && (
-                    // ★ グリッドが常に2列なので、広告は常に2列ぶち抜き
-                    <li className="list-none col-span-2">
-                      <AdSlot slot={import.meta.env.VITE_AD_SLOT_INLINE || ""} adKey={adKey} />
-                    </li>
-                  )}
-                </React.Fragment>
-              ))}
-            </ul>
-
-            {canShowMore && (
-              <div className="mt-6 flex justify-center">
-                <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
-                  さらに表示
-                </Button>
+          ) : (
+            <>
+              <div className="text-m text-base-content/70 mb-2">
+                  マッチスキル数: <strong>{resultCount}</strong> 件
               </div>
-            )}
-          </>
-        )}
+                <ul
+                  className={[
+                    "p-0 m-0 list-none",
+                    viewMode === "grid"
+                      ? [
+                          // ★ PCは常に2カラムに固定（md/ lg/ xl すべて2）
+                          "grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 items-stretch",
+                          // 子 <li> の等高・はみ出し防止
+                          "[&>li]:min-w-0 [&>li]:h-full",
+                          "[&>li_.card]:h-full",
+                          // ★ モバイルだけコンパクト（md以上は“元の見た目”寄りに戻す）
+                          "[&>li]:text-[13px] md:[&>li]:text-base",
+                          "[&>li_.card-body]:p-2 md:[&>li_.card-body]:p-6",
+                          "[&>li_.card-title]:text-sm md:[&>li_.card-title]:text-base",
+                          "[&>li_.badge]:scale-90 md:[&>li_.badge]:scale-100",
+                          // サムネ（SkillCardの .avatar 構造想定）
+                          "[&>li_.avatar>div]:w-8 [&>li_.avatar>div]:h-8 md:[&>li_.avatar>div]:w-16 md:[&>li_.avatar>div]:h-16",
+                          "[&>li_img]:max-w-full [&>li_img]:h-auto [&>li_img]:object-contain",
+                        ].join(" ")
+                      : "flex flex-col gap-3",
+                  ].join(" ")}
+                >
+                {pagedSkills.map((s, i) => (
+                  <React.Fragment key={`${s.name}-${i}`}>
+                    {/* SkillCard 側が <li class="card ..."> を返す想定なので、外側で <li> を作らない */}
+                    <SkillCard s={s} getCharacterById={getCharacterById} showIds={showIds} />
+                    {import.meta.env.VITE_FEATURE_ADS === "on" && (i + 1) % 6 === 0 && (
+                      // ★ グリッドが常に2列なので、広告は常に2列ぶち抜き
+                      <li className="list-none col-span-2">
+                        <AdSlot slot={import.meta.env.VITE_AD_SLOT_INLINE || ""} adKey={adKey} />
+                      </li>
+                    )}
+                  </React.Fragment>
+                ))}
+              </ul>
+
+              {canShowMore && (
+                <div className="mt-6 flex justify-center">
+                  <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
+                    さらに表示
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </Section>
     </TwoColumnLayout>
   );

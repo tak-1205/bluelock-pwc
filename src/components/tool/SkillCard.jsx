@@ -43,7 +43,7 @@ export default function SkillCard({ s, getCharacterById, showIds }) {
           <h3 className="card-title text-base">{s.name}</h3>
           <div className="ms-auto flex items-center gap-2">
             <div className="badge badge-info badge-outline">対象 {targets.length}</div>
-            <div className="badge badge-success badge-outline">発動者 {activators.length}</div>
+            <div className="badge badge-success badge-outline">発動 {activators.length}</div>
           </div>
         </div>
         <div className="text-sm text-base-content/80">
