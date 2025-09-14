@@ -10,7 +10,7 @@ export default function SiteFooter() {
         <div className="px-4 py-10">
           {/* 注意書き */}
           <p className="text-xs text-base-content/60">
-            ※本サイトは非公式のファンメイドサイトです。原作・各権利者とは関係ありません。
+            ※本サイトは個人運営のサイトです。原作・各権利者とは関係ありません。
           </p>
 
           {/* リンク */}

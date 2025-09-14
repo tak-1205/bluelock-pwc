@@ -185,25 +185,41 @@ export default function Tool() {
           </div>
         ) : (
           <>
-            <div className="text-sm text-base-content/70">
-                ヒット: <strong>{resultCount}</strong> 件
+            <div className="text-m text-base-content/70 mb-2">
+                マッチスキル数: <strong>{resultCount}</strong> 件
             </div>
-            <ul
-            className={[
-                "p-0 m-0 list-none",
-                viewMode === "grid"
-                ? "grid gap-4 md:grid-cols-2"     // 横型カードを2列で並べる
-                : "flex flex-col gap-3",           // リストは縦積み
-            ].join(" ")}
-            >
+              <ul
+                className={[
+                  "p-0 m-0 list-none",
+                  viewMode === "grid"
+                    ? [
+                        // ★ PCは常に2カラムに固定（md/ lg/ xl すべて2）
+                        "grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 items-stretch",
+                        // 子 <li> の等高・はみ出し防止
+                        "[&>li]:min-w-0 [&>li]:h-full",
+                        "[&>li_.card]:h-full",
+                        // ★ モバイルだけコンパクト（md以上は“元の見た目”寄りに戻す）
+                        "[&>li]:text-[13px] md:[&>li]:text-base",
+                        "[&>li_.card-body]:p-2 md:[&>li_.card-body]:p-6",
+                        "[&>li_.card-title]:text-sm md:[&>li_.card-title]:text-base",
+                        "[&>li_.badge]:scale-90 md:[&>li_.badge]:scale-100",
+                        // サムネ（SkillCardの .avatar 構造想定）
+                        "[&>li_.avatar>div]:w-8 [&>li_.avatar>div]:h-8 md:[&>li_.avatar>div]:w-16 md:[&>li_.avatar>div]:h-16",
+                        "[&>li_img]:max-w-full [&>li_img]:h-auto [&>li_img]:object-contain",
+                      ].join(" ")
+                    : "flex flex-col gap-3",
+                ].join(" ")}
+              >
               {pagedSkills.map((s, i) => (
                 <React.Fragment key={`${s.name}-${i}`}>
-                <SkillCard s={s} getCharacterById={getCharacterById} showIds={showIds} />
-                    {import.meta.env.VITE_FEATURE_ADS === "on" && (i + 1) % 6 === 0 && (
-                        <li className="list-none md:col-span-2">
-                        <AdSlot slot={import.meta.env.VITE_AD_SLOT_INLINE || ""} adKey={adKey} />
-                        </li>
-                    )}
+                  {/* SkillCard 側が <li class="card ..."> を返す想定なので、外側で <li> を作らない */}
+                  <SkillCard s={s} getCharacterById={getCharacterById} showIds={showIds} />
+                  {import.meta.env.VITE_FEATURE_ADS === "on" && (i + 1) % 6 === 0 && (
+                    // ★ グリッドが常に2列なので、広告は常に2列ぶち抜き
+                    <li className="list-none col-span-2">
+                      <AdSlot slot={import.meta.env.VITE_AD_SLOT_INLINE || ""} adKey={adKey} />
+                    </li>
+                  )}
                 </React.Fragment>
               ))}
             </ul>
