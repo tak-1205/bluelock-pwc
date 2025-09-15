@@ -36,10 +36,13 @@ export default function AffiliateRail({ items }) {
             {it.image && (
               <figure className="w-full h-28 grid place-items-center overflow-hidden p-2">
                 <img
-                  src={it.image}
-                  alt=""
-                  className="max-w-full max-h-full object-contain"
-                  loading="lazy"
+                  src={item.image}
+                  alt={item.title}
+                  width={224}
+                  height={224}
+                  loading={index < 2 ? "eager" : "lazy"}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  referrerPolicy="no-referrer"
                 />
               </figure>
             )}
