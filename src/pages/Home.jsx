@@ -24,7 +24,7 @@ export default function Home() {
           <div className="w-full rounded-2xl aspect-[16/9]">
            <div className="w-full rounded-2xl aspect-[16/9]">
              <img
-               src="/images/mv.jpg"   {/* ← 実ファイル名に合わせて .jpg or .JPG に変更 */}
+               src="/images/mv.jpg"  
                alt="キービジュアル"
                className="w-full h-full object-cover"
                width="1920"
