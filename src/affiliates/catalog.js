@@ -43,7 +43,7 @@ export const catalog /** @type {Record<string, AffItem>} */ = {
     title: "ブルーロック（35）　描き下ろしカイザー・ネス・五十嵐日常着SDステッカー付き特装版 （講談社キャラクターズA） [ 金城 宗幸 ]",
     url: "https://a.r10.to/hPKk5d",
     source: "rakuten",
-    image: "https://hbb.afl.rakuten.co.jp/hgb/4c53dbaf.6fa42252.4c53dbb0.6b894b9a/?me_id=1213310&item_id=21670279&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fbook%2Fcabinet%2F3679%2F9784065403679.jpg%3F_ex%3D240x240&s=240x240&t=pict",
+    image: "../images/placeholder.png",
     badge: "PR",
   },
   "rak-3": {
