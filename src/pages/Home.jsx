@@ -18,18 +18,36 @@ export default function Home() {
       {/* Hero（画像はPCで右、SPで上） */}
       <section className="mx-auto max-w-5x">
 
-        {/* ビジュアルバナー（横長） */}
-        <div className="container mx-auto mt-2">
-          <div className="rounded-2xl overflow-hidden bg-base-200">
-            <img
-              src="/images/mv.JPG"
-              alt="キービジュアル"
-              className="w-full h-48 md:h-64 object-cover rounded-2xl"
-              loading="lazy"
-              decoding="async"
-            />
+      {/* ビジュアルバナー（横長）：CLS回避のためアスペクトを予約 + 多フォーマット */}
+      <div className="container mx-auto mt-2">
+        <div className="rounded-2xl overflow-hidden bg-base-200">
+          <div className="w-full rounded-2xl aspect-[16/9]">
+            <picture>
+              {/* 先に AVIF / 次に WebP / 最後に JPG フォールバック */}
+              <source
+                type="image/avif"
+                srcSet="/images/mv-640.avif 640w, /images/mv-960.avif 960w, /images/mv-1280.avif 1280w, /images/mv-1920.avif 1920w"
+                sizes="100vw"
+              />
+              <source
+                type="image/webp"
+                srcSet="/images/mv-640.webp 640w, /images/mv-960.webp 960w, /images/mv-1280.webp 1280w, /images/mv-1920.webp 1920w"
+                sizes="100vw"
+              />
+              <img
+                src="/images/mv.JPG"
+                alt="キービジュアル"
+                className="w-full h-full object-cover"
+                width="1920"
+                height="1080"
+                fetchPriority="high"
+                decoding="async"
+                loading="eager"
+              />
+            </picture>
           </div>
         </div>
+      </div>
 
         {/* 追加：サイトの説明（幅を既存の container に合わせる） */}
         <section className="mt-6">
