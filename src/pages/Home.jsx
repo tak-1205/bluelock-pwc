@@ -21,14 +21,14 @@ export default function Home() {
       {/* ビジュアルバナー（横長）：CLS回避のためアスペクトを予約 + 多フォーマット */}
       <div className="container mx-auto mt-2">
         <div className="rounded-2xl overflow-hidden bg-base-200">
-          <div className="w-full rounded-2xl aspect-[16/9]">
-           <div className="w-full rounded-2xl aspect-[16/9]">
+          <div className="w-full rounded-2xl ">
+           <div className="w-full rounded-2xl ">
              <img
                src="/images/mv.jpg"  
                alt="キービジュアル"
                className="w-full h-full object-cover"
-               width="1920"
-               height="1080"
+               width="1500"
+               height="500"
                fetchPriority="high"
                decoding="async"
                loading="eager"
