@@ -5,22 +5,36 @@ import { suggestOneOffs } from "../utils/suggestOneOffs.js";
 import { countActivatedSkills } from "../utils/match.js";
 import { logCombo } from "../lib/logCombo.js";
 import useStabilizedAction from "../hooks/useStabilizedAction.js";
-import { characterList as characterListRaw } from "../data/characterList.js";
-import { matchSkills as matchSkillsRaw } from "../data/matchSkills.js"; // ← named import
+// データは初期描画後に取り込む（チャンク分離）
+// import は useEffect 内で動的に行う
 
 export default function useToolCore() {                       // ← default export
   // 共有URLから復元した直後かどうか
   const [restoredFromUrl, setRestoredFromUrl] = useState(false);
 
-  // ===== データ正規化 =====
+  const [raw, setRaw] = useState({ characters: [], skills: [] });
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const [{ characterList }, { matchSkills }] = await Promise.all([
+        import("../data/characterList.js"),
+        import("../data/matchSkills.js"),
+      ]);
+      if (!mounted) return;
+      setRaw({ characters: characterList || [], skills: matchSkills || [] });
+    })();
+    return () => { mounted = false; };
+  }, []);
+
   const characterList = useMemo(
-    () => (characterListRaw || []).map((c) => ({ ...c, id: normalizeId(c.id) })),
-    []
+    () => (raw.characters || []).map((c) => ({ ...c, id: normalizeId(c.id) })),
+    [raw.characters]
   );
 
   const matchSkills = useMemo(
     () =>
-      (matchSkillsRaw || []).map((s) => {
+      (raw.skills || []).map((s) => {
         // target1..5 → targets[] も持たせておく（下流の取り扱いを楽にする）
         const targets = [s.target1, s.target2, s.target3, s.target4, s.target5]
           .filter(Boolean)
@@ -41,7 +55,7 @@ export default function useToolCore() {                       // ← default exp
           activator5: normalizeId(s.activator5),
         };
       }),
-    []
+    [raw.skills]
   );
 
   // 参照マップ

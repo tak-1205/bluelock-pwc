@@ -42,6 +42,8 @@ export default function SuggestionsBar({ items, baseScore }) {
               title={idStr}
               onError={makeImageFallbackHandler(candidates)}
               loading="lazy"
+              width="40"
+              height="40"
             />
           </div>
         </div>

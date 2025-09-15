@@ -1,18 +1,19 @@
 // src/pages/Tool.jsx
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 import PageHeader from "../components/PageHeader.jsx";
 import SEO from "../components/SEO.jsx";
 import TwoColumnLayout from "../layouts/TwoColumnLayout.jsx";
 import SideMenu from "../layouts/SideMenu.jsx";
-import RightAds from "../layouts/RightAds.jsx";
+const RightAds = lazy(() => import("../layouts/RightAds.jsx"));
 
 import useToolCore from "../hooks/useToolCore.js";
 import useSkillsPipeline from "../hooks/useSkillsPipeline.js";
 
-import CharacterSelector from "../components/CharacterSelector.jsx";
-import SuggestionsBar from "../components/SuggestionsBar.jsx";
+const CharacterSelector = lazy(() => import("../components/CharacterSelector.jsx"));
+const SuggestionsBar = lazy(() => import("../components/SuggestionsBar.jsx"));
+
 import AdSlot from "../components/AdSlot.jsx";
 import SkillCard from "../components/tool/SkillCard.jsx";
 import { Row, Section, Select, Toggle, Button, Badge, Chip, Pill } from "../components/UiBits.jsx";
@@ -127,7 +128,7 @@ export default function Tool() {
 
   return (
     
-    <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
+    <TwoColumnLayout sidebar={<SideMenu />} right={<Suspense fallback={null}><RightAds /></Suspense>}>
       <SEO
         title="チーム編成作成ツール"
         description="キャラ選択から発動スキルを即時抽出。並び替え・検索・入れ替え提案に対応。"
@@ -137,54 +138,6 @@ export default function Tool() {
         title="チーム編成作成ツール"
         subtitle="キャラを選ぶだけで、発動するマッチスキルが分かります。入れ替え提案や共有にも対応。"
       />
-     {/* 使い方（ガイド） */}
-     <Section title="使い方">
-       <div className="bg-base-100 rounded-box border border-base-300 shadow-sm">
-         <details className="collapse collapse-arrow">
-           <summary className="collapse-title text-base font-semibold">
-             チーム編成作成ツールの使い方（かんたんガイド）
-           </summary>
-           <div className="collapse-content text-sm text-base-content/80 leading-relaxed">
-            <ol className="list-decimal pl-5 space-y-1">
-              <li>
-                <span className="font-medium">「選手選択」</span>を押し、モーダルでキャラを最大5人選んで
-                <span className="font-medium">「検索」</span>。
-              </li>
-              <li>
-                中央の「<span className="font-medium">発動するマッチスキル</span>」に結果が表示されます。
-                バッジの<span className="font-medium">対象</span>/<span className="font-medium">発動者</span>は一致数です。
-              </li>
-              <li>
-                下の「<span className="font-medium">似た組み合わせの提案</span>」をタップすると、
-                その組み合わせでこのページ（<code>/tool</code>）に切り替わります（<span className="font-medium">＋/−</span>は発動数の増減）。
-              </li>
-              <li>
-                共有は「<span className="font-medium">共有URL</span>」でURLコピー、
-                <span className="font-medium">Xで共有</span>は5人選択時に有効です。
-              </li>
-            </ol>
-            <div className="mt-3">
-              <div className="text-xs text-base-content/60">
-                キーボードで下記を押すと表示切り替えや並べ替え可能です。
-              </div>
-              <div className="text-xs text-base-content/60 mb-2">
-                小技：
-                <kbd className="kbd kbd-xs">/</kbd> 検索フォーカス、
-                <kbd className="kbd kbd-xs">G</kbd> 表示切替（グリッド/リスト）、
-                <kbd className="kbd kbd-xs">S</kbd> 並び替え切替。
-              </div>
-              <div className="text-xs text-base-content/60 mt-1">
-                データの誤りや改善提案は
-                <a href="https://x.com/pwc_egoist" target="_blank" className="link link-primary mx-1">Xアカウント</a>
-                または
-                <a href="/contact/" className="link link-primary mx-1">お問い合わせ</a>
-                からお知らせください。
-              </div>
-            </div>
-          </div>
-        </details>
-       </div>
-      </Section>
 
      {/* 操作（コントロールパネル） */}
      <Section title="ツール">
@@ -289,25 +242,29 @@ export default function Tool() {
             </Section>
             )}
 
-       {/* 提案 */}
-       <Section title="似た組み合わせのチーム編成提案">
-         <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6 space-y-3">
-           <p className="text-sm text-base-content/70">
-             提案をクリックすると、その組み合わせで結果に切り替わります（＋/− は発動数の増減）。
-           </p>
-           <SuggestionsBar items={suggestions} baseScore={suggestionsBase} />
-         </div>
-       </Section>
+          {/* 提案 */}
+          <Section title="似た組み合わせのチーム編成提案">
+            <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6 space-y-3">
+              <p className="text-sm text-base-content/70">
+                提案をクリックすると、その組み合わせで結果に切り替わります（＋/− は発動数の増減）。
+              </p>
+              <Suspense fallback={null}>
+                <SuggestionsBar items={suggestions} baseScore={suggestionsBase} />
+              </Suspense>
+            </div>
+          </Section>
 
           {/* モーダル：選手選択 */}
           <dialog ref={selectorDialogRef} className="modal">
             <div className="modal-box max-w-5xl">
               <h3 className="font-bold text-lg">選手を選ぶ</h3>
               <div className="mt-4 max-h-[70vh] overflow-y-auto">
-                <CharacterSelector
-                  selectedCharacters={selectedCharacters}
-                  onSelectCharacter={handleSelectCharacters}
-                />
+               <Suspense fallback={<div className="p-6 text-sm opacity-70">読込中…</div>}>
+                 <CharacterSelector
+                   selectedCharacters={selectedCharacters}
+                   onSelectCharacter={handleSelectCharacters}
+                 />
+               </Suspense>
               </div>
               <div className="modal-action">
                 <form method="dialog">
@@ -331,6 +288,54 @@ export default function Tool() {
             </form>
           </dialog>
         </div>
+      </Section>
+
+
+      {/* 使い方ガイド（ファーストビュー直下へ移動 / summary を小さめに） */}
+      <Section>
+        <details className="collapse collapse-arrow bg-base-100 border border-base-300 rounded-box shadow-sm">
+          <summary className="collapse-title text-sm md:text-base font-semibold">
+            チーム編成作成ツールの使い方（かんたんガイド）
+          </summary>
+           <div className="collapse-content text-sm text-base-content/80 leading-relaxed">
+            <ol className="list-decimal pl-5 space-y-1">
+              <li>
+                <span className="font-medium">「選手選択」</span>を押し、モーダルでキャラを最大5人選んで
+                <span className="font-medium">「検索」</span>。
+              </li>
+              <li>
+                中央の「<span className="font-medium">発動するマッチスキル</span>」に結果が表示されます。
+                バッジの<span className="font-medium">対象</span>/<span className="font-medium">発動者</span>は一致数です。
+              </li>
+              <li>
+                下の「<span className="font-medium">似た組み合わせの提案</span>」をタップすると、
+                その組み合わせでこのページ（<code>/tool</code>）に切り替わります（<span className="font-medium">＋/−</span>は発動数の増減）。
+              </li>
+              <li>
+                共有は「<span className="font-medium">共有URL</span>」でURLコピー、
+                <span className="font-medium">Xで共有</span>は5人選択時に有効です。
+              </li>
+            </ol>
+            <div className="mt-3">
+              <div className="text-xs text-base-content/60">
+                キーボードで下記を押すと表示切り替えや並べ替え可能です。
+              </div>
+              <div className="text-xs text-base-content/60 mb-2">
+                小技：
+                <kbd className="kbd kbd-xs">/</kbd> 検索フォーカス、
+                <kbd className="kbd kbd-xs">G</kbd> 表示切替（グリッド/リスト）、
+                <kbd className="kbd kbd-xs">S</kbd> 並び替え切替。
+              </div>
+              <div className="text-xs text-base-content/60 mt-1">
+                データの誤りや改善提案は
+                <a href="https://x.com/pwc_egoist" target="_blank" className="link link-primary mx-1">Xアカウント</a>
+                または
+                <a href="/contact/" className="link link-primary mx-1">お問い合わせ</a>
+                からお知らせください。
+              </div>
+            </div>
+          </div>
+        </details>
       </Section>
 
        {/* 結果（スキル一覧） */}

@@ -24,6 +24,8 @@ export default function SkillCard({ s, getCharacterById, showIds }) {
             title={alt}
             onError={makeImageFallbackHandler(candidates)}
             loading="lazy"
+            width="40"
+            height="40"
           />
         </div>
         {showIds && (

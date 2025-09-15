@@ -1,5 +1,7 @@
 // src/App.jsx
 import React from "react";
+import useLazyGA from "./hooks/useLazyGA.js";
+
 import { useLocation } from "react-router-dom";
 import ScrollManager from "./components/ScrollManager.jsx";
 
@@ -12,6 +14,8 @@ import Character from "./pages/Character.jsx";
 import Contact from "./pages/Contact.jsx";
 
 export default function App() {
+  useLazyGA(import.meta.env.VITE_GA_MEASUREMENT_ID); // ある場合のみ
+  
   const location = useLocation();
   const path = (location.pathname || "/").replace(/\/+$/, "") || "/";
 
