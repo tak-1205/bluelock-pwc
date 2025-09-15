@@ -85,27 +85,6 @@ export default function EffectText({ children }) {
         />
       </div>
 
-      {/* 下向き矢印の“スクロール手がかり”もSPのみ表示 */}
-      <div className="h-6 flex items-center justify-center lg:hidden">
-        <div
-          className={[
-            "w-6 h-6 rounded-full bg-base-100/90 shadow-sm flex items-center justify-center",
-            "pointer-events-none transition-opacity",
-            bottomShadow ? "opacity-100" : "opacity-0",
-          ].join(" ")}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" className="text-neutral-600">
-            <path
-              d="M6 9l6 6 6-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
     </div>
   );
 }

@@ -39,7 +39,7 @@ export default function SkillCard({ s, getCharacterById, showIds }) {
     <li className="card md:card-side bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition">
       {/* 左：テキスト */}
       <div className="card-body md:w-[60%]">
-        <div className="flex items-start gap-2 flex-wrap">
+        <div className="flex items-start gap-1 flex-wrap">
           <h3 className="card-title text-base">{s.name}</h3>
           <div className="ms-auto flex items-center gap-2">
             <div className="badge badge-info badge-outline">対象 {targets.length}</div>
@@ -52,8 +52,8 @@ export default function SkillCard({ s, getCharacterById, showIds }) {
       </div>
 
       {/* 右：画像 */}
-      <figure className="p-4 md:w-[40%]">
-        <div className="grid gap-3">
+      <figure className="p-2 md:w-[40%]">
+        <div className="grid gap-1">
           <div>
             <div className="text-xs text-base-content/60 mb-1">組み合わせ</div>
             <div className="flex flex-wrap gap-1.5">
