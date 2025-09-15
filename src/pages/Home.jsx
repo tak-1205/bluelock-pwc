@@ -22,29 +22,18 @@ export default function Home() {
       <div className="container mx-auto mt-2">
         <div className="rounded-2xl overflow-hidden bg-base-200">
           <div className="w-full rounded-2xl aspect-[16/9]">
-            <picture>
-              {/* 先に AVIF / 次に WebP / 最後に JPG フォールバック */}
-              <source
-                type="image/avif"
-                srcSet="/images/mv-640.avif 640w, /images/mv-960.avif 960w, /images/mv-1280.avif 1280w, /images/mv-1920.avif 1920w"
-                sizes="100vw"
-              />
-              <source
-                type="image/webp"
-                srcSet="/images/mv-640.webp 640w, /images/mv-960.webp 960w, /images/mv-1280.webp 1280w, /images/mv-1920.webp 1920w"
-                sizes="100vw"
-              />
-              <img
-                src="/images/mv.JPG"
-                alt="キービジュアル"
-                className="w-full h-full object-cover"
-                width="1920"
-                height="1080"
-                fetchPriority="high"
-                decoding="async"
-                loading="eager"
-              />
-            </picture>
+           <div className="w-full rounded-2xl aspect-[16/9]">
+             <img
+               src="/images/mv.jpg"   {/* ← 実ファイル名に合わせて .jpg or .JPG に変更 */}
+               alt="キービジュアル"
+               className="w-full h-full object-cover"
+               width="1920"
+               height="1080"
+               fetchPriority="high"
+               decoding="async"
+               loading="eager"
+             />
+           </div>
           </div>
         </div>
       </div>
