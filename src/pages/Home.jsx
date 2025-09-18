@@ -58,6 +58,36 @@ export default function Home() {
           </div>
         </section>
 
+        {/* --- TOP: お知らせ（静的） --- */}
+        <section aria-labelledby="news-heading" className="mt-6">
+          <div className="card bg-base-100 border border-base-200">
+            <div className="card-body p-4 sm:p-6">
+              <h2 id="news-heading" className="card-title text-base sm:text-lg">お知らせ</h2>
+
+              <ul className="mt-3 divide-y divide-base-200">
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-09-19</time>
+                    <p className="text-sm sm:text-base">
+                      追加マッチスキルを反映しました。
+                    </p>
+                  </div>
+                </li>
+
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-09-15</time>
+                    <p className="text-sm sm:text-base">
+                      サイトオープンしました。
+                    </p>
+                  </div>
+                </li>
+
+              </ul>
+            </div>
+          </div>
+        </section>
+
         {/* 追加：機能・コンテンツの説明（同じく container 揃え） */}
         <section className="mt-6 mb-8">
           <div className="container mx-auto">
