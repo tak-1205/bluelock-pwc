@@ -109,7 +109,6 @@ export default function AdSlot({
       <ins
         ref={insRef}
         className="adsbygoogle"
-        style={{ display: "block" }}
         style={{ display: "block", minHeight: 250 }}
         data-ad-client={AD_CLIENT}
         data-ad-slot={slot}
