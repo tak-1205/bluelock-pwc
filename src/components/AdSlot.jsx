@@ -40,6 +40,7 @@ export default function AdSlot({
   adKey = 0,
   format = "auto",
   fullWidth = true,
+  eager = false, 
   className = "",
   style,
 }) {
@@ -68,6 +69,21 @@ export default function AdSlot({
   // 表示域に入ったら SDK を読み込み → push
   useEffect(() => {
     if (!wrapRef.current) return;
+
+    // ▼ eager: ファーストビューなど、すぐ表示したい枠用に即時ロード
+    if (eager) {
+      (async () => {
+        await loadAdsScriptOnce();
+        if (insRef.current && !hasRenderedRef.current) {
+          try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+            hasRenderedRef.current = true;
+          } catch {}
+        }
+      })();
+      return; // ← IO は使わない
+    }
+
     const onIntersect = async (entries) => {
       if (!entries.some((e) => e.isIntersecting)) return;
       ioRef.current?.disconnect();
@@ -94,10 +110,12 @@ export default function AdSlot({
         ref={insRef}
         className="adsbygoogle"
         style={{ display: "block" }}
+        style={{ display: "block", minHeight: 250 }}
         data-ad-client={AD_CLIENT}
         data-ad-slot={slot}
         data-ad-format={format}
         data-full-width-responsive={fullWidth ? "true" : "false"}
+        data-adtest={import.meta.env.VITE_AD_TEST === "on" ? "on" : undefined}
       />
     </div>
   );
