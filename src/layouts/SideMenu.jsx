@@ -34,12 +34,19 @@ export default function SideMenu({ prepend = null, append = null, children = nul
           </NavLink>
         </li>
 
+        {/* キャラ別一覧：公開化（/characters へ遷移） */}
+        <li className={liClass}>
+          <NavLink
+            to="/characters"
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            キャラ別一覧
+          </NavLink>
+        </li>
+
         {/* 準備中（非リンク表示） */}
         <li className={liClass}>
           <Pending label="人気チーム編成ランキング" />
-        </li>
-        <li className={liClass}>
-          <Pending label="キャラ別一覧" />
         </li>
 
         {children}

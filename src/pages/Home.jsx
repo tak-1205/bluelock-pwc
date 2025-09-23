@@ -67,6 +67,16 @@ export default function Home() {
               <ul className="mt-3 divide-y divide-base-200">
                 <li className="py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-09-23</time>
+                    <p className="text-sm sm:text-base">
+                      <a href="/characters">キャラ別一覧ページを作成しました。</a><br />
+                      キャラごとの発動数の多いチーム編成や、組み合わせを確認できます。
+                    </p>
+                  </div>
+                </li>
+
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
                     <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-09-19</time>
                     <p className="text-sm sm:text-base">
                       追加マッチスキルを反映しました。

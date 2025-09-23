@@ -53,3 +53,22 @@ export function countActivatedSkills(ids) {
   }
   return count;
 }
+
+// ---- 共有モジュール連携（プリコンピュート等と同じ関数を使う） ----
+// ※ Node 側（プリコンピュート）からは、この utils/match.js を直接 import せず、
+//    ../lib/matchEngine.js を直接 import してください（data の import 解決の都合）。
+
+import {
+  makeMatchCounterFromSkills as _makeSharedCounter,
+  packSkills as _packSkills,
+  extractTargets as _extractTargets,
+} from '../lib/matchEngine.js';
+
+// プリコンピュート等で使う“共有カウンタ”を再エクスポート
+export const makeMatchCounterFromSkills = _makeSharedCounter;
+export const packSkills = _packSkills;
+export const extractTargets = _extractTargets;
+
+// （任意）フロント側でも“共有ロジック由来”のカウンタを使いたい場合の別名
+// 既存の countActivatedSkills と挙動を揃えたい時はこちらを参照してください。
+export const countActivatedSkillsShared = _makeSharedCounter(getNormalizedSkills());

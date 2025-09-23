@@ -36,3 +36,19 @@ export function canonicalId(raw) {
   // 英数とハイフン以外を削除、連続ハイフンを1つへ
   return n.replace(/[^A-Z0-9-]/g, "").replace(/-+/g, "-");
 }
+
+/**
+ * 例: "B901-03" → "B901"
+ */
+export function rootId(id) {
+ if (id == null) return id;
+ const s = String(id).trim();
+ return s.split('-')[0];
+}
+
+/**
+ * canonicalId を通した後に root を取る（不可視文字や全角記号を吸収した上で）
+ */
+export function canonicalRootId(id) {
+ return rootId(canonicalId(id));
+}
