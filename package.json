@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "prebuild": "node scripts/precompute-character-combos.mjs && node scripts/build-anchor-hints.mjs",
-    "precompute:all": "ALL=1 node scripts/build-combos.mjs",
+    "prebuild": "node scripts/prebuild.cjs",
+    "precompute:all": "node scripts/build-combos.mjs ALL=1 && node scripts/build-anchor-hints.mjs",
     "precompute:anchors": "node scripts/build-combos.mjs",
     "precompute:changed": "DIFF=1 node scripts/build-combos.mjs"
   },
