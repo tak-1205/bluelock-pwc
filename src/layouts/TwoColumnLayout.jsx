@@ -25,7 +25,10 @@ export default function TwoColumnLayout({
 
       <div className="drawer-content overflow-visible">
         {/* モバイル：上部バー（ハンバーガー + ブランド） */}
-        <div className="navbar bg-base-100 border-b border-base-200 lg:hidden">
+        <div
+          className="navbar sticky top-0 z-30 lg:hidden bg-base-100/90 backdrop-blur border-b border-base-200 shadow-sm"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}  // iOSノッチ対策
+        >
           <div className="flex-none">
             <label
               htmlFor={drawerId}
@@ -92,9 +95,9 @@ export default function TwoColumnLayout({
       </div>
 
       {/* 左：メニュー（drawer-side）—ここはそのまま。統一したい場合は同様に PWC EGOIST に変更可 */}
-      <div className="drawer-side">
-        <label htmlFor={drawerId} aria-label="close sidebar" className="drawer-overlay" />
-        <aside className="min-h-full w-72 bg-base-200 border-r border-base-300">
+      <div className="drawer-side z-[60]">
+        <label htmlFor={drawerId} aria-label="close sidebar" className="drawer-overlay z-[70]" />
+        <aside className="min-h-full w-72 bg-base-200 border-r border-base-300 relative z-[80]">
             <a href="/">
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-base-300">
                     <img src="/images/icon.png" alt="icon" width={100} height={100} />

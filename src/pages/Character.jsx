@@ -322,7 +322,7 @@ export default function Character() {
         {/* 5名：プリコンピュート（上位30） → 3列 */}
         {combosTop.length > 0 && (
           <div className="space-y-3">
-            <h2 className="text-lg font-semibold">{anchorLabel} を含む チーム編成</h2>
+            <h2 className="text-lg font-semibold">{anchorLabel} を含む 発動数の多いチーム編成</h2>
             <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {combosTop.map((row) => (
                 <li key={row.key} className="card bg-base-100 shadow-sm p-3 flex flex-col justify-between">
@@ -339,6 +339,11 @@ export default function Character() {
 
           </div>
         )}
+
+        <div className="space-y-3 mt-6">
+          <h2 className="text-lg font-semibold">他の組み合わせを探す</h2>
+          <a href="/tool" className="btn btn-sm btn-secondary w-full">チーム編成作成ツールへ</a>
+        </div>
         <div className="divider"></div>
 
         {/* 2〜5名：データ由来の全件表示（スキル名付き） */}
