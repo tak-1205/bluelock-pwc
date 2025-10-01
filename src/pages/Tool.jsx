@@ -217,6 +217,9 @@ export default function Tool() {
          {selectedCharacters.length > 0 && (
            <Section title="選択したキャラ">
              <div className="bg-base-100 rounded-box shadow-sm p-4 md:p-6">
+              <div className="text-m text-base-content/70 mb-2">
+                  マッチスキル数: <strong>{resultCount}</strong> 件
+              </div>
                <div className="flex flex-wrap gap-2">
                     {selectedCharacters.map((c) => {
                         const candidates = buildImageCandidates(c.id);

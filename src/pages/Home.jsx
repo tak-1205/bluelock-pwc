@@ -24,7 +24,7 @@ export default function Home() {
           <div className="w-full rounded-2xl ">
            <div className="w-full rounded-2xl ">
              <img
-               src="/images/mv.jpg"  
+               src="/images/mv2.jpg"  
                alt="キービジュアル"
                className="w-full h-full object-cover"
                width="1500"
