@@ -67,6 +67,15 @@ export default function Home() {
               <ul className="mt-3 divide-y divide-base-200">
                 <li className="py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-01</time>
+                    <p className="text-sm sm:text-base">
+                      <a href="/character/B013-06">馬狼照英【貪り喰らう咆哮】を追加しました。</a>
+                    </p>
+                  </div>
+                </li>
+
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
                     <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-09-23</time>
                     <p className="text-sm sm:text-base">
                       <a href="/characters">キャラ別一覧ページを作成しました。</a><br />
@@ -125,6 +134,30 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* 稼働中 */}
+              <div className="card bg-base-100 shadow-sm">
+                <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
+                  <img
+                    src="/images/feature-character.png"
+                    alt="キャラ別一覧"
+                    className="max-h-full max-w-full object-contain"
+                    loading="lazy"
+                    onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
+                  />
+                </figure>
+                <div className="card-body">
+                  <h3 className="card-title">
+                    キャラ別一覧 
+                  </h3>
+                  <p className="text-sm text-base-content/70">
+                    キャラごとの発動スキルを一覧表示。キャラの相性をまとめて確認。
+                  </p>
+                  <div className="card-actions justify-end">
+                    <Link to="/characters" className="btn btn-sm btn-primary">使ってみる</Link>
+                  </div>
+                </div>
+              </div>
+
               {/* 準備中その1 */}
               <div className="card bg-base-100 shadow-sm">
                 <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
@@ -145,30 +178,6 @@ export default function Home() {
                   </p>
                   <div className="card-actions justify-end">
                     <button className="btn btn-sm btn-disabled">準備</button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 準備中その2 */}
-              <div className="card bg-base-100 shadow-sm">
-                <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
-                  <img
-                    src="/images/feature-character.png"
-                    alt="キャラ別一覧"
-                    className="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                    onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
-                  />
-                </figure>
-                <div className="card-body">
-                  <h3 className="card-title">
-                    キャラ別一覧 <span className="badge badge-ghost badge-sm">準備中</span>
-                  </h3>
-                  <p className="text-sm text-base-content/70">
-                    キャラごとの発動スキルを一覧表示。キャラの相性をまとめて確認。（準備中）
-                  </p>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-sm btn-disabled">準備中</button>
                   </div>
                 </div>
               </div>
