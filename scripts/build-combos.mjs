@@ -1,10 +1,11 @@
 // scripts/build-combos.mjs
-// 目的：/public/combos/<anchorId>.json（5人・発動数上位30）をプリコンピュートして保存。
-// 特徴：
-//  - クライアント実行ゼロ。表示はJSON読むだけ。
-//  - 差分再計算対応：新規/変更スキル・新キャラに関係するアンカーのみ再計算。
-//  - UIと同一ロジックで発動数をカウント（targets+activators / canonicalフォールバック / 重複排除キー）。
-//  - ★同じ5人（順不同）は canonical キーで統合し、count の最大を採用＆代表rawで安定出力。
+// 目的：/public/combos/<memberId>.json（5人・発動数上位TOP_N）をプリコンピュートして保存。
+// 変更点（2025-10-03 対称保証版）:
+//  - これまで「アンカーIDごとにTOP_N→即書き出し」だった処理を、
+//    「アンカーで見つけたコンボを5人全員のバケットに同時配布 → メンバー単位でTOP_N整形→書き出し」に変更。
+//  - 差分再計算（DIFF/ANCHORS）でも、影響メンバーの既存ファイルを読み込み、マージ後にTOP_N形成するため、
+//    片側だけ落ちる/消える非対称が起きにくい。
+//  - JSONの1要素は { key, ids, count } のまま据え置き（既存UI互換）。
 //
 // 使い方：
 //  - 全再計算:          ALL=1 node scripts/build-combos.mjs
@@ -13,7 +14,7 @@
 //
 // 調整（環境変数）:
 //  - EXPAND_HOPS=2   … プール拡張ホップ数（1〜3推奨）
-//  - PER_ROOT=3      … 同名系（canonical）ごとの候補上限
+//  - PER_ROOT=3      … 同名系（canonical root）ごとの候補上限
 //  - POOL_MAX=120    … 候補人数の最大（拡張後に制限）
 //  - TOP_N=30        … 出力件数
 //  - OUT_DIR=./public/combos
@@ -84,6 +85,7 @@ async function tryLoadMatchSkills() {
   }
   throw new Error("matchSkills not found in src/data/matchSkills.{json,js}");
 }
+
 // UIと同一の正規化関数を使う（なければフォールバック）
 let normalizeId, canonicalId;
 async function loadIdUtils() {
@@ -92,7 +94,7 @@ async function loadIdUtils() {
     normalizeId = m.normalizeId;
     canonicalId = m.canonicalId;
   } catch {
-    // フォールバック（最低限）: 大文字/小文字・不可視・全角ハイフン等
+    // フォールバック（最低限）
     normalizeId = (raw) => {
       let s = String(raw || "");
       try { s = s.normalize("NFKC"); } catch {}
@@ -100,10 +102,7 @@ async function loadIdUtils() {
       s = s.replace(/[‐-‒–—―−－]/g, "-");
       return s.trim().toLowerCase();
     };
-    canonicalId = (raw) => {
-      // 同名系の規則がある場合は src/utils/ids.js を使うのが望ましい
-      return normalizeId(raw);
-    };
+    canonicalId = (raw) => normalizeId(raw);
   }
 }
 
@@ -112,7 +111,6 @@ function rootId(raw) {
   const s = String(raw || "");
   return s.split("-")[0];
 }
-// canonical(normalize(id)) を通してから root を取る
 function canonicalRootId(idOrNorm) {
   const norm = normalizeId(idOrNorm);
   const can  = canonicalId(norm);
@@ -130,10 +128,6 @@ function extractActivators(s) {
   return [s.activator1, s.activator2, s.activator3, s.activator4, s.activator5].filter(Boolean);
 }
 
-// UIの countActivatedSkills と同等：
-//  - involved = targets ∪ activators
-//  - まず normalizeId で全包含、ダメなら canonicalId で全包含
-//  - 重複排除キー = `${name}__${detail||effect}__${sorted targets(norm)}`
 function makeCounterFromSkills(allSkills) {
   const packed = allSkills.map((s) => {
     const targets = extractTargets(s).map(normalizeId).filter(Boolean);
@@ -226,12 +220,11 @@ function buildRepresentativeMap(characterList) {
 // ========= プール構築＆列挙 =========
 function buildPool(anchorRaw, cooccur, perRoot, poolMax) {
   const anchorNorm = normalizeId(anchorRaw);
-  const anchorCan  = canonicalId(anchorNorm);
 
   // 1) アンカーからホップ拡張
   const expanded = expandHops([anchorNorm], cooccur, EXPAND_HOPS);
 
-  // 2) 同root（ハイフン前）が過多にならないよう制限しつつ、人数上限
+  // 2) 同root過多の抑制 + 人数上限
   const usedRoot = new Map(); const out = [];
   const anchorRoot = canonicalRootId(anchorNorm);
   for (const idNorm of expanded) {
@@ -246,14 +239,14 @@ function buildPool(anchorRaw, cooccur, perRoot, poolMax) {
   return out;
 }
 
-// ★同じ5人（順不同）は canonical キーで1件に統合（countの最大を採用）し、代表rawで安定出力
+// ★同じ5人（順不同）は canonical キーで1件に統合（count最大を採用）し、代表rawで安定出力
 function enumerateTop5(anchorRaw, poolNorm, countFn, topN, canonToRaw) {
   const n = poolNorm.length;
   const anchorNorm = normalizeId(anchorRaw);
   const anchorCan  = canonicalId(anchorNorm);
   const repAnchor  = canonToRaw.get(anchorCan) || String(anchorRaw);
 
-  const bestByCanonKey = new Map(); // canonKey -> { ids, count }
+  const bestByCanonKey = new Map(); // canonKey -> { key, ids, count }
 
   for (let i=0;i<n;i++) {
     for (let j=i+1;j<n;j++) {
@@ -276,28 +269,30 @@ function enumerateTop5(anchorRaw, poolNorm, countFn, topN, canonToRaw) {
           ]);
           if (rootSet.size !== 5) continue;
 
-          // 表示用の安定並びは従来どおり canonical 昇順の代表raw（JSON互換維持）
+          // 表示用ID列の安定化
           const othersSorted = [canA, canB, canC, canD].sort();
-          const idsStable = [repAnchor, ...othersSorted.map(cn => canonToRaw.get(cn) || cn)];
+          // ★返すときは、常に5人をcanonical昇順の代表rawに正規化（アンカー先頭はやめる）
+          const idsStable = stableIds([repAnchor, ...othersSorted.map(cn => canonToRaw.get(cn) || cn)], canonToRaw);
 
-          // 採点：UIロジックと同一の countFn（normalize/canonical対応済み）
+          // 採点
           const count = countFn(idsStable);
           if (count <= 0) continue;
 
-          // 順不同の重複統合キー（canonical）
-          const canonKey = [anchorCan, ...othersSorted].join("|");
+          // 順不同重複キー（canonical）
+          // ★キーも5人を完全ソートした順不同キーに統一
+          const canonKey = canonComboKey(idsStable);
 
           const prev = bestByCanonKey.get(canonKey);
           if (!prev || count > prev.count) {
-            bestByCanonKey.set(canonKey, { ids: idsStable, count });
+            bestByCanonKey.set(canonKey, { key: canonKey, ids: idsStable, count });
           }
         }
       }
     }
   }
 
-  // 上位Nに整形
-  const arr = [...bestByCanonKey.entries()].map(([key, v]) => ({ key, ...v }));
+  // 上位N（アンカー視点の暫定TOP_N）を返す
+  const arr = [...bestByCanonKey.values()];
   arr.sort((x, y) => y.count - x.count || x.key.localeCompare(y.key));
   if (arr.length > topN) arr.length = topN;
   return arr;
@@ -328,6 +323,29 @@ function computeSnapshot(matchSkills, characterList) {
   return { rowHashes, ids, hashAll, generatedAt: new Date().toISOString() };
 }
 
+// ========= 既存JSONの読み込み（存在しない場合は []） =========
+async function readExistingCombos(memberId) {
+  const file = path.join(OUT_DIR, `${memberId}.json`);
+  try {
+    const txt = await fs.readFile(file, "utf8");
+    const arr = JSON.parse(txt);
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
+// ========= 便利：キー生成（順不同canonical連結） =========
+function canonComboKey(ids) {
+  return ids.map(x => canonicalId(normalizeId(x))).sort().join("|");
+}
+
+// 便利：出力用の安定ID配列（canonical昇順 → 代表raw）
+function stableIds(ids, canonToRaw) {
+  const can = ids.map(x => canonicalId(normalizeId(x))).sort();
+  return can.map(cn => canonToRaw.get(cn) || cn);
+}
+
 // ========= main =========
 async function main() {
   await fs.mkdir(OUT_DIR, { recursive: true });
@@ -344,7 +362,7 @@ async function main() {
   } else if (DO_ALL || !manifest.snapshot?.rowHashes?.length) {
     targets = characters.map(c => String(c.id));
   } else if (DO_DIFF) {
-    // 差分：スキル行のハッシュ差分から影響ID抽出 → 共起で拡張 → 影響アンカーに
+    // 差分：スキル行ハッシュ差分 + キャラ増減 → 共起1ホップで影響アンカー抽出
     const prev = manifest.snapshot;
     const prevSet = new Set(prev.rowHashes || []);
     const curSet  = new Set(snap.rowHashes || []);
@@ -352,7 +370,6 @@ async function main() {
     for (const h of curSet) if (!prevSet.has(h)) changedRows.add(h);
     for (const h of prevSet) if (!curSet.has(h)) changedRows.add(h);
 
-    // 変化のあった行に登場するID集合
     const changedIds = new Set();
     if (changedRows.size) {
       const changedHashSet = new Set(changedRows);
@@ -362,12 +379,10 @@ async function main() {
         for (const id of allIdsInRow(s)) changedIds.add(id);
       }
     }
-    // キャラの増減
     const prevIds = new Set(prev.ids || []);
     for (const id of snap.ids) if (!prevIds.has(id)) changedIds.add(id);
     for (const id of prevIds) if (!snap.ids.includes(id)) changedIds.add(id);
 
-    // 共起で1ホップ拡張 → 影響アンカー候補
     const co = buildCooccurMap(skills);
     const impacted = expandHops(changedIds, co, 1);
     const impactedRaw = new Set();
@@ -376,7 +391,6 @@ async function main() {
       const raw = allRaw.get(id);
       if (raw) impactedRaw.add(raw);
     }
-    // 新規実行がない場合は何もしない
     targets = Array.from(impactedRaw);
     if (targets.length === 0) {
       console.log("No impacted anchors detected. Nothing to do.");
@@ -386,7 +400,6 @@ async function main() {
       return;
     }
   } else {
-    // 既定：全件（初回）と同等
     targets = characters.map(c => String(c.id));
   }
 
@@ -397,27 +410,74 @@ async function main() {
   // 代表rawマップ（canonical -> raw）
   const repMap = buildRepresentativeMap(characters);
 
-  let done = 0;
+  // ★ 対称保証：メンバーバケット（memberId -> Map(key -> {key, ids, count})）
+  const bucketsByMember = new Map();
+  const changedMembers = new Set();
+
+  // ユーティリティ：メンバーバケットへ push（countはmax採用）
+  function bucketPush(memberId, combo) {
+    if (!bucketsByMember.has(memberId)) bucketsByMember.set(memberId, new Map());
+    const map = bucketsByMember.get(memberId);
+    // ★combo.key は信用せず再計算、ids も安定化してから保存
+    const ids = stableIds(combo.ids, repMap);
+    const k = canonComboKey(ids);
+    const prev = map.get(k);
+    if (!prev || combo.count > prev.count) {
+      map.set(k, { key: k, ids, count: combo.count });
+    }
+    changedMembers.add(memberId);
+  }
+
+  let doneAnchors = 0;
   for (const anchorId of targets) {
     const pool = buildPool(anchorId, cooccur, PER_ROOT, POOL_MAX);
     if (pool.length < 4) {
-      // 充分な候補が無い場合は空で保存（存在しないより安全）
-      await fs.writeFile(path.join(OUT_DIR, `${anchorId}.json`), JSON.stringify([], null, 0), "utf8");
-      manifest.files[anchorId] = { updatedAt: new Date().toISOString(), poolSize: pool.length, top: 0 };
-      console.log(`⚠ ${anchorId}: pool<4 → 0件保存`);
+      console.log(`⚠ ${anchorId}: pool<4 → skip (no combos)`);
       continue;
     }
-    const top = enumerateTop5(anchorId, pool, count, TOP_N, repMap);
-    await fs.writeFile(path.join(OUT_DIR, `${anchorId}.json`), JSON.stringify(top, null, 0), "utf8");
-    manifest.files[anchorId] = { updatedAt: new Date().toISOString(), poolSize: pool.length, top: top.length };
-    done++;
-    console.log(`✔ ${anchorId}: ${top.length} combos  (pool=${pool.length})`);
+    const topForAnchor = enumerateTop5(anchorId, pool, count, TOP_N, repMap);
+    // このアンカーで採用されたコンボを参加5人すべてのバケットへ同時配布
+    for (const combo of topForAnchor) {
+      const members = stableIds(combo.ids, repMap);
+      const key = canonComboKey(members);
+      const fixed = { key, ids: members, count: combo.count };
+      for (const m of members) bucketPush(m, fixed);
+    }
+    doneAnchors++;
+    console.log(`✔ anchor ${anchorId}: ${topForAnchor.length} combos distributed`);
+  }
+
+  // 影響メンバーの既存JSONを読み込み、マージ → TOP_N整形 → 書き出し
+  let written = 0;
+  for (const memberId of changedMembers) {
+    const map = bucketsByMember.get(memberId) || new Map();
+
+    // 既存ファイル（過去の他アンカー由来）をマージ
+    const existing = await readExistingCombos(memberId);
+    for (const e of existing) {
+    const ids = stableIds(e.ids, repMap);
+    const k = canonComboKey(ids);
+    const prev = map.get(k);
+    if (!prev || e.count > prev.count) {
+      map.set(k, { key: k, ids, count: e.count });
+    }
+    }
+
+    // 最終整形（count desc → key asc の安定化）→ TOP_N 切り
+    const finalArr = Array.from(map.values())
+      .sort((a, b) => b.count - a.count || (a.key || "").localeCompare(b.key || ""))
+      .slice(0, TOP_N);
+
+    await fs.writeFile(path.join(OUT_DIR, `${memberId}.json`), JSON.stringify(finalArr, null, 0), "utf8");
+    manifest.files[memberId] = { updatedAt: new Date().toISOString(), top: finalArr.length };
+    written++;
   }
 
   // スナップショット更新
   manifest.snapshot = snap;
   await saveManifest(manifest);
-  console.log(`Done. Wrote ${done} files to ${OUT_DIR}`);
+
+  console.log(`Done. processed anchors=${doneAnchors}, wrote member files=${written}, out=${OUT_DIR}`);
 }
 
 main().catch((e)=>{ console.error(e); process.exit(1); });
