@@ -1,10 +1,12 @@
 // src/layouts/SideMenu.jsx
-import { NavLink, Link } from "react-router-dom";
+import React from "react";
+import { NavLink } from "react-router-dom";
+import characterList from "../data/characterList.js";
+import { getProfileByRootId, rootIdOf } from "../utils/profile.js";
 
 export default function SideMenu({ prepend = null, append = null, children = null }) {
   const liClass = "whitespace-nowrap";
 
-  // 準備中項目（非リンク・非フォーカス・クリック不可）
   const Pending = ({ label }) => (
     <div
       className="flex items-center gap-2 text-base-content/60 opacity-60 cursor-not-allowed select-none pointer-events-none"
@@ -15,6 +17,20 @@ export default function SideMenu({ prepend = null, append = null, children = nul
       <span className="badge badge-ghost badge-sm">準備中</span>
     </div>
   );
+
+  // 親ページ用の一覧（rootIdごとに1件）
+  const roots = React.useMemo(() => {
+    const set = new Set((characterList || []).map(c => rootIdOf(c.id)));
+    return Array.from(set)
+      .sort()
+      .map(r => {
+        const prof = getProfileByRootId(r);
+        return { rootId: r, label: prof?.name || r };
+      });
+  }, []);
+
+  // プルダウン開閉（details/summaryは使わない）
+  const [open, setOpen] = React.useState(false);
 
   return (
     <>
@@ -34,19 +50,53 @@ export default function SideMenu({ prepend = null, append = null, children = nul
           </NavLink>
         </li>
 
-        {/* キャラ別一覧：公開化（/characters へ遷移） */}
+        {/* 「キャラ別一覧」リンク + 右側に開閉ボタン（クリック領域を分離） */}
         <li className={liClass}>
-          <NavLink
-            to="/characters"
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            キャラ別一覧
-          </NavLink>
+          <div className="flex items-center gap-2">
+            <NavLink
+              to="/characters"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              キャラ別一覧
+            </NavLink>
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-controls="character-root-dropdown"
+              className="ml-auto btn btn-ghost btn-xs shrink-0"
+              onClick={() => setOpen(v => !v)}
+            >
+              {open ? "▾" : "▸"}
+            </button>
+          </div>
+
+          {open && (
+            <div
+              id="character-root-dropdown"
+              className="mt-1 rounded-md border border-base-300 max-h-72 overflow-auto"
+            >
+              {/* ← .menu を使わず縦並びを強制 */}
+              <ul className="p-1 flex flex-col gap-1">
+                {roots.map(it => (
+                  <li key={it.rootId}>
+                    <NavLink
+                      to={`/characters/${it.rootId}`}
+                      className="block px-3 py-2 hover:bg-base-200 rounded"
+                    >
+                      {it.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </li>
 
-        {/* 準備中（非リンク表示） */}
         <li className={liClass}>
           <Pending label="人気チーム編成ランキング" />
+        </li>
+        <li className={liClass}>
+          <Pending label="発動トレーニングスキル" />
         </li>
 
         {children}

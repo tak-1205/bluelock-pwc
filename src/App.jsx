@@ -1,7 +1,6 @@
 // src/App.jsx
 import React from "react";
 import useLazyGA from "./hooks/useLazyGA.js";
-
 import { useLocation } from "react-router-dom";
 import ScrollManager from "./components/ScrollManager.jsx";
 
@@ -13,20 +12,39 @@ import Tool from "./pages/Tool.jsx";
 import Contact from "./pages/Contact.jsx";
 import Characters from "./pages/Characters.jsx";
 import Character from "./pages/Character.jsx";
+import CharacterRoot from "./pages/CharacterRoot.jsx"; // 親ページ
 
 export default function App() {
-  useLazyGA(import.meta.env.VITE_GA_MEASUREMENT_ID); // ある場合のみ
+  useLazyGA(import.meta.env.VITE_GA_MEASUREMENT_ID);
 
-  // ✅ pathname を正しく取得
   const { pathname } = useLocation();
-  // 末尾スラッシュ除去（/ → /, /foo/ → /foo）
   const path = (pathname || "/").replace(/\/+$/, "") || "/";
 
-  // ✅ まず /characters を判定（/character に先に当たらないように）
-  if (path === "/characters" || path.startsWith("/characters/")) return <Characters />;
+  // --- /characters 系 ---
+  if (path === "/characters") return <Characters />;
+  if (path.startsWith("/characters/")) {
+    const slug = path.slice("/characters/".length); // 例: "B001"
+    const isRoot = /^[A-Z]\d{3}$/i.test(slug);
+    return isRoot ? <CharacterRoot rootId={slug} /> : <Characters />;
+  }
 
-  // ✅ 次に /character（個別）
-  if (path === "/character" || path.startsWith("/character/")) return <Character />;
+  // --- /character 系 ---
+  // /character 単体は従来どおりバージョン別ページにフォールバック
+  if (path === "/character") return <Character />;
+
+  if (path.startsWith("/character/")) {
+    const slug = path.slice("/character/".length); // 例: "B001" or "B001-03"
+    const isRoot = /^[A-Z]\d{3}$/i.test(slug);
+
+    if (isRoot) {
+      // rootIdの場合は /characters/B001 にリダイレクト
+      window.location.replace(`/characters/${slug}`);
+      return null; // レンダリングは不要
+    }
+
+    // それ以外（B001-03など）はバージョンページ
+    return <Character />;
+  }
 
   // 既存の早期return群：トップ/他ページ
   let Page = Tool;
@@ -36,7 +54,6 @@ export default function App() {
   else if (path === "/tool") Page = Tool;
   else if (path === "/contact") Page = Contact;
 
-  // ScrollManager を常に一緒に描画
   return (
     <>
       <ScrollManager />
