@@ -12,13 +12,26 @@ import Tool from "./pages/Tool.jsx";
 import Contact from "./pages/Contact.jsx";
 import Characters from "./pages/Characters.jsx";
 import Character from "./pages/Character.jsx";
-import CharacterRoot from "./pages/CharacterRoot.jsx"; // 親ページ
+import CharacterRoot from "./pages/CharacterRoot.jsx";
+
+// 追加（スキル逆引き）
+import Skills from "./pages/Skills.jsx";
+import SkillDetail from "./pages/SkillDetail.jsx";
 
 export default function App() {
   useLazyGA(import.meta.env.VITE_GA_MEASUREMENT_ID);
 
   const { pathname } = useLocation();
   const path = (pathname || "/").replace(/\/+$/, "") || "/";
+
+  // --- /skills 系（新規） ---
+  if (path === "/skills") return <Skills />;
+  if (path === "/skill") return <Skills />; // /skill は一覧へフォールバック
+  if (path.startsWith("/skill/")) {
+    const slug = path.slice("/skill/".length); // 例: "『漁狩り』だ"
+    // SkillDetail 側で useLocation 参照でもOKだが、明示的に key を渡すと再マウントが確実
+    return <SkillDetail key={slug} />;
+  }
 
   // --- /characters 系 ---
   if (path === "/characters") return <Characters />;
@@ -39,7 +52,7 @@ export default function App() {
     if (isRoot) {
       // rootIdの場合は /characters/B001 にリダイレクト
       window.location.replace(`/characters/${slug}`);
-      return null; // レンダリングは不要
+      return null;
     }
 
     // それ以外（B001-03など）はバージョンページ
