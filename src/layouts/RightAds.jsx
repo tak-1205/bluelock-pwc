@@ -1,7 +1,8 @@
 // src/layouts/RightAds.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import AdSlot from "../components/AdSlot.jsx";
+import AdSlot from "../components/AdSlot.jsx"; // ← AdSense 用
+import AdSlotAdstir from "../components/AdSlotAdstir.jsx"; // ← adstir 用（新規）
 import { logAffClick } from "../lib/logAffClick.js";
 import { getAffiliateItemsForPath } from "../affiliates/registry.js";
 import { onAdsRefresh } from "../lib/adBus.js";
@@ -9,10 +10,11 @@ import { onAdsRefresh } from "../lib/adBus.js";
 export default function RightAds({ items, slots = {} }) {
   const SHOW_ADS = import.meta.env.VITE_FEATURE_ADS === "on";
   const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "on";
+  const AD_PROVIDER = import.meta.env.VITE_AD_PROVIDER || "adsense"; // ← 追加
   const location = useLocation();
   const NOTHING_TO_SHOW = !SHOW_ADS && !SHOW_AFF;
 
-  if (NOTHING_TO_SHOW) return null; // ← 右カラムまるごと非表示（TwoColumnLayoutが2カラム化）
+  if (NOTHING_TO_SHOW) return null;
 
   const effectiveItems =
     items && items.length ? items : getAffiliateItemsForPath(location.pathname);
@@ -25,9 +27,19 @@ export default function RightAds({ items, slots = {} }) {
   const SLOT_MID = import.meta.env.VITE_AD_SLOT_SIDEBAR_MID || slots.mid || "";
   const SLOT_BOTTOM = import.meta.env.VITE_AD_SLOT_SIDEBAR_BOTTOM || slots.bottom || "";
 
+  // adstirタグ（原文そのまま貼付）
+  const TAG_TOP = import.meta.env.VITE_ADSTIR_TAG_TOP || "";
+  const TAG_MID = import.meta.env.VITE_ADSTIR_TAG_MID || "";
+  const TAG_BOTTOM = import.meta.env.VITE_ADSTIR_TAG_BOTTOM || "";
+
   const handleAffClick = (_e, item) => {
     try {
-      logAffClick({ id: item.id, source: item.source, path: location.pathname, ts: Date.now() });
+      logAffClick({
+        id: item.id,
+        source: item.source,
+        path: location.pathname,
+        ts: Date.now(),
+      });
     } catch {}
   };
 
@@ -45,23 +57,48 @@ export default function RightAds({ items, slots = {} }) {
     </div>
   );
 
-  return (
-    <div className="space-y-4">
-      {/* AdSense: 上段 */}
-      {SHOW_ADS && SLOT_TOP && (
+  const renderAd = (pos, slot, tag, minH = 250) => {
+    if (!SHOW_ADS) return null;
+
+    if (AD_PROVIDER === "adstir" && tag) {
+      return (
         <div className="card bg-base-100 shadow">
           <div className="card-body">
-            <div className="min-h-[300px]">
-              <AdSlot slot={SLOT_TOP} adKey={adKey} />
+            <div className={`min-h-[${minH}px]`}>
+              <AdSlotAdstir tagHtml={tag} />
             </div>
           </div>
         </div>
-      )}
+      );
+    }
 
+    if (AD_PROVIDER === "adsense" && slot) {
+      return (
+        <div className="card bg-base-100 shadow">
+          <div className="card-body">
+            <div className={`min-h-[${minH}px]`}>
+              <AdSlot slot={slot} adKey={adKey} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* 広告：上段 */}
+      {renderAd("top", SLOT_TOP, TAG_TOP, 300)}
+
+      {/* アフィリエイト枠 */}
       {SHOW_AFF && effectiveItems.length > 0 && (
         <div className="card bg-base-100 shadow">
           <div className="card-body">
-            <div className="text-xs font-semibold text-base-content/70">Sponsored</div>
+            <div className="text-xs font-semibold text-base-content/70">
+              Sponsored
+            </div>
             <ul className="mt-2 space-y-3">
               {effectiveItems.map((item) => (
                 <li key={item.id}>
@@ -73,7 +110,6 @@ export default function RightAds({ items, slots = {} }) {
                     className="block hover:opacity-90 transition"
                   >
                     {item.image ? (
-                      // 画像あり：左56pxのサムネ枠＋テキストの2カラムで幅安定
                       <div className="grid grid-cols-[3.5rem_1fr] gap-3 items-start">
                         <figure className="w-14 h-14 grid place-items-center overflow-hidden">
                           <img
@@ -84,18 +120,23 @@ export default function RightAds({ items, slots = {} }) {
                           />
                         </figure>
                         <div className="min-w-0">
-                          <div className="text-sm font-medium line-clamp-2">{item.title}</div>
+                          <div className="text-sm font-medium line-clamp-2">
+                            {item.title}
+                          </div>
                           {item.badge && (
-                            <div className="badge badge-ghost badge-sm mt-1">{item.badge}</div>
+                            <div className="badge badge-ghost badge-sm mt-1">
+                              {item.badge}
+                            </div>
                           )}
                         </div>
                       </div>
                     ) : (
-                      // 画像なし：左詰めのテキストのみ（余白を作らない）
                       <div className="min-w-0">
                         <div className="text-sm font-medium">{item.title}</div>
                         {item.badge && (
-                          <div className="badge badge-ghost badge-sm mt-1">{item.badge}</div>
+                          <div className="badge badge-ghost badge-sm mt-1">
+                            {item.badge}
+                          </div>
                         )}
                       </div>
                     )}
@@ -107,27 +148,11 @@ export default function RightAds({ items, slots = {} }) {
         </div>
       )}
 
-      {/* AdSense: 中段 */}
-      {SHOW_ADS && SLOT_MID && (
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <div className="min-h-[250px]">
-              <AdSlot slot={SLOT_MID} adKey={adKey} />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 広告：中段 */}
+      {renderAd("mid", SLOT_MID, TAG_MID, 250)}
 
-      {/* AdSense: 下段 */}
-      {SHOW_ADS && SLOT_BOTTOM && (
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <div className="min-h-[250px]">
-              <AdSlot slot={SLOT_BOTTOM} adKey={adKey} />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 広告：下段 */}
+      {renderAd("bottom", SLOT_BOTTOM, TAG_BOTTOM, 250)}
     </div>
   );
 }
