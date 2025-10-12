@@ -12,15 +12,27 @@ import Tool from "./pages/Tool.jsx";
 import Contact from "./pages/Contact.jsx";
 import Characters from "./pages/Characters.jsx";
 import Character from "./pages/Character.jsx";
-import CharacterRoot from "./pages/CharacterRoot.jsx"; // 親ページ
+import CharacterRoot from "./pages/CharacterRoot.jsx";
+import Training from "./pages/TrainingTool.jsx";
 
 export default function App() {
   useLazyGA(import.meta.env.VITE_GA_MEASUREMENT_ID);
 
   const { pathname } = useLocation();
-  const path = (pathname || "/").replace(/\/+$/, "") || "/";
+  const rawPath = (pathname || "/").replace(/\/+$/, "") || "/";
+  const path = rawPath;                // そのまま（/characters の slug は大小維持）
+  const pathLower = rawPath.toLowerCase(); // 固定パスの判定/正規化にのみ使用
 
-  // --- /characters 系 ---
+  // --- 固定パスの大文字混在を正規化（/Training → /training など）---
+  if (
+    /^\/(tool|training|privacy|ranking|contact)$/.test(pathLower) &&
+    path !== pathLower
+  ) {
+    window.location.replace(pathLower);
+    return null;
+  }
+
+  // --- /characters 系（大小そのまま扱う）---
   if (path === "/characters") return <Characters />;
   if (path.startsWith("/characters/")) {
     const slug = path.slice("/characters/".length); // 例: "B001"
@@ -28,8 +40,7 @@ export default function App() {
     return isRoot ? <CharacterRoot rootId={slug} /> : <Characters />;
   }
 
-  // --- /character 系 ---
-  // /character 単体は従来どおりバージョン別ページにフォールバック
+  // --- /character 系（大小そのまま扱う）---
   if (path === "/character") return <Character />;
 
   if (path.startsWith("/character/")) {
@@ -39,20 +50,19 @@ export default function App() {
     if (isRoot) {
       // rootIdの場合は /characters/B001 にリダイレクト
       window.location.replace(`/characters/${slug}`);
-      return null; // レンダリングは不要
+      return null;
     }
-
-    // それ以外（B001-03など）はバージョンページ
     return <Character />;
   }
 
-  // 既存の早期return群：トップ/他ページ
-  let Page = Tool;
-  if (path === "/privacy") Page = Privacy;
-  else if (path === "/ranking") Page = Ranking;
-  else if (path === "/") Page = Home;
-  else if (path === "/tool") Page = Tool;
-  else if (path === "/contact") Page = Contact;
+  // --- 既存の早期return群：トップ/他ページ（小文字で判定）---
+  let Page = Tool; // 既定は従来通り Tool
+  if (pathLower === "/privacy") Page = Privacy;
+  else if (pathLower === "/ranking") Page = Ranking;
+  else if (pathLower === "/") Page = Home;
+  else if (pathLower === "/tool") Page = Tool;
+  else if (pathLower === "/training") Page = Training;
+  else if (pathLower === "/contact") Page = Contact;
 
   return (
     <>

@@ -5,26 +5,54 @@ import { characterList } from '../data/characterList';
 // URLに ?debug=true が含まれるか判定
 const isDebugMode = new URLSearchParams(window.location.search).get('debug') === 'true';
 
-function CharacterSelector({ selectedCharacters, onSelectCharacter }) {
-  const handleSelect = (character) => {
-    const nameOnly = character.name.split('【')[0];
-    const alreadySelectedNames = selectedCharacters.map((c) => c.name.split('【')[0]);
-    const isAlreadySelectedSameName = alreadySelectedNames.includes(nameOnly);
-    const isAlreadySelectedSameId = selectedCharacters.some((c) => c.id === character.id);
+/**
+ * 追加プロップ：
+ * - maxSelectable: 選べる上限（デフォルト 5）。育成ダイアログでは 1 を指定。
+ * - lockedSelectedIds: 「選択済みとして表示し、かつクリック不可」にするID配列。
+ *    例）サポート選手ダイアログで育成選手のIDを渡す → グレー＋選択不可で表示。
+ */
+function CharacterSelector({
+  selectedCharacters,
+  onSelectCharacter,
+  maxSelectable = 5,
+  lockedSelectedIds = [],
+}) {
+  const selectedIds = new Set(selectedCharacters.map((c) => c.id));
+  const lockedIdSet = new Set(lockedSelectedIds);
 
-    if (isAlreadySelectedSameId) {
+  const nameOnly = (s) => String(s || '').split('【')[0];
+
+  // locked の名前重複もブロック対象に含める
+  const lockedNameRoots = new Set(
+    characterList
+      .filter((c) => lockedIdSet.has(c.id))
+      .map((c) => nameOnly(c.name))
+  );
+
+  const handleSelect = (character) => {
+    const root = nameOnly(character.name);
+    const isSelectedByState = selectedIds.has(character.id);
+    const isLocked = lockedIdSet.has(character.id);
+    const isSameNameSelected = selectedCharacters.some((c) => nameOnly(c.name) === root);
+    const isSameNameLocked = lockedNameRoots.has(root);
+
+    if (isLocked) return; // ロックされたIDは完全に操作不可
+
+    if (isSelectedByState) {
+      // 既に state 側で選ばれている → 解除
       onSelectCharacter(selectedCharacters.filter((c) => c.id !== character.id));
-    } else {
-      if (selectedCharacters.length >= 5) {
-        alert('最大5名まで選択できます');
-        return;
-      }
-      if (isAlreadySelectedSameName) {
-        alert('同名キャラは選択できません');
-        return;
-      }
-      onSelectCharacter([...selectedCharacters, character]);
+      return;
     }
+
+    if (selectedCharacters.length >= maxSelectable) {
+      alert(`最大${maxSelectable}名まで選択できます`);
+      return;
+    }
+    if (isSameNameSelected || isSameNameLocked) {
+      alert('同名キャラは選択できません');
+      return;
+    }
+    onSelectCharacter([...selectedCharacters, character]);
   };
 
   const handleCopyJSON = () => {
@@ -47,7 +75,7 @@ function CharacterSelector({ selectedCharacters, onSelectCharacter }) {
 
   return (
     <div>
-      <h2>キャラクター選択（最大5名、同名不可）</h2>
+      <h2>キャラクター選択（最大{maxSelectable}名、同名不可）</h2>
 
       {isDebugMode && (
         <div style={{ marginBottom: '10px' }}>
@@ -58,35 +86,49 @@ function CharacterSelector({ selectedCharacters, onSelectCharacter }) {
 
       <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', listStyle: 'none', padding: 0 }}>
         {characterList.map((character) => {
-          const isSelected = selectedCharacters.some((c) => c.id === character.id);
-          const nameOnly = character.name.split('【')[0];
-          const isSameNameSelected = selectedCharacters.some((c) => c.name.split('【')[0] === nameOnly);
-          const isSelectable = !isSelected && !isSameNameSelected && selectedCharacters.length < 5;
+          const root = nameOnly(character.name);
+          const isLocked = lockedIdSet.has(character.id);
+          const isSelectedByState = selectedIds.has(character.id);
+          const isSelectedVisual = isLocked || isSelectedByState; // 表示上の「選択済み」
+          const isSameNameSelected = selectedCharacters.some((c) => nameOnly(c.name) === root);
+          const isSameNameLocked = lockedNameRoots.has(root);
+
+          const selectableCapacity = selectedCharacters.length < maxSelectable;
+          const isSelectable =
+            !isLocked &&
+            !isSelectedByState &&
+            !isSameNameSelected &&
+            !isSameNameLocked &&
+            selectableCapacity;
+
+          const title = isLocked
+            ? '育成選手のため選択できません'
+            : isSelectedByState
+            ? '選択済み（クリックで解除）'
+            : !selectableCapacity
+            ? `最大${maxSelectable}名まで選択できます`
+            : isSameNameSelected || isSameNameLocked
+            ? '同名キャラは選択できません'
+            : '';
 
           return (
             <li
               key={character.id}
               onClick={() => {
-                if (isSelectable || isSelected) handleSelect(character);
+                if (isLocked) return;
+                if (isSelectable || isSelectedByState) handleSelect(character);
               }}
-              title={
-                isSelected
-                  ? '選択済み'
-                  : !isSelectable && isSameNameSelected
-                  ? '同名キャラは選択できません'
-                  : selectedCharacters.length >= 5
-                  ? '最大5名まで選択できます'
-                  : ''
-              }
+              title={title}
               style={{
-                border: isSelected ? '2px solid blue' : '2px solid #ccc',
+                position: 'relative',
+                border: isSelectedVisual ? '2px solid blue' : '2px solid #ccc',
                 borderRadius: '8px',
                 padding: '2px',
-                cursor: isSelectable || isSelected ? 'pointer' : 'not-allowed',
+                cursor: isLocked ? 'not-allowed' : (isSelectable || isSelectedByState) ? 'pointer' : 'not-allowed',
                 width: '75px',
                 textAlign: 'center',
-                opacity: isSelectable || isSelected ? 1 : 0.4,
-                backgroundColor: isSelected ? '#e0f0ff' : 'white',
+                opacity: isLocked ? 0.4 : (isSelectable || isSelectedByState) ? 1 : 0.4,
+                backgroundColor: isSelectedVisual ? '#e0f0ff' : 'white',
                 color: '#000',
               }}
             >
@@ -100,6 +142,18 @@ function CharacterSelector({ selectedCharacters, onSelectCharacter }) {
                 }}
               />
               <div style={{ fontSize: '10px' }}>{character.name}</div>
+
+              {isLocked && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.15)',
+                    borderRadius: '6px',
+                  }}
+                  aria-hidden
+                />
+              )}
             </li>
           );
         })}

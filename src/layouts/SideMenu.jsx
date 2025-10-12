@@ -50,6 +50,12 @@ export default function SideMenu({ prepend = null, append = null, children = nul
           </NavLink>
         </li>
 
+        <li className={liClass}>
+          <NavLink to="/training" className={({ isActive }) => (isActive ? "active" : "")}>
+            トレーニングスキル確認ツール
+          </NavLink>
+        </li>
+
         {/* 「キャラ別一覧」リンク + 右側に開閉ボタン（クリック領域を分離） */}
         <li className={liClass}>
           <div className="flex items-center gap-2">
