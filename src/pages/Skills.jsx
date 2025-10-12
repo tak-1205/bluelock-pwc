@@ -215,13 +215,13 @@ export default function Skills() {
   return (
     <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
       <section className="p-4 space-y-5">
-        <h1 className="text-xl font-bold">スキル一覧</h1>
+        <h1 className="text-xl font-bold">マッチスキル一覧</h1>
 
         {/* 検索 */}
         <div className="flex flex-wrap items-end gap-3">
           <label className="form-control w-full sm:w-96">
             <div className="label">
-              <span className="label-text">スキル名／発動スキル／発動者名で検索</span>
+              <span className="label-text">マッチスキル名／発動スキル／発動者名で検索</span>
             </div>
             <input
               className="input input-bordered"
@@ -267,7 +267,7 @@ export default function Skills() {
             <table className="table table-zebra table-fixed w-full">
               <thead>
                 <tr>
-                  <th className="whitespace-normal">スキル名</th>
+                  <th className="whitespace-normal">マッチスキル名</th>
                   <th className="whitespace-normal">発動スキル</th>
                   <th className="whitespace-normal">発動する組み合わせ例</th>
                 </tr>
