@@ -59,8 +59,8 @@ export default function RightAds({ items, slots = {} }) {
   };
 
   const wrapperClass = isSP
-  ? "mx-auto w-[320px] min-w-[320px] min-h-[60px]"
-  : "mx-auto w-[300px] min-w-[300px] min-h-[250px]";
+  ? "mx-auto w-[320px] min-w-[320px] h-[60px]"
+  : "mx-auto w-[300px] min-w-[300px] h-[250px]";
 
   return (
     <div className="space-y-4">
