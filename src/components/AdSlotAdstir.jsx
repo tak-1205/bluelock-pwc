@@ -2,98 +2,83 @@
 import React, { useEffect, useRef } from "react";
 
 /**
- * AdSlotAdstir
- * - tagHtml に含まれる <script> / <div> を安全に順序保証で挿入
- * - 外部 <script> は onload/onerror を待って「直列」実行（config → loader）
- * - InvalidCharacterError 対策：
- *   - 不可視スペース（U+3000 含む）などを正規化
- *   - 属性コピーはホワイトリスト方式（未知/不正名は無視）
+ * AdSlotAdstir（iframeサンドボックス版）
+ *
+ * 背景:
+ * - adstir.js は document.write を用いるため、SPA後挿入だと
+ *   「非同期scriptから document.write 禁止」エラーが出やすい。
+ * 解法:
+ * - フレンドリー iframe を生成し、その中に config→loader を
+ *   順序通りで document.write させる（doc.open/write/close）。
+ *
+ * 特徴:
+ * - lazy: IntersectionObserver でビューポート付近で初期化
+ * - tagHtml: <script src="/adstir_*_config.js"></script><script src="https://js.ad-stir.com/js/adstir.js"></script>
+ * - 幅/高さは親（ラッパー）で管理。iframe 自体は100%でフィットさせる。
  */
+
 export default function AdSlotAdstir({ tagHtml, lazy = true, className = "" }) {
   const hostRef = useRef(null);
   const initedRef = useRef(false);
 
-  // 1) 不可視文字の正規化（貼り付け時の全角スペース/ZWSP混入対策）
+  // 不可視スペースなどの正規化（貼付け時の混入対策）
   const normalizeHtml = (html) =>
     (html || "")
-      // NBSP, En/Em space, zero-width 等を半角スペースへ正規化
       .replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]+/g, " ")
       .trim();
 
-  // 2) 属性名の正規化（不可視文字除去＋trim）
-  const normalizeAttrName = (name) =>
-    String(name || "").replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]+/g, "").trim();
+  // iframe に ad タグを書き込む（順序は tagHtml の記述順）
+  const writeIntoIframe = (container, html) => {
+    // 古い要素をクリア
+    container.textContent = "";
 
-  // 3) <script> 属性ホワイトリスト
-  //    代表的な安全属性のみ許可。data-* は通す。
-  const SCRIPT_ATTR_WHITELIST = /^(src|async|defer|crossorigin|referrerpolicy|type|nonce|integrity|data-[\w-]+)$/i;
+    const iframe = document.createElement("iframe");
+    // レイアウトは親で幅・高さを決めるので、iframe は100%でフィット
+    Object.assign(iframe.style, {
+      display: "block",
+      width: "100%",
+      height: "100%",
+      border: "0",
+      overflow: "hidden",
+    });
+    iframe.setAttribute("scrolling", "no");
+    iframe.setAttribute("frameBorder", "0");
+    iframe.setAttribute("aria-label", "adstir-ad-iframe");
 
-  // 4) HTML → Node 群（順序保持）に分解（template 経由で script 自動実行を防止）
-  const toOrderedNodes = (html) => {
-    const tpl = document.createElement("template");
-    tpl.innerHTML = html;
-    return Array.from(tpl.content.childNodes);
-  };
+    container.appendChild(iframe);
 
-  // 5) 子ノードを順にマウント。<script> は安全コピー＋直列ロード。
-  const mountNodesSequentially = async (container, nodes) => {
-    for (const node of nodes) {
-      // 非 <script> はそのままクローンして追加
-      if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() !== "script") {
-        container.appendChild(node.cloneNode(true));
-        continue;
-      }
-      if (node.nodeType !== Node.ELEMENT_NODE || node.tagName.toLowerCase() !== "script") {
-        // テキストノード等は無視（必要なら挿入してもOK）
-        continue;
-      }
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) return;
 
-      // <script> は安全コピー
-      await new Promise((resolve) => {
-        try {
-          const s = document.createElement("script");
+    // adstir は document.write を想定しているため、open→write→close で同期的に流し込む
+    // body 直下にそのまま tagHtml を書き込む（config → loader の順が大事）
+    const safeHtml = normalizeHtml(html);
+    const htmlDoc = [
+      "<!doctype html>",
+      "<html><head><meta charset='utf-8' /></head><body>",
+      // ラッパー（なくてもよいが計測用にidを付けておく）
+      "<div id='adstir-slot'></div>",
+      safeHtml,
+      "</body></html>",
+    ].join("");
 
-          // 属性コピー（不正名は除去）
-          for (const attr of Array.from(node.attributes)) {
-            const name = normalizeAttrName(attr.name).toLowerCase();
-            if (SCRIPT_ATTR_WHITELIST.test(name)) {
-              s.setAttribute(name, attr.value);
-            }
-          }
-
-          // 直列実行を担保（外部は onload/onerror 待ち、inline は同期）
-          if (s.hasAttribute("src")) {
-            s.async = false; // 明示
-            s.onload = () => resolve();
-            s.onerror = () => resolve(); // 失敗でも次へ進めてハング防止
-            container.appendChild(s);
-          } else {
-            // inline script
-            s.text = node.textContent || "";
-            container.appendChild(s);
-            resolve();
-          }
-        } catch (_e) {
-          // 万一の例外でも先へ進む
-          resolve();
-        }
-      });
+    try {
+      doc.open();
+      doc.write(htmlDoc);
+      doc.close();
+    } catch {
+      // 万一 iframe 書き込みに失敗した場合は、フォールバック（非推奨）
+      // ただし adstir.js は document.write 前提のため、基本は iframe 書込のみで十分
     }
   };
 
   useEffect(() => {
     if (!hostRef.current || initedRef.current) return;
 
-    const run = async () => {
+    const run = () => {
       if (!hostRef.current || initedRef.current) return;
       initedRef.current = true;
-
-      const safeHtml = normalizeHtml(tagHtml);
-      // 初期化（再実行時の残骸もクリア）
-      hostRef.current.textContent = "";
-
-      const nodes = toOrderedNodes(safeHtml);
-      await mountNodesSequentially(hostRef.current, nodes);
+      writeIntoIframe(hostRef.current, tagHtml);
     };
 
     if (!lazy) {
@@ -101,7 +86,6 @@ export default function AdSlotAdstir({ tagHtml, lazy = true, className = "" }) {
       return;
     }
 
-    // ビューポート付近で起動（遅延ロード）
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
@@ -118,7 +102,8 @@ export default function AdSlotAdstir({ tagHtml, lazy = true, className = "" }) {
 
   return (
     <div className={className}>
-      <div ref={hostRef} aria-label="adstir-ad" />
+      {/* 親側で w-[320px]/w-[300px] & min-h を指定しておくこと */}
+      <div ref={hostRef} aria-label="adstir-ad" style={{ width: "100%", height: "100%" }} />
     </div>
   );
 }
