@@ -59,7 +59,7 @@ export default function RightAds({ items, slots = {} }) {
   };
 
   const wrapperClass = isSP
-  ? "mx-auto w-[320px] min-w-[320px] h-[150px]"
+  ? ""
   : "mx-auto w-[300px] min-w-[300px] h-[250px]";
 
   return (
