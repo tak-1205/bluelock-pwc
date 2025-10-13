@@ -61,30 +61,15 @@ export default function AdSlotAdstir({ tagHtml, lazy = true, className = "" }) {
     }
   };
 
-  const bootWithOrderGuarantee = (container, configSrc, loaderSrc) => {
+  // 正順実行（**パーサ挿入**）… config → loader を doc.write で連続記述
+  const bootWithParserOrder = (container, configSrc, loaderSrc) => {
     const html = `<!doctype html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;overflow:hidden">
   <div id="adstir-slot"></div>
   <script src="${configSrc}"></script>
-  <script>
-    (function(){
-      var MAX_WAIT=5000, start=Date.now();
-      function hasVars(){ return typeof window.adstir_vars==='object' && window.adstir_vars; }
-      function loadLoader(){
-        var s=document.createElement('script');
-        s.src='${loaderSrc}';
-        s.async=false;
-        document.body.appendChild(s);
-      }
-      (function tick(){
-        if (hasVars()) return loadLoader();
-        if (Date.now()-start>MAX_WAIT) return; // give up quietly
-        setTimeout(tick, 30);
-      })();
-    })();
-  </script>
+  <script src="${loaderSrc}"></script>
 </body>
 </html>`;
     writeHtmlIntoIframe(container, html);
@@ -125,10 +110,10 @@ export default function AdSlotAdstir({ tagHtml, lazy = true, className = "" }) {
       console.debug("[AdSlotAdstir] extracted srcs:", allSrcs);
       console.debug("[AdSlotAdstir] configSrc:", configSrc || "(none)", "loaderSrc:", loaderSrc || "(none)");
 
-      if (configSrc && loaderSrc) {
-        // 正常系：順序保証して実行
-        bootWithOrderGuarantee(hostRef.current, configSrc, loaderSrc);
-      } else {
+    　if (configSrc && loaderSrc) {
+        　// 正常系：**doc.write で連続 <script>**（document.write 禁止問題を回避）
+        　bootWithParserOrder(hostRef.current, configSrc, loaderSrc);
+    　} else {
         // フォールバック：生HTMLをそのまま書き込む（document.write 実行経路）
         console.warn("[AdSlotAdstir] fallback to raw tagHtml write (parser did not find both srcs)");
         bootWithRawFallback(hostRef.current, safe);
