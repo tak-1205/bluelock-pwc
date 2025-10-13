@@ -1,4 +1,4 @@
-var adstir_vars = {
+window.adstir_vars = {
   ver: "4.0",
   type: "interstitial",
   app_id: "MEDIA-cf6de28",
