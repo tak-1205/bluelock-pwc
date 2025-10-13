@@ -46,11 +46,11 @@ export default function RightAds({ items, slots = {} }) {
   const TAG_TOP_PC = TAG_PC, TAG_MID_PC = TAG_PC, TAG_BTM_PC = TAG_PC;
   const TAG_TOP_SP = TAG_SP, TAG_MID_SP = TAG_SP, TAG_BTM_SP = TAG_SP;
 
-  const isSP = useIsSP(1024); // 例：1024px未満をSP扱い（好みで768等に変更可）
+  const isSP = useIsSP(768); // 例：1024px未満をSP扱い（好みで768等に変更可）
 
   const tagTop = isSP ? TAG_TOP_SP : TAG_TOP_PC;
-  const tagMid = isSP ? TAG_MID_SP : TAG_MID_PC;
-  const tagBtm = isSP ? TAG_BTM_SP : TAG_BTM_PC;
+  const tagMid = "";
+  const tagBtm = "";
 
   const handleAffClick = (_e, item) => {
     try {
@@ -114,26 +114,7 @@ export default function RightAds({ items, slots = {} }) {
         </div>
       )}
 
-      {/* 中段・下段（遅延初期化のまま） */}
-      {SHOW_ADS && (tagMid) && (
-        <div className="card bg-base-100 shadow">
-          <div className="card-body p-0">
-            <div className={wrapperClass}>
-              <AdSlotAdstir tagHtml={tagMid} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {SHOW_ADS && (tagBtm) && (
-        <div className="card bg-base-100 shadow">
-          <div className="card-body p-0">
-            <div className={wrapperClass}>
-              <AdSlotAdstir tagHtml={tagBtm} />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 中段・下段は非表示（将来使うときは上の tagMid/tagBtm を復活） */}
     </div>
   );
 }
