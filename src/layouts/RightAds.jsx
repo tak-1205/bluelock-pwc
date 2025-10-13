@@ -63,8 +63,8 @@ export default function RightAds({ items, slots = {} }) {
       {/* 上段（ファーストビューに入りやすいのでlazy=falseでもOK） */}
       {SHOW_ADS && (tagTop) && (
         <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <div className="min-h-[300px]">
+          <div className="card-body p-0">
+            <div className="mx-auto w-[320px] min-w-[320px] min-h-[60px]">
               <AdSlotAdstir tagHtml={tagTop} lazy={false} />
             </div>
           </div>
@@ -113,8 +113,8 @@ export default function RightAds({ items, slots = {} }) {
       {/* 中段・下段（遅延初期化のまま） */}
       {SHOW_ADS && (tagMid) && (
         <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <div className="min-h-[250px]">
+          <div className="card-body p-0">
+            <div className="mx-auto w-[320px] min-w-[320px] min-h-[60px]">
               <AdSlotAdstir tagHtml={tagMid} />
             </div>
           </div>
@@ -123,8 +123,8 @@ export default function RightAds({ items, slots = {} }) {
 
       {SHOW_ADS && (tagBtm) && (
         <div className="card bg-base-100 shadow">
-          <div className="card-body">
-            <div className="min-h-[250px]">
+          <div className="card-body p-0">
+            <div className="mx-auto w-[320px] min-w-[320px] min-h-[60px]">
               <AdSlotAdstir tagHtml={tagBtm} />
             </div>
           </div>
