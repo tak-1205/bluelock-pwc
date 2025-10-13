@@ -8,23 +8,85 @@
     <title> PWC EGOIST【ブルーロック PWC】</title>
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
-    <!-- AdSense: 審査中はメタタグで接続。承認後に必要なら <script> を追加 -->
     <meta name="google-adsense-account" content="ca-pub-1152336644480194">
-
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VVFP9CCRGJ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-VVFP9CCRGJ');
     </script>
-
+    <style>
+      #adstir-topframe-slot-wrap {
+        position: absolute;
+        left: -9999px;
+        top: -9999px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        width: 320px;
+        height: 50px;
+        z-index: 0;
+      }
+    </style>
   </head>
   <body class="font-sans">
+    <div id="adstir-topframe-slot-wrap">
+      <div id="adstir-topframe-slot"></div>
+      <script>
+        (function () {
+          var isSP = window.matchMedia('(max-width: 767px)').matches;
+          if (isSP) {
+            window.adstir_vars = {
+              ver: "4.0",
+              type: "banner",
+              platform: "web",
+              app_id: "MEDIA-fd43f5bc",
+              ad_spot: 1,
+              width: 320,
+              height: 50
+            };
+          } else {
+            window.adstir_vars = {
+              ver: "4.0",
+              type: "banner",
+              platform: "web",
+              app_id: "MEDIA-cf6de28",
+              ad_spot: 1,
+              width: 300,
+              height: 250
+            };
+          }
+        })();
+      </script>
+      <script src="https://js.ad-stir.com/js/adstir.js"></script>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      (function () {
+        var wrap = document.getElementById('adstir-topframe-slot-wrap');
+        if (!wrap) return;
+        function tryMove() {
+          var anchor = document.getElementById('right-ads-anchor-top');
+          if (!anchor) return false;
+          if (anchor.contains(wrap)) return true;
+          anchor.appendChild(wrap);
+          wrap.style.position = 'static';
+          wrap.style.left = 'auto';
+          wrap.style.top = 'auto';
+          return true;
+        }
+        if (!tryMove()) {
+          var obs = new MutationObserver(function () {
+            if (tryMove()) obs.disconnect();
+          });
+          obs.observe(document.body, { childList: true, subtree: true });
+          window.addEventListener('popstate', tryMove, { passive: true });
+        }
+      })();
+    </script>
   </body>
 </html>

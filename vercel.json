@@ -4,14 +4,11 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/images/(.*)", "destination": "/images/$1" },
-
     { "source": "/share/combos/:ids.png", "destination": "/api/og?ids=:ids" },
     { "source": "/share/combos/:ids", "destination": "/api/share-combos?ids=:ids" },
-
     { "source": "/ads.txt", "destination": "/ads.txt" },
     { "source": "/adstir_pc_config.js", "destination": "/adstir_pc_config.js" },
     { "source": "/adstir_sp_config.js", "destination": "/adstir_sp_config.js" },
-
     { "source": "/(favicon.ico|robots.txt|sitemap.xml)", "destination": "/$1" },
     { "source": "/(.*)", "destination": "/" }
   ],
@@ -34,7 +31,6 @@
         { "key": "Cache-Control", "value": "no-store" }
       ]
     },
-
     {
       "source": "/(adstir_pc_config.js|adstir_sp_config.js)",
       "headers": [

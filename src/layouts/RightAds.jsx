@@ -1,8 +1,5 @@
-// src/layouts/RightAds.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import AdSlot from "../components/AdSlot.jsx"; // AdSense用（未使用なら残置OK）
-import AdSlotAdstir from "../components/AdSlotAdstir.jsx"; // ← 追加済のやつ
 import { logAffClick } from "../lib/logAffClick.js";
 import { getAffiliateItemsForPath } from "../affiliates/registry.js";
 import { onAdsRefresh } from "../lib/adBus.js";
@@ -15,7 +12,6 @@ const useIsSP = (breakpoint = 768) => {
     if (typeof window === "undefined") return;
     const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
     const handler = (e) => setIsSP(e.matches);
-    // 初期 & 監視
     handler(mql);
     mql.addEventListener?.("change", handler);
     return () => mql.removeEventListener?.("change", handler);
@@ -26,7 +22,6 @@ const useIsSP = (breakpoint = 768) => {
 export default function RightAds({ items, slots = {} }) {
   const SHOW_ADS = import.meta.env.VITE_FEATURE_ADS === "on";
   const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "on";
-  const AD_PROVIDER = import.meta.env.VITE_AD_PROVIDER || "adstir";
   const location = useLocation();
   const NOTHING_TO_SHOW = !SHOW_ADS && !SHOW_AFF;
   if (NOTHING_TO_SHOW) return null;
@@ -38,19 +33,8 @@ export default function RightAds({ items, slots = {} }) {
   useEffect(() => { setAdKey((k) => k + 1); }, [location.key]);
   useEffect(() => onAdsRefresh(() => setAdKey((k) => k + 1)), []);
 
-  // ── adstir：PC/SP共通タグ（位置が分かれていなければ同じものを各枠に使う）
-  const TAG_PC = import.meta.env.VITE_ADSTIR_TAG_PC || "";
-  const TAG_SP = import.meta.env.VITE_ADSTIR_TAG_SP || "";
-
-  // 将来、枠別タグを使う時はここを VITE_ADSTIR_TAG_TOP_PC 等に差し替え
-  const TAG_TOP_PC = TAG_PC, TAG_MID_PC = TAG_PC, TAG_BTM_PC = TAG_PC;
-  const TAG_TOP_SP = TAG_SP, TAG_MID_SP = TAG_SP, TAG_BTM_SP = TAG_SP;
-
-  const isSP = useIsSP(768); // 例：1024px未満をSP扱い（好みで768等に変更可）
-
-  const tagTop = isSP ? TAG_TOP_SP : TAG_TOP_PC;
-  const tagMid = "";
-  const tagBtm = "";
+  const isSP = useIsSP(768);
+  const anchorClass = isSP ? "h-[50px]" : "h-[250px]";
 
   const handleAffClick = (_e, item) => {
     try {
@@ -58,24 +42,9 @@ export default function RightAds({ items, slots = {} }) {
     } catch {}
   };
 
-  const wrapperClass = isSP
-  ? ""
-  : "mx-auto w-[300px] min-w-[300px] h-[250px]";
-
   return (
     <div className="space-y-4">
-      {/* 上段（ファーストビューに入りやすいのでlazy=falseでもOK） */}
-      {SHOW_ADS && (tagTop) && (
-        <div className="card bg-base-100 shadow">
-          <div className="card-body p-0">
-            <div className={wrapperClass}>
-              <AdSlotAdstir tagHtml={tagTop} lazy={false} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* アフィリエイト枠（任意） */}
+      <div id="right-ads-anchor-top" className={anchorClass} />
       {SHOW_AFF && effectiveItems.length > 0 && (
         <div className="card bg-base-100 shadow">
           <div className="card-body">
@@ -113,8 +82,6 @@ export default function RightAds({ items, slots = {} }) {
           </div>
         </div>
       )}
-
-      {/* 中段・下段は非表示（将来使うときは上の tagMid/tagBtm を復活） */}
     </div>
   );
 }
