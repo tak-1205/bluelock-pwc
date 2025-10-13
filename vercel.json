@@ -8,11 +8,9 @@
     { "source": "/share/combos/:ids.png", "destination": "/api/og?ids=:ids" },
     { "source": "/share/combos/:ids", "destination": "/api/share-combos?ids=:ids" },
 
-    /* ▼▼ ここから“SPAにリライトさせない例外” ▼▼ */
     { "source": "/ads.txt", "destination": "/ads.txt" },
     { "source": "/adstir_pc_config.js", "destination": "/adstir_pc_config.js" },
     { "source": "/adstir_sp_config.js", "destination": "/adstir_sp_config.js" },
-    /* ▲▲ ここまで必ず /(.*) より前に置く ▲▲ */
 
     { "source": "/(favicon.ico|robots.txt|sitemap.xml)", "destination": "/$1" },
     { "source": "/(.*)", "destination": "/" }
