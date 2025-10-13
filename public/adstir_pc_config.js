@@ -1,9 +1,9 @@
-var adstir_vars = {
+window.adstir_vars = {
   ver: "4.0",
-  type: "banner",      // ← 明示
-  platform: "web",     // ← 明示
+  type: "banner",
+  platform: "web",
   app_id: "MEDIA-cf6de28",
   ad_spot: 2,
-  width: 300,          // ← PC 右カラム用
+  width: 300,
   height: 250
 };

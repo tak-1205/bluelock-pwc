@@ -58,13 +58,17 @@ export default function RightAds({ items, slots = {} }) {
     } catch {}
   };
 
+  const wrapperClass = isSP
+  ? "mx-auto w-[320px] min-w-[320px] min-h-[60px]"
+  : "mx-auto w-[300px] min-w-[300px] min-h-[250px]";
+
   return (
     <div className="space-y-4">
       {/* 上段（ファーストビューに入りやすいのでlazy=falseでもOK） */}
       {SHOW_ADS && (tagTop) && (
         <div className="card bg-base-100 shadow">
           <div className="card-body p-0">
-            <div className="mx-auto w-[320px] min-w-[320px] min-h-[60px]">
+            <div className={wrapperClass}>
               <AdSlotAdstir tagHtml={tagTop} lazy={false} />
             </div>
           </div>
@@ -114,7 +118,7 @@ export default function RightAds({ items, slots = {} }) {
       {SHOW_ADS && (tagMid) && (
         <div className="card bg-base-100 shadow">
           <div className="card-body p-0">
-            <div className="mx-auto w-[320px] min-w-[320px] min-h-[60px]">
+            <div className={wrapperClass}>
               <AdSlotAdstir tagHtml={tagMid} />
             </div>
           </div>
@@ -124,7 +128,7 @@ export default function RightAds({ items, slots = {} }) {
       {SHOW_ADS && (tagBtm) && (
         <div className="card bg-base-100 shadow">
           <div className="card-body p-0">
-            <div className="mx-auto w-[320px] min-w-[320px] min-h-[60px]">
+            <div className={wrapperClass}>
               <AdSlotAdstir tagHtml={tagBtm} />
             </div>
           </div>
