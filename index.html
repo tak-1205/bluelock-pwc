@@ -18,11 +18,18 @@
     </script>
   </head>
   <body class="font-sans">
-    <div id="adstir-topframe-source" style="position:absolute;left:-9999px;top:-9999px">
+    <div id="adstir-topframe-source">
       <script>
         (function () {
-          var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-          if (w < 768) {
+          var a = document.getElementById('right-ads-anchor-top');
+          var isSP = false;
+          if (a) {
+            var w = a.clientWidth || 0;
+            if (w >= 315 && w <= 325) isSP = true;
+          } else {
+            isSP = window.matchMedia('(max-width: 767px)').matches;
+          }
+          if (isSP) {
             window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-fd43f5bc", ad_spot:1, width:320, height:50 };
           } else {
             window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-cf6de28", ad_spot:1, width:300, height:250 };
@@ -43,9 +50,9 @@
           var a = anchor();
           if (!src || !a) return false;
           if (!a.contains(src)) a.appendChild(src);
-          src.style.position = 'static';
-          src.style.left = 'auto';
-          src.style.top = 'auto';
+          var isSP = a.clientWidth >= 315 && a.clientWidth <= 325;
+          src.style.width = isSP ? '320px' : '300px';
+          src.style.height = isSP ? '50px' : '250px';
           return true;
         }
         if (!move()) {

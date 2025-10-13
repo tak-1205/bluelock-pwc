@@ -34,7 +34,7 @@ export default function RightAds({ items, slots = {} }) {
   useEffect(() => onAdsRefresh(() => setAdKey((k) => k + 1)), []);
 
   const isSP = useIsSP(768);
-  const anchorClass = isSP ? "h-[50px]" : "h-[250px]";
+  const anchorClass = isSP ? "w-[320px] min-w-[320px] h-[50px]" : "w-[300px] min-w-[300px] h-[250px]";
 
   const handleAffClick = (_e, item) => {
     try {
@@ -43,11 +43,11 @@ export default function RightAds({ items, slots = {} }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-visible">
       <div id="right-ads-anchor-top" className={anchorClass} />
       {SHOW_AFF && effectiveItems.length > 0 && (
-        <div className="card bg-base-100 shadow">
-          <div className="card-body">
+        <div className="card bg-base-100 shadow overflow-visible">
+          <div className="card-body overflow-visible">
             <div className="text-xs font-semibold text-base-content/70">Sponsored</div>
             <ul className="mt-2 space-y-3">
               {effectiveItems.map((item) => (
