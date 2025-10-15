@@ -430,7 +430,7 @@ function collectTypes(pool) {
 // daisyUIで作るフィルタバー
 function TypeFilterBar({ items, value, onChange }) {
   return (
-    <div className="px-4 pt-10">
+    <div className="pt-5">
       <div className="text-sm mb-2">タイプで絞り込み</div>
         <div className="mt-2 text-xs text-base-content/70">
            ボタンをクリックすると、各タイプのカードのみ表示されます。
@@ -739,13 +739,12 @@ export default function TrainingTool() {
       <section className="p-4 max-w-5xl mx-auto space-y-6">
         {/* 見出し */}
         <div className="flex items-center gap-3">
-          <img src="/images/icon.png" alt="icon" width={24} height={24} />
           <h1 className="text-2xl font-bold">トレーニングスキル確認ツール</h1>
         </div>
 
         {/* サポート編成ボックス */}
         <div className="bg-base-100 rounded-2xl border border-base-300 shadow-sm">
-          <div className="px-4 py-3 border-b border-base-300 flex items-center justify-between">
+          <div className="py-3 border-b border-base-300 flex items-center justify-between">
             <div className="font-semibold">サポート編成</div>
           </div>
 
@@ -944,20 +943,20 @@ export default function TrainingTool() {
           className="modal-box max-w-5xl"
           style={{ display: "flex", flexDirection: "column", maxHeight: "80vh", paddingBottom: 0 }}
         >
-          <h3 className="font-bold text-lg px-4 pt-4">スペシャルサポートカードを選ぶ（最大4）</h3>
+          <h3 className="font-bold text-lg pt-4">スペシャルサポートカードを選ぶ（最大4）</h3>
 
-          <div className="mt-2 text-xs text-base-content/70 px-4">
+          <div className="mt-2 text-xs text-base-content/70">
             ※ 比較的最近追加された、効果量の高いカードのみ表示しています。（具体的には画像の表示されているカードのみ。）
           </div>
 
-          <div className="mt-2 text-xs text-base-content/70 px-4">
+          <div className="mt-2 text-xs text-base-content/70">
             全てレベルMAXの時の効果量で表示されます。
           </div>
 
           {/* ★ 追加：タイプ絞り込みバー */}
           <TypeFilterBar items={supportTypeItems} value={supportTypeKey} onChange={setSupportTypeKey} />
 
-          <div className="mt-3" style={{ overflowY: "auto", padding: "0 16px", flex: "1 1 auto" }}>
+          <div className="mt-3" style={{ overflowY: "auto", padding: "5px", flex: "1 1 auto" }}>
             <SupportCardPicker
               pool={filteredNormalCards} // ← 絞り込み後のプール
               max={4}
@@ -974,7 +973,7 @@ export default function TrainingTool() {
               bottom: 0,
               background: "var(--fallback-b1, oklch(var(--b1)))",
               borderTop: "1px solid rgba(0,0,0,0.08)",
-              padding: "12px 16px",
+              padding: "12px 5px",
               marginTop: 0,
             }}
           >
@@ -992,12 +991,12 @@ export default function TrainingTool() {
           className="modal-box max-w-5xl"
           style={{ display: "flex", flexDirection: "column", maxHeight: "80vh", paddingBottom: 0 }}
         >
-          <h3 className="font-bold text-lg px-4 pt-4">EXサポートカードを選ぶ（1）</h3>
+          <h3 className="font-bold text-lg pt-4">EXサポートカードを選ぶ（1）</h3>
 
           {/* ★ 追加：タイプ絞り込みバー */}
           <TypeFilterBar items={exTypeItems} value={exTypeKey} onChange={setExTypeKey} />
 
-          <div className="mt-3" style={{ overflowY: "auto", padding: "0 16px", flex: "1 1 auto" }}>
+          <div className="mt-3" style={{ overflowY: "auto", padding: "0", flex: "1 1 auto" }}>
             <ExSupportPicker
               pool={filteredExCards} // ← 絞り込み後のプール
               selectedId={selectedExSupport || null}
@@ -1013,7 +1012,7 @@ export default function TrainingTool() {
               bottom: 0,
               background: "var(--fallback-b1, oklch(var(--b1)))",
               borderTop: "1px solid rgba(0,0,0,0.08)",
-              padding: "12px 16px",
+              padding: "12px 5px",
               marginTop: 0,
             }}
           >
