@@ -17,52 +17,71 @@
       gtag('config', 'G-VVFP9CCRGJ');
     </script>
     <style>
-      :root{
-        --ads-right: 16px;
-        --ads-top: 80px;
-        --ads-z: 1000;
-      }
-      /* 右上段オーバーレイ（レイアウト非干渉） */
-      #ads-right-rail{ position: fixed; right: var(--ads-right); top: var(--ads-top); z-index: var(--ads-z); pointer-events: none; }
-      #ads-right-rail .slot{ pointer-events: auto; }
-      /* PC/ SP のスロット切替 */
-      #slot-right-top-pc{ width:300px; height:250px; display:none; }
-      #slot-right-top-sp{ width:320px; height:50px;  display:none; }
-      @media (min-width:1024px){ #slot-right-top-pc{ display:block; } }
-      @media (max-width:1023px){ #slot-right-top-sp{ display:block; } }
-      .slot-wrap{ width:100%; height:100%; }
+      /* PC 右カラム内用スロット（300x250） */
+      #adslot-right-top-pc { width:300px; height:250px; display:none; margin:0; }
+      @media (min-width:1280px){ #adslot-right-top-pc{ display:block; } } /* Tailwindのxl基準 */
+
+      /* SP 本文下用スロット（320x50） */
+      #adslot-main-bottom-sp { width:320px; height:50px; display:none; margin:16px auto 0; }
+      @media (max-width:1279px){ #adslot-main-bottom-sp{ display:block; } }
+
+      .slot-wrap { width:100%; height:100%; }
     </style>
   </head>
   <body class="font-sans">
-    <!-- React本体（既存レイアウトそのまま） -->
+    <!-- React本体 -->
     <div id="root"></div>
 
-    <!-- 右上段：レイアウトに触れないオーバーレイ設置 -->
-    <div id="ads-right-rail" aria-label="Right rail overlay">
-      <div id="slot-right-top-pc" class="slot">
-        <div class="slot-wrap">
-          <div id="adstir-slot-right-top-pc"></div>
-          <script>
-            if (window.matchMedia('(min-width:1024px)').matches) {
-              window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-cf6de28", ad_spot:1, width:300, height:250 };
-              document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
-            }
-          </script>
-        </div>
+    <!-- PC: 右カラム上段（直書き→React生成後に<aside>内へ移動） -->
+    <div id="adslot-right-top-pc" aria-label="Right rail top (PC)">
+      <div class="slot-wrap">
+        <div id="adstir-slot-right-top-pc"></div>
+        <script>
+          if (window.matchMedia('(min-width:1280px)').matches) {
+            window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-cf6de28", ad_spot:1, width:300, height:250 };
+            document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
+          }
+        </script>
       </div>
-      <div id="slot-right-top-sp" class="slot">
-        <div class="slot-wrap">
-          <div id="adstir-slot-right-top-sp"></div>
-          <script>
-            if (window.matchMedia('(max-width:1023px)').matches) {
-              window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-fd43f5bc", ad_spot:1, width:320, height:50 };
-              document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
-            }
-          </script>
-        </div>
+    </div>
+
+    <!-- SP: 本文下（直書き・移動なし） -->
+    <div id="adslot-main-bottom-sp" aria-label="Main bottom (SP)">
+      <div class="slot-wrap">
+        <div id="adstir-slot-main-bottom-sp"></div>
+        <script>
+          if (window.matchMedia('(max-width:1279px)').matches) {
+            window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-fd43f5bc", ad_spot:1, width:320, height:50 };
+            document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
+          }
+        </script>
       </div>
     </div>
 
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- PC用スロットをReactの右カラム<aside>内に移動（SPは移動しない） -->
+    <script>
+      (function () {
+        var moved = false;
+        function placeIntoAside(){
+          if(moved) return true;
+          if (!window.matchMedia('(min-width:1280px)').matches) return false;
+          var host = document.querySelector('aside.hidden.xl\\:block.sticky.top-4.self-start.space-y-4, aside.xl\\:block.sticky.top-4.self-start.space-y-4');
+          var slot = document.getElementById('adslot-right-top-pc');
+          if(!host || !slot) return false;
+          if(!host.contains(slot)) host.prepend(slot);
+          moved = true;
+          return true;
+        }
+        if (!placeIntoAside()) {
+          var mo = new MutationObserver(function(){
+            if (placeIntoAside()) mo.disconnect();
+          });
+          mo.observe(document.body, { childList:true, subtree:true });
+          window.addEventListener('popstate', placeIntoAside, { passive:true });
+        }
+      })();
+    </script>
   </body>
 </html>
