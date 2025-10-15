@@ -16,56 +16,73 @@
       gtag('js', new Date());
       gtag('config', 'G-VVFP9CCRGJ');
     </script>
+    <style>
+      @media (max-width:768px){
+        aside.min-h-full.w-72.bg-base-200.border-r.border-base-300.relative.z-\[80\]{
+          width: 320px !important;
+          min-width: 320px !important;
+        }
+      }
+    </style>
+
   </head>
   <body class="font-sans">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- PC右カラム（xl以上）とSP本文下（xl未満）に独立ページをiframeで差し込み -->
     <script>
-      (function(){
-        function placePC(){
-          if(!matchMedia('(min-width:1280px)').matches) return false;
-          const aside =
-            document.querySelector('aside.sticky.top-4.self-start.space-y-4') ||
-            document.querySelector('aside.xl\\:block.sticky.top-4.self-start.space-y-4') ||
-            document.querySelector('aside.sticky');
-          if(!aside || document.getElementById('unitPc')) return false;
-          const f=document.createElement('iframe');
-          f.id='unitPc';
-          f.width=300; f.height=250;
-          f.loading='lazy';
-          f.setAttribute('frameborder','0');
-          f.setAttribute('scrolling','no');
-          f.style.display='block';
-          f.style.margin='0 auto';
-          f.src='/u/pc-unit.html';
-          aside.prepend(f);
-          return true;
-        }
-        function placeSP(){
-          if(!matchMedia('(max-width:1279px)').matches) return false;
-          const root=document.getElementById('root');
-          if(!root || document.getElementById('unitSp')) return false;
-          const f=document.createElement('iframe');
-          f.id='unitSp';
-          f.width=320; f.height=50;
-          f.loading='lazy';
-          f.setAttribute('frameborder','0');
-          f.setAttribute('scrolling','no');
-          f.style.display='block';
-          f.style.margin='16px auto 0';
-          f.src='/u/sp-unit.html';
-          root.after(f);
-          return true;
-        }
-        function place(){ let ok=false; ok=placePC()||ok; ok=placeSP()||ok; return ok; }
-        if(!place()){
-          const mo=new MutationObserver(()=>{ place() && mo.disconnect(); });
-          mo.observe(document.body,{childList:true,subtree:true});
-          addEventListener('popstate', place, {passive:true});
-        }
-      })();
+    (function(){
+      function findAside(){
+        // ご提示のクラスに合わせて最優先でマッチ
+        return document.querySelector('aside.min-h-full.w-72.bg-base-200.border-r.border-base-300.relative.z-\\[80\\]') ||
+              document.querySelector('aside.sticky.top-4.self-start.space-y-4') ||
+              document.querySelector('aside.xl\\:block.sticky.top-4.self-start.space-y-4') ||
+              document.querySelector('aside.sticky') || null;
+      }
+
+      function placePC(){
+        if(!matchMedia('(min-width:769px)').matches) return false;
+        const aside = findAside();
+        if(!aside || document.getElementById('unitPc')) return false;
+        const f = document.createElement('iframe');
+        f.id='unitPc';
+        f.width=300; f.height=250;
+        f.loading='lazy';
+        f.setAttribute('frameborder','0');
+        f.setAttribute('scrolling','no');
+        f.style.display='block';
+        f.style.margin='0 auto';
+        f.src='/u/pc-unit.html';
+        aside.prepend(f);
+        return true;
+      }
+
+      function placeSP(){
+        if(!matchMedia('(max-width:768px)').matches) return false;
+        const aside = findAside();
+        if(!aside || document.getElementById('unitSp')) return false;
+        const f = document.createElement('iframe');
+        f.id='unitSp';
+        f.width=320; f.height=50;
+        f.loading='lazy';
+        f.setAttribute('frameborder','0');
+        f.setAttribute('scrolling','no');
+        f.style.display='block';
+        f.style.margin='0 auto';
+        f.src='/u/sp-unit.html';
+        aside.prepend(f);
+        return true;
+      }
+
+      function place(){ let ok=false; ok=placePC()||ok; ok=placeSP()||ok; return ok; }
+
+      if(!place()){
+        const mo=new MutationObserver(()=>{ place() && mo.disconnect(); });
+        mo.observe(document.body, { childList:true, subtree:true });
+        addEventListener('popstate', place, { passive:true });
+      }
+    })();
     </script>
+
   </body>
 </html>
