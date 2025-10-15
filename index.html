@@ -17,12 +17,8 @@
       gtag('config', 'G-VVFP9CCRGJ');
     </script>
     <style>
-      @media (max-width:768px){
-        aside.min-h-full.w-72.bg-base-200.border-r.border-base-300.relative.z-\[80\]{
-          width: 320px !important;
-          min-width: 320px !important;
-        }
-      }
+      #sp-rail-float { position: fixed; right: 12px; top: 12px; z-index: 1000; width: 320px; height: 50px; display: none; }
+      @media (max-width:1279px){ #sp-rail-float{ display: block; } }
     </style>
 
   </head>
@@ -32,55 +28,88 @@
 
     <script>
     (function(){
-      function findAside(){
-        // ご提示のクラスに合わせて最優先でマッチ
-        return document.querySelector('aside.min-h-full.w-72.bg-base-200.border-r.border-base-300.relative.z-\\[80\\]') ||
-              document.querySelector('aside.sticky.top-4.self-start.space-y-4') ||
-              document.querySelector('aside.xl\\:block.sticky.top-4.self-start.space-y-4') ||
-              document.querySelector('aside.sticky') || null;
+      // PC（右レール）…現状OKなので維持
+      function findRightRailAside(){
+        const cands = [
+          'aside.hidden.xl\\:block.sticky.top-4.self-start.space-y-4',
+          'aside.sticky.top-4.self-start.space-y-4',
+          'aside.xl\\:block.sticky.top-4.self-start.space-y-4'
+        ];
+        for (const sel of cands) {
+          const el = document.querySelector(sel);
+          if (el && !el.classList.contains('border-r')) return el; // 左カラム除外
+        }
+        return null;
       }
 
       function placePC(){
-        if(!matchMedia('(min-width:769px)').matches) return false;
-        const aside = findAside();
-        if(!aside || document.getElementById('unitPc')) return false;
+        if (!matchMedia('(min-width:1280px)').matches) return false;
+        const aside = findRightRailAside();
+        if (!aside || document.getElementById('unitPc')) return false;
+
         const f = document.createElement('iframe');
-        f.id='unitPc';
-        f.width=300; f.height=250;
-        f.loading='lazy';
+        f.id = 'unitPc';
+        f.width = 300; f.height = 250;
+        f.loading = 'lazy';
         f.setAttribute('frameborder','0');
         f.setAttribute('scrolling','no');
-        f.style.display='block';
-        f.style.margin='0 auto';
-        f.src='/u/pc-unit.html';
+        f.style.display = 'block';
+        f.style.margin = '0 auto';
+        f.src = '/u/pc-unit.html';
         aside.prepend(f);
         return true;
+      }
+
+      // ── SP：「Sponsored」ラベルを含む .card-body を見つけ、その直前に挿入
+      function findSpSponsoredSlot(){
+        // ご提示の外枠を優先
+        const root = document.querySelector('div.mt-6.xl\\:hidden') || document;
+        const bodies = root.querySelectorAll('.card .card-body');
+        for (const body of bodies) {
+          // 子要素の中からテキストが "Sponsored" の要素を探す（セレクタに[]を使わない）
+          const kids = Array.from(body.children);
+          for (const el of kids) {
+            const txt = (el.textContent || '').trim();
+            if (/^Sponsored$/i.test(txt)) return { body, label: el };
+          }
+          // 子で見つからなくても body 全体に "Sponsored" が含まれるなら対象にする
+          if (/Sponsored/i.test(body.textContent || '')) return { body, label: null };
+        }
+        return null;
       }
 
       function placeSP(){
-        if(!matchMedia('(max-width:768px)').matches) return false;
-        const aside = findAside();
-        if(!aside || document.getElementById('unitSp')) return false;
+        if (!matchMedia('(max-width:1279px)').matches) return false;
+        const target = findSpSponsoredSlot();
+        if (!target || document.getElementById('unitSp')) return false;
+
         const f = document.createElement('iframe');
-        f.id='unitSp';
-        f.width=320; f.height=50;
-        f.loading='lazy';
+        f.id = 'unitSp';
+        f.width = 320; f.height = 50;
+        f.loading = 'lazy';
         f.setAttribute('frameborder','0');
         f.setAttribute('scrolling','no');
-        f.style.display='block';
-        f.style.margin='0 auto';
-        f.src='/u/sp-unit.html';
-        aside.prepend(f);
+        f.style.display = 'block';
+        f.style.margin = '0 auto 12px';
+        f.src = '/u/sp-unit.html';
+
+        // 「Sponsored」ラベルの直前に差し込み（見つからなければ先頭）
+        if (target.label) {
+          target.body.insertBefore(f, target.label);
+        } else {
+          target.body.prepend(f);
+        }
         return true;
       }
 
-      function place(){ let ok=false; ok=placePC()||ok; ok=placeSP()||ok; return ok; }
+      function place(){ let ok=false; ok = placePC() || ok; ok = placeSP() || ok; return ok; }
 
-      if(!place()){
-        const mo=new MutationObserver(()=>{ place() && mo.disconnect(); });
+      if (!place()) {
+        const mo = new MutationObserver(() => { place() && mo.disconnect(); });
         mo.observe(document.body, { childList:true, subtree:true });
-        addEventListener('popstate', place, { passive:true });
       }
+      addEventListener('popstate', place, { passive:true });
+      addEventListener('resize', (() => { let t=null; return () => { clearTimeout(t); t=setTimeout(place,120); }; })(), { passive:true });
     })();
     </script>
 
