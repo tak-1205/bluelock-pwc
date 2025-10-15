@@ -2,11 +2,17 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
+    { "source": "/u/(.*)", "destination": "/u/$1" },
+
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/images/(.*)", "destination": "/images/$1" },
 
     { "source": "/share/combos/:ids.png", "destination": "/api/og?ids=:ids" },
     { "source": "/share/combos/:ids", "destination": "/api/share-combos?ids=:ids" },
+
+    { "source": "/ads.txt", "destination": "/ads.txt" },
+    { "source": "/adstir_pc_config.js", "destination": "/adstir_pc_config.js" },
+    { "source": "/adstir_sp_config.js", "destination": "/adstir_sp_config.js" },
 
     { "source": "/(favicon.ico|robots.txt|sitemap.xml)", "destination": "/$1" },
     { "source": "/(.*)", "destination": "/" }
@@ -14,15 +20,35 @@
   "headers": [
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     },
     {
       "source": "/images/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     },
     {
       "source": "/(.*).html",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/(adstir_pc_config.js|adstir_sp_config.js)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300" },
+        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/ads.txt",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300" },
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
+      ]
     }
   ]
 }

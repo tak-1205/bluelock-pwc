@@ -75,7 +75,7 @@ export default function TwoColumnLayout({
              {children}
              {hasRight && (
                // モバイル/タブレット：本文の下にインライン表示 
-               <div className="mt-6 xl:hidden">
+               <div className={`mt-6 xl:hidden`}>
                  {right}
                </div>
              )}

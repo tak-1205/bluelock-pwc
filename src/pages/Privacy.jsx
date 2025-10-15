@@ -28,6 +28,11 @@ export default function Privacy() {
             DM までお願いします。
           </p>
 
+          <div className="divider my-6">広告について</div>
+          <p className="text-sm text-base-content/70">
+          当サイトはadstirによる広告配信を利用しています。クッキー等により最適化された広告が表示される場合があります。詳細はadstirのプライバシーポリシーをご参照ください。
+          </p>
+
           <div className="divider my-6">アフィリエイトについて</div>
 
           <p className="text-sm text-base-content/70">
