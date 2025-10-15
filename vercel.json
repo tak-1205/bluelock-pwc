@@ -2,13 +2,18 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
+    { "source": "/u/(.*)", "destination": "/u/$1" },
+
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/images/(.*)", "destination": "/images/$1" },
+
     { "source": "/share/combos/:ids.png", "destination": "/api/og?ids=:ids" },
     { "source": "/share/combos/:ids", "destination": "/api/share-combos?ids=:ids" },
+
     { "source": "/ads.txt", "destination": "/ads.txt" },
     { "source": "/adstir_pc_config.js", "destination": "/adstir_pc_config.js" },
     { "source": "/adstir_sp_config.js", "destination": "/adstir_sp_config.js" },
+
     { "source": "/(favicon.ico|robots.txt|sitemap.xml)", "destination": "/$1" },
     { "source": "/(.*)", "destination": "/" }
   ],
@@ -43,15 +48,6 @@
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=300" },
         { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
-      ]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://www.googletagmanager.com https://js.ad-stir.com https://ad.ad-stir.com https://sp-trk.com https://dmp.im-apps.net https://static.cloudflareinsights.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; frame-src https:; child-src https:; connect-src 'self' https:; font-src 'self' data:;"
-        }
       ]
     }
   ]

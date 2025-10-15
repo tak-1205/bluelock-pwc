@@ -16,79 +16,54 @@
       gtag('js', new Date());
       gtag('config', 'G-VVFP9CCRGJ');
     </script>
-    <style>
-      /* PC右カラム用ユニット（広告ワードを避けた中立ID） */
-      #unit-rt-pc { width:300px; height:250px; display:none; margin:0; }
-      @media (min-width:1280px){ #unit-rt-pc{ display:block; } }
-
-      /* SP本文下ユニット（必要時に運用） */
-      #unit-main-sp { width:320px; height:50px; display:none; margin:16px auto 0; }
-      @media (max-width:1279px){ #unit-main-sp{ display:block; } }
-
-      .u-wrap { width:100%; height:100%; }
-    </style>
   </head>
   <body class="font-sans">
-    <!-- React本体 -->
     <div id="root"></div>
-
-    <!-- PC: 右カラム上段（直書き＋後で<aside>へ容器ごと移動） -->
-    <div id="unit-rt-pc" aria-label="rail unit pc">
-      <div class="u-wrap">
-        <div id="slot-pc"></div>
-        <script>
-          (function(){
-            if (window.matchMedia('(min-width:1280px)').matches) {
-              window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-cf6de28", ad_spot:2, width:300, height:250 };
-              document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
-            }
-          })();
-        </script>
-      </div>
-    </div>
-
-    <!-- SP: 本文下（直書き・移動なし） -->
-    <div id="unit-main-sp" aria-label="main unit sp">
-      <div class="u-wrap">
-        <div id="slot-sp"></div>
-        <script>
-          (function(){
-            if (window.matchMedia('(max-width:1279px)').matches) {
-              window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-fd43f5bc", ad_spot:1, width:320, height:50 };
-              document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
-            }
-          })();
-        </script>
-      </div>
-    </div>
-
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- PCユニットを React の右カラム <aside> 内へ移動（xl以上のみ） -->
+    <!-- PC右カラム（xl以上）とSP本文下（xl未満）に独立ページをiframeで差し込み -->
     <script>
-      (function () {
-        var moved = false;
-        function findAside(){
-          // Tailwindのクラス構成が変わっても拾えるように、stickyかつspace-y-4のasideを優先
-          var cand = document.querySelector('aside.sticky.top-4.self-start.space-y-4') ||
-                     document.querySelector('aside.xl\\:block.sticky.top-4.self-start.space-y-4') ||
-                     document.querySelector('aside.sticky');
-          return cand || null;
-        }
-        function place(){
-          if (moved) return true;
-          if (!window.matchMedia('(min-width:1280px)').matches) return false;
-          var host = findAside();
-          var slot = document.getElementById('unit-rt-pc');
-          if (!host || !slot) return false;
-          if (!host.contains(slot)) host.prepend(slot);
-          moved = true;
+      (function(){
+        function placePC(){
+          if(!matchMedia('(min-width:1280px)').matches) return false;
+          const aside =
+            document.querySelector('aside.sticky.top-4.self-start.space-y-4') ||
+            document.querySelector('aside.xl\\:block.sticky.top-4.self-start.space-y-4') ||
+            document.querySelector('aside.sticky');
+          if(!aside || document.getElementById('unitPc')) return false;
+          const f=document.createElement('iframe');
+          f.id='unitPc';
+          f.width=300; f.height=250;
+          f.loading='lazy';
+          f.setAttribute('frameborder','0');
+          f.setAttribute('scrolling','no');
+          f.style.display='block';
+          f.style.margin='0 auto';
+          f.src='/u/pc-unit.html';
+          aside.prepend(f);
           return true;
         }
-        if (!place()) {
-          var mo = new MutationObserver(function(){ if (place()) mo.disconnect(); });
-          mo.observe(document.body, { childList:true, subtree:true });
-          window.addEventListener('popstate', place, { passive:true });
+        function placeSP(){
+          if(!matchMedia('(max-width:1279px)').matches) return false;
+          const root=document.getElementById('root');
+          if(!root || document.getElementById('unitSp')) return false;
+          const f=document.createElement('iframe');
+          f.id='unitSp';
+          f.width=320; f.height=50;
+          f.loading='lazy';
+          f.setAttribute('frameborder','0');
+          f.setAttribute('scrolling','no');
+          f.style.display='block';
+          f.style.margin='16px auto 0';
+          f.src='/u/sp-unit.html';
+          root.after(f);
+          return true;
+        }
+        function place(){ let ok=false; ok=placePC()||ok; ok=placeSP()||ok; return ok; }
+        if(!place()){
+          const mo=new MutationObserver(()=>{ place() && mo.disconnect(); });
+          mo.observe(document.body,{childList:true,subtree:true});
+          addEventListener('popstate', place, {passive:true});
         }
       })();
     </script>
