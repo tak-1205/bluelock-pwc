@@ -67,6 +67,16 @@ export default function Home() {
               <ul className="mt-3 divide-y divide-base-200">
                 <li className="py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-15</time>
+                    <p className="text-sm sm:text-base">
+                      <a href="/characters">トレーニングスキル確認ツールを作成しました</a><br />
+                      トレーニング時のトレーニングスキルをキャラとサポートカードを選択して確認できるようにしました。表示されるのはレベルMAX時の効果量のため、強い組み合わせの参考や、次に狙うカードの参考にしてください。
+                    </p>
+                  </div>
+                </li>
+
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
                     <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-04</time>
                     <p className="text-sm sm:text-base">
                       <a href="/characters">全キャラクター一覧の絞り込み機能の追加</a>
@@ -167,12 +177,12 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 準備中その1 */}
+              {/* 稼働中 */}
               <div className="card bg-base-100 shadow-sm">
                 <figure className="h-64 w-full bg-base-200 rounded-lg overflow-hidden flex items-center justify-center">
                   <img
-                    src="/images/feature-ranking.png"
-                    alt="人気チーム編成"
+                    src="/images/trainingSkills.png"
+                    alt="トレーニングスキル確認ツール"
                     className="max-h-full max-w-full object-contain"
                     loading="lazy"
                     onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
@@ -180,13 +190,13 @@ export default function Home() {
                 </figure>
                 <div className="card-body">
                   <h3 className="card-title">
-                    人気チーム編成 <span className="badge badge-ghost badge-sm">準備</span>
+                    トレーニングスキル確認ツール
                   </h3>
                   <p className="text-sm text-base-content/70">
-                    よく使われる組み合わせを集計し可視化。
+                    トレーニング時のトレーニングスキルをキャラとサポートカードを選択して確認。
                   </p>
                   <div className="card-actions justify-end">
-                    <button className="btn btn-sm btn-disabled">準備</button>
+                    <Link to="/training" className="btn btn-sm btn-primary">使ってみる</Link>
                   </div>
                 </div>
               </div>

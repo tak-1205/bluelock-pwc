@@ -433,7 +433,7 @@ function TypeFilterBar({ items, value, onChange }) {
     <div className="pt-5">
       <div className="text-sm mb-2">タイプで絞り込み</div>
         <div className="mt-2 text-xs text-base-content/70">
-           ボタンをクリックすると、各タイプのカードのみ表示されます。
+           ボタンをクリックすると、各タイプのカードのみ表示されます。タイプは練習メニューの内容で表示されます。
         </div>
       <div className="flex flex-wrap gap-2 pt-5">
         <button
@@ -744,7 +744,7 @@ export default function TrainingTool() {
 
         {/* サポート編成ボックス */}
         <div className="bg-base-100 rounded-2xl border border-base-300 shadow-sm">
-          <div className="py-3 border-b border-base-300 flex items-center justify-between">
+          <div className="p-3 border-b border-base-300 flex items-center justify-between">
             <div className="font-semibold">サポート編成</div>
           </div>
 
@@ -807,6 +807,9 @@ export default function TrainingTool() {
                 );
               })}
             </div>
+            <div className="mt-2 text-xs text-base-content/70">
+                ※ 現在選択できるスペシャルサポートカードは効果量の高いURとSSR「公共の場で泳ぐな」のみです。
+            </div>
           </section>
 
           {/* EXサポートカード（1） */}
@@ -835,9 +838,13 @@ export default function TrainingTool() {
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">発動スキル（{activatedWithTrainee.length}）</h2>
 
+            <div className="mt-2 text-xs text-base-content/70">
+                ※ 表示されるスキルはレベルMAXの内容です。レベルによって発動スキル数、効果量が異なります。
+            </div>
+
           {activatedEffectTotalsByEffect.size > 0 && (
             <div className="text-sm p-3 rounded bg-base-200/50 border border-base-300">
-              <div className="font-semibold mb-1">発動スキルの合計</div>
+              <div className="font-semibold mb-1">発動スキルの効果合計</div>
               <ul className="flex flex-wrap gap-2">
                 {Array.from(activatedEffectTotalsByEffect.entries()).map(([effect, total]) => (
                   <li key={effect} className="badge badge-outline">
@@ -946,11 +953,7 @@ export default function TrainingTool() {
           <h3 className="font-bold text-lg pt-4">スペシャルサポートカードを選ぶ（最大4）</h3>
 
           <div className="mt-2 text-xs text-base-content/70">
-            ※ 比較的最近追加された、効果量の高いカードのみ表示しています。（具体的には画像の表示されているカードのみ。）
-          </div>
-
-          <div className="mt-2 text-xs text-base-content/70">
-            全てレベルMAXの時の効果量で表示されます。
+            
           </div>
 
           {/* ★ 追加：タイプ絞り込みバー */}
