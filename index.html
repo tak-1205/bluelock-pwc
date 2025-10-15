@@ -2,7 +2,7 @@
 <html lang="ja" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="index,follow" />
     <meta name="keywords" content="ブルーロック,PWC,プロジェクトワールドチャンピオン,PROJECT WORLD CHAMPION,BLUE LOCK PWC">
     <title> PWC EGOIST【ブルーロック PWC】</title>
@@ -18,43 +18,39 @@
     </script>
     <style>
       :root {
-        --right-slot-top: 80px;
-        --right-slot-right: 16px;
+        --slot-right-top-top: 80px;
+        --slot-right-top-right: 16px;
+        --z-ads: 1000;
       }
-      #slot-right-top {
-        position: fixed;
-        right: var(--right-slot-right);
-        top: var(--right-slot-top);
-        width: 300px;
-        height: 250px;
-        z-index: 1000;
-        display: none;
-      }
-      @media (min-width: 1024px) {
-        #slot-right-top { display: block; }
-      }
+      #slot-right-top-pc, #slot-right-top-sp { position: fixed; right: var(--slot-right-top-right); top: var(--slot-right-top-top); z-index: var(--z-ads); display: none; }
+      #slot-right-top-pc { width: 300px; height: 250px; }
+      #slot-right-top-sp { width: 320px; height: 50px; }
+      @media (min-width: 1024px) { #slot-right-top-pc { display: block; } }
+      @media (max-width: 1023px) { #slot-right-top-sp { display: block; } }
       .slot-wrap { width: 100%; height: 100%; }
     </style>
   </head>
   <body class="font-sans">
-    <div id="slot-right-top">
+    <div id="slot-right-top-pc">
       <div class="slot-wrap">
-        <div id="adstir-slot-right-top"></div>
+        <div id="adstir-slot-right-top-pc"></div>
         <script>
-          (function () {
-            if (window.matchMedia('(min-width: 1024px)').matches) {
-              window.adstir_vars = {
-                ver: "4.0",
-                type: "banner",
-                platform: "web",
-                app_id: "MEDIA-cf6de28",
-                ad_spot: 1,
-                width: 300,
-                height: 250
-              };
-              document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
-            }
-          })();
+          if (window.matchMedia('(min-width: 1024px)').matches) {
+            window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-cf6de28", ad_spot:1, width:300, height:250 };
+            document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
+          }
+        </script>
+      </div>
+    </div>
+
+    <div id="slot-right-top-sp">
+      <div class="slot-wrap">
+        <div id="adstir-slot-right-top-sp"></div>
+        <script>
+          if (window.matchMedia('(max-width: 1023px)').matches) {
+            window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-fd43f5bc", ad_spot:1, width:320, height:50 };
+            document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
+          }
         </script>
       </div>
     </div>
