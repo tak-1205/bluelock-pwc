@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="index,follow" />
     <meta name="keywords" content="ブルーロック,PWC,プロジェクトワールドチャンピオン,PROJECT WORLD CHAMPION,BLUE LOCK PWC">
-    <title>PWC EGOIST【ブルーロック PWC】</title>
+    <title> PWC EGOIST【ブルーロック PWC】</title>
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="google-adsense-account" content="ca-pub-1152336644480194">
@@ -17,55 +17,45 @@
       gtag('config', 'G-VVFP9CCRGJ');
     </script>
     <style>
-      :root { --layout-gap: 16px; }
-      body { margin: 0; }
-      #app-layout { box-sizing: border-box; padding: 0 var(--layout-gap); max-width: 1200px; margin: 0 auto; }
-      #app-main { min-width: 0; }
-      #app-aside { min-width: 0; }
-      @media (min-width:1024px){
-        #app-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; column-gap: var(--layout-gap); }
+      :root {
+        --slot-right-top-top: 80px;
+        --slot-right-top-right: 16px;
+        --z-ads: 1000;
       }
-      @media (max-width:1023px){
-        #app-layout { display: block; }
-        #app-aside { margin: 16px auto 0; width: 320px; }
-      }
-      #slot-right-top-pc { width:300px; height:250px; margin: 0 auto; display:none; }
-      #slot-right-top-sp { width:320px; height:50px; margin: 0 auto; display:none; }
-      @media (min-width:1024px){ #slot-right-top-pc{ display:block; } }
-      @media (max-width:1023px){ #slot-right-top-sp{ display:block; } }
-      .slot-wrap { width:100%; height:100%; }
+      #slot-right-top-pc, #slot-right-top-sp { position: fixed; right: var(--slot-right-top-right); top: var(--slot-right-top-top); z-index: var(--z-ads); display: none; }
+      #slot-right-top-pc { width: 300px; height: 250px; }
+      #slot-right-top-sp { width: 320px; height: 50px; }
+      @media (min-width: 1024px) { #slot-right-top-pc { display: block; } }
+      @media (max-width: 1023px) { #slot-right-top-sp { display: block; } }
+      .slot-wrap { width: 100%; height: 100%; }
     </style>
   </head>
   <body class="font-sans">
-    <div id="app-layout">
-      <main id="app-main">
-        <div id="root"></div>
-      </main>
-      <aside id="app-aside" aria-label="Right rail">
-        <div id="slot-right-top-pc">
-          <div class="slot-wrap">
-            <div id="adstir-slot-right-top-pc"></div>
-            <script>
-              if (window.matchMedia('(min-width:1024px)').matches) {
-                window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-cf6de28", ad_spot:1, width:300, height:250 };
-                document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
-              }
-            </script>
-          </div>
-        </div>
-        <div id="slot-right-top-sp">
-          <div class="slot-wrap">
-            <div id="adstir-slot-right-top-sp"></div>
-            <script>
-              if (window.matchMedia('(max-width:1023px)').matches) {
-                window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-fd43f5bc", ad_spot:1, width:320, height:50 };
-                document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
-              }
-            </script>
-          </div>
-        </div>
-      </aside>
+    <div id="slot-right-top-pc">
+      <div class="slot-wrap">
+        <div id="adstir-slot-right-top-pc"></div>
+        <script>
+          if (window.matchMedia('(min-width: 1024px)').matches) {
+            window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-cf6de28", ad_spot:1, width:300, height:250 };
+            document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
+          }
+        </script>
+      </div>
     </div>
+
+    <div id="slot-right-top-sp">
+      <div class="slot-wrap">
+        <div id="adstir-slot-right-top-sp"></div>
+        <script>
+          if (window.matchMedia('(max-width: 1023px)').matches) {
+            window.adstir_vars = { ver:"4.0", type:"banner", platform:"web", app_id:"MEDIA-fd43f5bc", ad_spot:1, width:320, height:50 };
+            document.write('<script src="https://js.ad-stir.com/js/adstir.js"><\/script>');
+          }
+        </script>
+      </div>
+    </div>
+
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
