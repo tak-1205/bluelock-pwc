@@ -4,21 +4,6 @@ import { logAffClick } from "../lib/logAffClick.js";
 import { getAffiliateItemsForPath } from "../affiliates/registry.js";
 import { onAdsRefresh } from "../lib/adBus.js";
 
-const useIsSP = (breakpoint = 768) => {
-  const [isSP, setIsSP] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth < breakpoint : false
-  );
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
-    const handler = (e) => setIsSP(e.matches);
-    handler(mql);
-    mql.addEventListener?.("change", handler);
-    return () => mql.removeEventListener?.("change", handler);
-  }, [breakpoint]);
-  return isSP;
-};
-
 export default function RightAds({ items, slots = {} }) {
   const SHOW_ADS = import.meta.env.VITE_FEATURE_ADS === "on";
   const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "on";
@@ -33,9 +18,6 @@ export default function RightAds({ items, slots = {} }) {
   useEffect(() => { setAdKey((k) => k + 1); }, [location.key]);
   useEffect(() => onAdsRefresh(() => setAdKey((k) => k + 1)), []);
 
-  const isSP = useIsSP(768);
-  const anchorClass = isSP ? "w-[320px] min-w-[320px] h-[50px]" : "w-[300px] min-w-[300px] h-[250px]";
-
   const handleAffClick = (_e, item) => {
     try {
       logAffClick({ id: item.id, source: item.source, path: location.pathname, ts: Date.now() });
@@ -43,11 +25,10 @@ export default function RightAds({ items, slots = {} }) {
   };
 
   return (
-    <div className="space-y-4 overflow-visible">
-      <div id="right-ads-anchor-top" className={anchorClass} />
+    <div className="space-y-4">
       {SHOW_AFF && effectiveItems.length > 0 && (
-        <div className="card bg-base-100 shadow overflow-visible">
-          <div className="card-body overflow-visible">
+        <div className="card bg-base-100 shadow">
+          <div className="card-body">
             <div className="text-xs font-semibold text-base-content/70">Sponsored</div>
             <ul className="mt-2 space-y-3">
               {effectiveItems.map((item) => (
