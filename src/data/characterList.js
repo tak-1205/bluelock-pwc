@@ -80,6 +80,7 @@ export const characterList = [
 { id: 'B029-02', name: 'レオナルド・ルナ【レ・アールの貴公子】',rarity: '3',type: 'テクニック'},
 { id: 'B030-01', name: '烏旅人【ヒットマン】',rarity: '3',type: 'テクニック'},
 { id: 'B030-02', name: '烏旅人【無欠への一手】',rarity: '3',type: '賢さ'},
+{ id: 'B030-03', name: '烏旅人【X 弱点がないなら創るまで】',rarity: '4',type: 'テクニック'},
 { id: 'B031-01', name: '乙夜影汰【忍者の末裔】',rarity: '3',type: 'スピード'},
 { id: 'B031-02', name: '乙夜影汰【最強の飛び道具】',rarity: '3',type: 'テクニック'},
 { id: 'B032-01', name: '氷織羊【はんなりゲーマー】',rarity: '3',type: '賢さ'},

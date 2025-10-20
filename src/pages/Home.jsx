@@ -65,6 +65,16 @@ export default function Home() {
               <h2 id="news-heading" className="card-title text-base sm:text-lg">お知らせ</h2>
 
               <ul className="mt-3 divide-y divide-base-200">
+
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-20</time>
+                    <p className="text-sm sm:text-base">
+                      <a href="/character/B30-03">烏旅人【X 弱点がないなら創るまで】を追加しました。</a>
+                    </p>
+                  </div>
+                </li>
+
                 <li className="py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
                     <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-15</time>
@@ -80,15 +90,6 @@ export default function Home() {
                     <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-04</time>
                     <p className="text-sm sm:text-base">
                       <a href="/characters">全キャラクター一覧の絞り込み機能の追加</a>
-                    </p>
-                  </div>
-                </li>
-
-                <li className="py-3 sm:py-4">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
-                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-01</time>
-                    <p className="text-sm sm:text-base">
-                      <a href="/character/B013-06">馬狼照英【貪り喰らう咆哮】を追加しました。</a>
                     </p>
                   </div>
                 </li>
