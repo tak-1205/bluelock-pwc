@@ -70,7 +70,7 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
                     <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-20</time>
                     <p className="text-sm sm:text-base">
-                      <a href="/character/B30-03">烏旅人【X 弱点がないなら創るまで】を追加しました。</a>
+                      <a href="/character/B030-03">烏旅人【X 弱点がないなら創るまで】を追加しました。</a>
                     </p>
                   </div>
                 </li>
