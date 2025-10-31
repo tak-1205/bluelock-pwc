@@ -1,7 +1,7 @@
 export const matchSkills = [
 {
-  "name": "美技",
-  "detail": "試合中、自身のキックとテクニックが増加する。【発動上限数：1回】",
+  "name": "言えるコトはひとつ",
+  "detail": "スキル発動時、しばらくの間、チームで一番高いステータスを持つ味方はそのステータスが大幅に上昇する。（発動上限数：1回）",
   "target1": "B013-02",
   "target2": "B018-02",
   "target3": null,
@@ -14,8 +14,8 @@ export const matchSkills = [
   "activator5": null
 },
 {
-  "name": "パス上手",
-  "detail": "スキル発動した際の自身のパス時のみ、パスカットされづらくなる。【発動上限数：無し】",
+  "name": "そんな畏まらんでええよ",
+  "detail": "試合開始時から一定時間、味方全体のパスカット成功時にボールを奪取する確率が大幅に上昇し、マッチアップにおいて実力を発揮しやすくなる。（発動上限数：1回）",
   "target1": "B019-02",
   "target2": "B018-02",
   "target3": null,
@@ -28,8 +28,8 @@ export const matchSkills = [
   "activator5": null
 },
 {
-  "name": "鉄脚",
-  "detail": "試合中、自身のキックが増加する。【発動上限数：1回】",
+  "name": "動いてみ",
+  "detail": "スキル発動時、しばらくの間、味方全体のパス成功率が大幅に上昇する。（発動上限数：2回）",
   "target1": "B020-02",
   "target2": "B018-02",
   "target3": null,
@@ -42,8 +42,8 @@ export const matchSkills = [
   "activator5": null
 },
 {
-  "name": "トラップ上手",
-  "detail": "スキルが発動するとパスを受けたあと、今回の攻撃中に限り自身の能力が増加する。【発動上限数：無し】",
+  "name": "自分にできる武器",
+  "detail": "スキル発動時、しばらくの間、自身のシュートブロック成功率とパスカット成功率が大幅に上昇する。（発動上限数：2回）",
   "target1": "B018-02",
   "target2": "B901-01",
   "target3": null,
@@ -56,8 +56,8 @@ export const matchSkills = [
   "activator5": null
 },
 {
-  "name": "分析力",
-  "detail": "自身のポジションがMFまたはDFの時、スキル発動時から一定時間、自身のテクニックと賢さを大きく上昇させ、敵全体のテクニックを少し下げる。【発動回数：2回】",
+  "name": "俺使えや",
+  "detail": "スキル発動時、しばらくの間、味方全体の突破成功率が大幅に上昇し、自身のクロス実行率が大幅に上昇する。（発動上限数：2回）",
   "target1": "B018-02",
   "target2": "B021-02",
   "target3": null,
@@ -70,8 +70,8 @@ export const matchSkills = [
   "activator5": null
 },
 {
-  "name": "位置取り",
-  "detail": "スキル発動時の相手のシュートに限り、自身のシュートブロック発動率を大幅に上げ、相手のシュート成功率を下げる。さらに、しばらくの間、自身のスピードとフィジカルを大幅に上げる。【発動上限数：2回】",
+  "name": "第三の矢",
+  "detail": "スキルが発動するとパスを受けたあと、一定時間、自身の突破成功率とパス実行率が大幅に上昇する。さらに、味方全体のスピードとシュート成功率が大幅に上昇する。（発動上限数：1回）",
   "target1": "B004-03",
   "target2": "B018-02",
   "target3": null,
@@ -84,8 +84,8 @@ export const matchSkills = [
   "activator5": null
 },
 {
-  "name": "位置取り",
-  "detail": "スキル発動時の相手のシュートに限り、自身のシュートブロック発動率を大幅に上げ、相手のシュート成功率を下げる。さらに、しばらくの間、自身のスピードとフィジカルを大幅に上げる。【発動上限数：2回】",
+  "name": "獲物",
+  "detail": "スキル発動時のシュートに限り、自身のシュート成功率を大幅に上昇する。（発動上限数：3回）",
   "target1": "B004-04",
   "target2": "B018-02",
   "target3": null,
@@ -14120,6 +14120,104 @@ export const matchSkills = [
   "target4": null,
   "target5": null,
   "activator1": "B001-09",
+  "activator2": null,
+  "activator3": null,
+  "activator4": null,
+  "activator5": null
+},
+{
+  "name": "言えるコトはひとつ",
+  "detail": "スキル発動時、しばらくの間、チームで一番高いステータスを持つ味方はそのステータスが大幅に上昇する。（発動上限数：1回）",
+  "target1": "B032-04",
+  "target2": "B030-03",
+  "target3": null,
+  "target4": null,
+  "target5": null,
+  "activator1": "B032-04",
+  "activator2": null,
+  "activator3": null,
+  "activator4": null,
+  "activator5": null
+},
+{
+  "name": "そんな畏まらんでええよ",
+  "detail": "試合開始時から一定時間、味方全体のパスカット成功時にボールを奪取する確率が大幅に上昇し、マッチアップにおいて実力を発揮しやすくなる。（発動上限数：1回）",
+  "target1": "B032-04",
+  "target2": "B004-08",
+  "target3": null,
+  "target4": null,
+  "target5": null,
+  "activator1": "B032-04",
+  "activator2": null,
+  "activator3": null,
+  "activator4": null,
+  "activator5": null
+},
+{
+  "name": "動いてみ",
+  "detail": "スキル発動時、しばらくの間、味方全体のパス成功率が大幅に上昇する。（発動上限数：2回）",
+  "target1": "B032-04",
+  "target2": "B013-06",
+  "target3": null,
+  "target4": null,
+  "target5": null,
+  "activator1": "B032-04",
+  "activator2": null,
+  "activator3": null,
+  "activator4": null,
+  "activator5": null
+},
+{
+  "name": "自分にできる武器",
+  "detail": "スキル発動時、しばらくの間、自身のシュートブロック成功率とパスカット成功率が大幅に上昇する。（発動上限数：2回）",
+  "target1": "B032-04",
+  "target2": "B036-02",
+  "target3": null,
+  "target4": null,
+  "target5": null,
+  "activator1": "B032-04",
+  "activator2": null,
+  "activator3": null,
+  "activator4": null,
+  "activator5": null
+},
+{
+  "name": "俺使えや",
+  "detail": "スキル発動時、しばらくの間、味方全体の突破成功率が大幅に上昇し、自身のクロス実行率が大幅に上昇する。（発動上限数：2回）",
+  "target1": "B030-03",
+  "target2": "B013-06",
+  "target3": "B032-04",
+  "target4": null,
+  "target5": null,
+  "activator1": "B030-03",
+  "activator2": null,
+  "activator3": null,
+  "activator4": null,
+  "activator5": null
+},
+{
+  "name": "第三の矢",
+  "detail": "スキルが発動するとパスを受けたあと、一定時間、自身の突破成功率とパス実行率が大幅に上昇する。さらに、味方全体のスピードとシュート成功率が大幅に上昇する。（発動上限数：1回）",
+  "target1": "B004-08",
+  "target2": "B030-03",
+  "target3": "B032-04",
+  "target4": null,
+  "target5": null,
+  "activator1": "B004-08",
+  "activator2": null,
+  "activator3": null,
+  "activator4": null,
+  "activator5": null
+},
+{
+  "name": "獲物",
+  "detail": "スキル発動時のシュートに限り、自身のシュート成功率を大幅に上昇する。（発動上限数：3回）",
+  "target1": "B013-06",
+  "target2": "B032-04",
+  "target3": "B036-02",
+  "target4": null,
+  "target5": null,
+  "activator1": "B013-06",
   "activator2": null,
   "activator3": null,
   "activator4": null,

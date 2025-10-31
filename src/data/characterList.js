@@ -86,6 +86,7 @@ export const characterList = [
 { id: 'B032-01', name: '氷織羊【はんなりゲーマー】',rarity: '3',type: '賢さ'},
 { id: 'B032-02', name: '氷織羊【冷静な視野】',rarity: '3',type: 'スピード'},
 { id: 'B032-03', name: '氷織羊【桜はんなり】',rarity: '3',type: 'キック'},
+{ id: 'B032-04', name: '氷織羊【X 自分にできる武器】',rarity: '4',type: '賢さ'},
 { id: 'B033-01', name: '雪宮剣優【1on1エンペラー】',rarity: '3',type: 'キック'},
 { id: 'B033-02', name: '雪宮剣優【ストリート・スタイル】',rarity: '3',type: 'キック'},
 { id: 'B034-01', name: '清羅刃【ボーダーライナー】',rarity: '3',type: '賢さ'},

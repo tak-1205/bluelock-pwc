@@ -68,6 +68,15 @@ export default function Home() {
 
                 <li className="py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-11-01</time>
+                    <p className="text-sm sm:text-base">
+                      <a href="/character/B032-04">氷織羊【X 自分にできる武器】を追加しました。</a>
+                    </p>
+                  </div>
+                </li>
+
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
                     <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-20</time>
                     <p className="text-sm sm:text-base">
                       <a href="/character/B030-03">烏旅人【X 弱点がないなら創るまで】を追加しました。</a>
@@ -81,34 +90,6 @@ export default function Home() {
                     <p className="text-sm sm:text-base">
                       <a href="/characters">トレーニングスキル確認ツールを作成しました</a><br />
                       トレーニング時のトレーニングスキルをキャラとサポートカードを選択して確認できるようにしました。表示されるのはレベルMAX時の効果量のため、強い組み合わせの参考や、次に狙うカードの参考にしてください。
-                    </p>
-                  </div>
-                </li>
-
-                <li className="py-3 sm:py-4">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
-                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-04</time>
-                    <p className="text-sm sm:text-base">
-                      <a href="/characters">全キャラクター一覧の絞り込み機能の追加</a>
-                    </p>
-                  </div>
-                </li>
-
-                <li className="py-3 sm:py-4">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
-                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-09-23</time>
-                    <p className="text-sm sm:text-base">
-                      <a href="/characters">キャラ別一覧ページを作成しました。</a><br />
-                      キャラごとの発動数の多いチーム編成や、組み合わせを確認できます。
-                    </p>
-                  </div>
-                </li>
-
-                <li className="py-3 sm:py-4">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
-                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-09-19</time>
-                    <p className="text-sm sm:text-base">
-                      追加マッチスキルを反映しました。
                     </p>
                   </div>
                 </li>
