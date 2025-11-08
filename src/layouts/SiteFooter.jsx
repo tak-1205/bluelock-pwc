@@ -15,6 +15,7 @@ export default function SiteFooter() {
 
           {/* リンク */}
           <nav className="grid grid-flow-col gap-4 my-4">
+            <Link to="/support-amazon" className="link link-hover">『PWC EGOIST』ご支援のお願い</Link>
             <Link to="/privacy" className="link link-hover">プライバシー</Link>
             <Link to="/contact" className="link link-hover">お問い合わせ</Link>
           </nav>

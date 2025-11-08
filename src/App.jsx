@@ -14,6 +14,8 @@ import Characters from "./pages/Characters.jsx";
 import Character from "./pages/Character.jsx";
 import CharacterRoot from "./pages/CharacterRoot.jsx";
 import Training from "./pages/TrainingTool.jsx";
+import SupportAmazon from "./pages/SupportAmazon.jsx";
+import MatchSkillsIndex from "@/pages/MatchSkillsIndex.jsx";
 
 export default function App() {
   useLazyGA(import.meta.env.VITE_GA_MEASUREMENT_ID);
@@ -63,6 +65,8 @@ export default function App() {
   else if (pathLower === "/tool") Page = Tool;
   else if (pathLower === "/training") Page = Training;
   else if (pathLower === "/contact") Page = Contact;
+  else if (pathLower === "/support-amazon") Page = SupportAmazon;
+  else if (pathLower === "/skills") Page = MatchSkillsIndex;
 
   return (
     <>

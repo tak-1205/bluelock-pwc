@@ -1,7 +1,7 @@
 // src/layouts/TwoColumnLayout.jsx
 import React from "react";
 import SiteFooter from "./SiteFooter.jsx";
-// （必要なら）import { Link } from "react-router-dom"; // ロゴをリンク化したいとき用
+import SupportAmazonBanner from "@/components/SupportAmazonBanner.jsx";
 
 export default function TwoColumnLayout({
   sidebar,
@@ -73,6 +73,10 @@ export default function TwoColumnLayout({
           <div className={`grid gap-6 ${hasRight ? "xl:grid-cols-[minmax(0,1fr)_20rem]" : ""}`}>
            <main className="min-w-0">
              {children}
+             {/* 全ページ共通：Amazon投げ銭バナー（環境変数でON/OFF） */}
+             {(import.meta.env.VITE_FEATURE_SUPPORT_BANNER ?? "on") === "on" && (
+               <SupportAmazonBanner />
+             )}
              {hasRight && (
                // モバイル/タブレット：本文の下にインライン表示 
                <div className={`mt-6 xl:hidden`}>

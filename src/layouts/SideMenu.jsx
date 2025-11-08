@@ -56,6 +56,12 @@ export default function SideMenu({ prepend = null, append = null, children = nul
           </NavLink>
         </li>
 
+        <li className={liClass}>
+          <NavLink to="/skills" className={({ isActive }) => (isActive ? "active" : "")}>
+            マッチスキル検索
+          </NavLink>
+        </li>
+
         {/* 「キャラ別一覧」リンク + 右側に開閉ボタン（クリック領域を分離） */}
         <li className={liClass}>
           <div className="flex items-center gap-2">
@@ -99,10 +105,9 @@ export default function SideMenu({ prepend = null, append = null, children = nul
         </li>
 
         <li className={liClass}>
-          <Pending label="人気チーム編成ランキング" />
-        </li>
-        <li className={liClass}>
-          <Pending label="発動トレーニングスキル" />
+          <NavLink to="/support-amazon" className={({ isActive }) => (isActive ? "active" : "")}>
+            『PWC EGOIST』ご支援のお願い
+          </NavLink>
         </li>
 
         {children}
