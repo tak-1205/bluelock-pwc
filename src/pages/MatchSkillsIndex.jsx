@@ -136,13 +136,25 @@ function Select({
   );
 }
 
-function CharacterIcon({ id, size = 44 }) {
+function CharacterIcon({ id, size = 44, selected = false, disabled = false }) {
   return (
     <img
-      src={`/images/${id}.png`} alt={id} title={id} loading="lazy"
-      width={size} height={size}
-      className="h-11 w-11 rounded-xl border border-base-300 object-cover bg-base-200"
-      onError={(e) => { e.currentTarget.style.opacity = "0.35"; }}
+      src={`/images/${id}.png`}
+      alt={id}
+      title={id}
+      loading="lazy"
+      width={size}
+      height={size}
+      className={`h-11 w-11 rounded-xl border object-cover transition duration-200 ${
+        selected
+          ? "border-primary ring-2 ring-primary/40"
+          : disabled
+          ? "border-base-300 opacity-40 grayscale"
+          : "border-base-300"
+      } bg-base-200`}
+      onError={(e) => {
+        e.currentTarget.style.opacity = "0.35";
+      }}
     />
   );
 }
@@ -159,6 +171,26 @@ function MatchSkillsList() {
   const [activatorCount, setActivatorCount] = useState("");
   const [targetCount, setTargetCount] = useState("");
   const [expanded, setExpanded] = useState(() => new Set());
+  // ① 対象キャラフィルタ（IDの配列）。選んだIDすべてを含むスキルだけ表示します。
+  const [targetFilterIds, setTargetFilterIds] = useState([]);
+  // 対象キャラとして登場する全ID（一覧表示用）
+  const allTargetIds = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (skills || []).flatMap((s) =>
+            Array.isArray(s.targets) ? s.targets : []
+          )
+        )
+      ).sort(),
+    [skills]
+  );
+  const toggleTargetId = useCallback((id) => {
+    setTargetFilterIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  }, []);
+  const clearTargetFilter = useCallback(() => setTargetFilterIds([]), []);
 
   const handleSearch = useCallback(() => {
     setHasSearched(true);
@@ -190,6 +222,12 @@ function MatchSkillsList() {
     return skills.filter((s) => {
       if (wantsCount && s.targets.length !== wantsCount) return false;
       if (wantsACount && s.activators.length !== wantsACount) return false;
+      // ② 選択された target ID を全て含むか（部分集合判定）
+      if (targetFilterIds.length > 0) {
+        for (const tid of targetFilterIds) {
+          if (!s.targets.includes(tid)) return false;
+        }
+      }
       if (!qRaw) return true;
 
       // ✅ 正規化済みハヤスタックで厳密に判定（生テキストの includes は使わない）
@@ -200,14 +238,16 @@ function MatchSkillsList() {
       if (searchScope === "name") return hitName;
       return hitDetail || hitName; // both
     });
-  }, [skills, hasSearched, qApplied, searchScope, targetCount, activatorCount]);
+  }, [skills, hasSearched, qApplied, searchScope, targetCount, activatorCount, targetFilterIds]);
 
   // === ページング & 展開 ===
   const [page, setPage] = useState(1);
   const PAGE = 40;
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE));
 
-  useEffect(() => setPage(1), [qApplied, targetCount, activatorCount]);
+  useEffect(() => {
+    setPage(1);
+  }, [qApplied, targetCount, activatorCount, targetFilterIds]);
 
   const pageItems = useMemo(
     () => filtered.slice(0, page * PAGE),
@@ -215,8 +255,18 @@ function MatchSkillsList() {
   );
 
   useEffect(() => {
-    if (!hasSearched) return;
-    setExpanded(new Set(filtered.map((s) => s.id))); // 検索後は全展開
+    if (targetFilterIds.length > 0 && !hasSearched) {
+      setHasSearched(true);
+      setQApplied((prev) => (prev ?? qInput).trim());
+    }
+    // 何も return しない（クリーンアップ不要）
+  }, [targetFilterIds, hasSearched, qInput]);
+
+  useEffect(() => {
+    if (!hasSearched) {
+      return; // ここでの return は「クリーンアップ関数なし」を示すだけなのでOK
+    }
+    setExpanded(new Set(filtered.map((s) => s.id)));
   }, [hasSearched, filtered]);
 
   const toggleExpand = (id) => {
@@ -314,21 +364,63 @@ function MatchSkillsList() {
               options={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: `${n} 人` }))}
             />
           </div>
+          {/* ③ 対象キャラで絞り込み（複数選択可） */}
+          <div className="mt-2">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="text-xs font-semibold opacity-70">対象キャラで絞り込み</div>
+              <div>
+                {targetFilterIds.length > 0 && (
+                  <button type="button" onClick={clearTargetFilter} className="btn btn-xs">
+                    選択クリア ({targetFilterIds.length})
+                  </button>
+                )}
+              </div>
+            </div>
+            {/* === 対象キャラフィルタ === */}
+            <div className="flex flex-wrap justify-center gap-2 mt-6">
+              {allTargetIds.map((cid) => {
+                const isSelected = targetFilterIds.includes(cid);
+                const isDisabled = targetFilterIds.length > 0 && !isSelected;
+
+                return (
+                  <button
+                    key={cid}
+                    type="button"
+                    onClick={() => {
+                      if (isDisabled) return;        // 無効時はクリック無視
+                      toggleTargetId(cid);
+                    }}
+                    disabled={isDisabled}            // アクセシビリティ上も無効化
+                    aria-pressed={isSelected}
+                    aria-disabled={isDisabled}
+                    className={`p-0 rounded-xl focus:outline-none ${
+                      isDisabled ? "cursor-not-allowed" : "hover:opacity-80"
+                    }`}
+                    title={cid}
+                  >
+                    <CharacterIcon id={cid} selected={isSelected} disabled={isDisabled} />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </form>
 
         {/* === リスト === */}
-        {!hasSearched && (
+        {!hasSearched && targetFilterIds.length === 0 && (
           <div className="mt-10 text-center text-sm opacity-70">
-            上の検索欄から語句を入力して検索してください。
+            検索語を入力して「検索」するか、下の<span className="font-semibold">対象キャラのアイコン</span>を選択してください。
           </div>
         )}
 
         {hasSearched && (
           <>
             {pageItems.length === 0 ? (
-              <div className="mt-10 text-center text-sm opacity-70">
-                条件に合致するスキルが見つかりませんでした。
-              </div>
+            <div className="mt-10 text-center text-sm opacity-70">
+              {targetFilterIds.length > 0
+                ? "選択した対象キャラをすべて含むスキルは見つかりませんでした。"
+                : "条件に合致するスキルが見つかりませんでした。"}
+            </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {pageItems.map((s) => {
