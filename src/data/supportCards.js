@@ -62,6 +62,7 @@ function normalizeRow(row) {
 
 /** ========== ここにスプレッドシート書き出し結果を追記 ========== */
 const SOURCE_ROWS = [
+{ supportcard_id: 'SP-UR018', supportcard_name: '本とメガネとエゴイスト',type:'賢さ',type2:'フィジカル'},
 { supportcard_id: 'SP-UR017', supportcard_name: '怪物への変身',type:'スピード',type2:'賢さ'},
 { supportcard_id: 'SP-UR016', supportcard_name: '悪夢へ誘う魔王',type:'賢さ',type2:'テクニック'},
 { supportcard_id: 'SP-UR015', supportcard_name: '小悪魔の茶会',type:'キック',type2:'スピード'},

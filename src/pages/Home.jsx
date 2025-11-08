@@ -68,18 +68,18 @@ export default function Home() {
 
                 <li className="py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
-                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-11-01</time>
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-11-08</time>
                     <p className="text-sm sm:text-base">
-                      <a href="/character/B032-04">氷織羊【X 自分にできる武器】を追加しました。</a>
+                      <a href="/training">UR 本とメガネとエゴイストを追加しました。</a>
                     </p>
                   </div>
                 </li>
 
                 <li className="py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
-                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-10-20</time>
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-11-01</time>
                     <p className="text-sm sm:text-base">
-                      <a href="/character/B030-03">烏旅人【X 弱点がないなら創るまで】を追加しました。</a>
+                      <a href="/character/B032-04">氷織羊【X 自分にできる武器】を追加しました。</a>
                     </p>
                   </div>
                 </li>
