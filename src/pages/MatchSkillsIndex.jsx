@@ -1,10 +1,11 @@
+// src/pages/MatchSkillsIndex.jsx
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import SEO from "@/components/SEO.jsx";
 import TwoColumnLayout from "@/layouts/TwoColumnLayout.jsx";
 import SideMenu from "@/layouts/SideMenu.jsx";
 import RightAds from "@/layouts/RightAds.jsx";
 import PageHeader from "@/components/PageHeader.jsx";
-//import { matchSkills as RAW_MATCH_SKILLS } from "@/data/matchSkills.js";
+// import { matchSkills as RAW_MATCH_SKILLS } from "@/data/matchSkills.js";
 import { matchSkills as RAW_MATCH_SKILLS } from "@/data/matchSkills.cleaned.js";
 
 /* ---------- icons (inline) ---------- */
@@ -24,39 +25,7 @@ const IconX = (p) => (
   <Icon {...p}><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></Icon>
 );
 
-function highlight(text, term) {
-  if (!term) return text;
-  // 生テキストに対して大小区別なしの部分一致（日本語OK）
-  try {
-    const re = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
-    const parts = String(text).split(re);
-    const matches = String(text).match(re) || [];
-    const out = [];
-    for (let i = 0; i < parts.length; i++) {
-      out.push(parts[i]);
-      if (i < matches.length) {
-        out.push(<mark key={i} className="px-0.5 rounded bg-warning/40">{matches[i]}</mark>);
-      }
-    }
-    return out;
-  } catch {
-    return text;
-  }
-}
-
-
-function toHiragana(s) {
-  return String(s || "").replace(/[\u30A1-\u30F6]/g, ch =>
-    String.fromCharCode(ch.charCodeAt(0) - 0x60)
-  );
-}
-function toKatakana(s) {
-  return String(s || "").replace(/[\u3041-\u3096]/g, ch =>
-    String.fromCharCode(ch.charCodeAt(0) + 0x60)
-  );
-}
-
-/* ---------- data normalize ---------- */
+/* ---------- normalize helpers ---------- */
 function normalizeText(t) {
   return String(t || "")
     .replace(/[\u200B-\u200D\uFEFF\uFE00-\uFE0F]/g, "")
@@ -83,14 +52,13 @@ function normalizeSkill(raw, idx) {
   if (Array.isArray(raw?.activators)) activators.push(...raw.activators.filter(Boolean));
   if (Array.isArray(raw?.actors)) activators.push(...raw.actors.filter(Boolean));
 
-  // ★ 一意なID（raw.id が無ければ name+index を採用）
   const idBase = raw?.id ?? `${name}__${idx}`;
   const id = String(idBase).replace(/\s+/g, "_");
-  const _key = `${id}`; // map用の安定キー
+  const _key = `${id}`;
 
   return {
-    id,          // クリック展開などに使用（今後これも一意）
-    _key,        // ★ React の key に使う
+    id,
+    _key,
     name,
     detail,
     targets: [...new Set(targets)],
@@ -116,7 +84,7 @@ function Toggle({ checked, onChange, label, className = "" }) {
 function Select({
   value,
   onChange,
-  options = [1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: `${n} 人` })), // ← 追加
+  options = [1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: `${n} 人` })),
   placeholder,
   className = "",
 }) {
@@ -152,9 +120,7 @@ function CharacterIcon({ id, size = 44, selected = false, disabled = false }) {
           ? "border-base-300 opacity-40 grayscale"
           : "border-base-300"
       } bg-base-200`}
-      onError={(e) => {
-        e.currentTarget.style.opacity = "0.35";
-      }}
+      onError={(e) => { e.currentTarget.style.opacity = "0.35"; }}
     />
   );
 }
@@ -163,46 +129,45 @@ function CharacterIcon({ id, size = 44, selected = false, disabled = false }) {
 function MatchSkillsList() {
   const skills = useNormalizedSkills();
 
+  // 検索テキスト
   const [qInput, setQInput] = useState("");
   const [qApplied, setQApplied] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
-  const [searchScope, setSearchScope] = useState("both");
+  const [searchScope, setSearchScope] = useState("both"); // "detail" | "name" | "both"
 
-  const [activatorCount, setActivatorCount] = useState("");
+  // 既存フィルタ
   const [targetCount, setTargetCount] = useState("");
   const [expanded, setExpanded] = useState(() => new Set());
-  // ① 対象キャラフィルタ（IDの配列）。選んだIDすべてを含むスキルだけ表示します。
-  const [targetFilterIds, setTargetFilterIds] = useState([]);
-  // 対象キャラとして登場する全ID（一覧表示用）
-  const allTargetIds = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          (skills || []).flatMap((s) =>
-            Array.isArray(s.targets) ? s.targets : []
-          )
-        )
-      ).sort(),
-    [skills]
-  );
-  const toggleTargetId = useCallback((id) => {
-    setTargetFilterIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  }, []);
-  const clearTargetFilter = useCallback(() => setTargetFilterIds([]), []);
 
+  // 対象キャラフィルタ
+  const [targetFilterIds, setTargetFilterIds] = useState([]); // string[]
+  const [showTargetPicker, setShowTargetPicker] = useState(false);
+
+  // 対象キャラ候補（targets からユニーク抽出）
+  const allTargetIds = useMemo(() => {
+    const set = new Set();
+    for (const s of skills) for (const t of s.targets || []) set.add(t);
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "ja"));
+  }, [skills]);
+
+  // アイコンのトグル（1人固定）
+  const toggleTargetId = useCallback((cid) => {
+    setTargetFilterIds((prev) => {
+      if (prev.includes(cid)) return prev.filter((x) => x !== cid);
+      if (prev.length > 0) return [cid];
+      return [...prev, cid];
+    });
+  }, []);
+
+  // 検索確定
   const handleSearch = useCallback(() => {
     setHasSearched(true);
     setQApplied(qInput.trim());
   }, [qInput]);
 
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === "Enter" && !e.nativeEvent.isComposing) handleSearch();
-    },
-    [handleSearch]
-  );
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) handleSearch();
+  }, [handleSearch]);
 
   const handleClear = useCallback(() => {
     setQInput("");
@@ -211,63 +176,47 @@ function MatchSkillsList() {
     setExpanded(new Set());
   }, []);
 
-  // === フィルタ ===
+  // === 絞り込み ===
   const filtered = useMemo(() => {
-    if (!hasSearched) return [];
+    if (!hasSearched && targetFilterIds.length === 0) return [];
+
     const qRaw = qApplied.trim();
     const qNorm = normalizeText(qRaw);
     const wantsCount = Number(targetCount) || null;
-    const wantsACount = Number(activatorCount) || null;
 
     return skills.filter((s) => {
       if (wantsCount && s.targets.length !== wantsCount) return false;
-      if (wantsACount && s.activators.length !== wantsACount) return false;
-      // ② 選択された target ID を全て含むか（部分集合判定）
+
       if (targetFilterIds.length > 0) {
-        for (const tid of targetFilterIds) {
-          if (!s.targets.includes(tid)) return false;
-        }
+        const set = new Set(s.targets);
+        for (const id of targetFilterIds) if (!set.has(id)) return false;
       }
+
       if (!qRaw) return true;
 
-      // ✅ 正規化済みハヤスタックで厳密に判定（生テキストの includes は使わない）
-      const hitDetail = s.__hayDetail.includes(qNorm);
-      const hitName   = s.__hayName.includes(qNorm);
+      const hitDetail =
+        s.__hayDetail.includes(qNorm) || normalizeText(s.detail).includes(qNorm);
+      const hitName =
+        s.__hayName.includes(qNorm) || normalizeText(s.name).includes(qNorm);
 
       if (searchScope === "detail") return hitDetail;
       if (searchScope === "name") return hitName;
       return hitDetail || hitName; // both
     });
-  }, [skills, hasSearched, qApplied, searchScope, targetCount, activatorCount, targetFilterIds]);
+  }, [skills, hasSearched, qApplied, searchScope, targetFilterIds, targetCount]);
 
-  // === ページング & 展開 ===
+  // ページング
   const [page, setPage] = useState(1);
   const PAGE = 40;
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE));
+  useEffect(() => { setPage(1); }, [qApplied, targetCount, targetFilterIds, searchScope]);
+  const pageItems = useMemo(() => filtered.slice(0, page * PAGE), [filtered, page]);
 
+  // 検索後（または対象キャラ選択時）は全カード展開
   useEffect(() => {
-    setPage(1);
-  }, [qApplied, targetCount, activatorCount, targetFilterIds]);
-
-  const pageItems = useMemo(
-    () => filtered.slice(0, page * PAGE),
-    [filtered, page]
-  );
-
-  useEffect(() => {
-    if (targetFilterIds.length > 0 && !hasSearched) {
-      setHasSearched(true);
-      setQApplied((prev) => (prev ?? qInput).trim());
-    }
-    // 何も return しない（クリーンアップ不要）
-  }, [targetFilterIds, hasSearched, qInput]);
-
-  useEffect(() => {
-    if (!hasSearched) {
-      return; // ここでの return は「クリーンアップ関数なし」を示すだけなのでOK
-    }
+    if (!hasSearched && targetFilterIds.length === 0) return; // ← 何も返さない
     setExpanded(new Set(filtered.map((s) => s.id)));
-  }, [hasSearched, filtered]);
+  }, [hasSearched, targetFilterIds, filtered]);
 
   const toggleExpand = (id) => {
     setExpanded((prev) => {
@@ -280,35 +229,27 @@ function MatchSkillsList() {
   return (
     <div className="card bg-base-100 shadow-sm border border-base-300">
       <div className="card-body">
+
         {/* Header */}
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-xl font-bold tracking-tight">マッチスキル検索</h2>
-            <p className="text-sm opacity-70">
+            <h2 className="text-2xl font-bold leading-tight sm:text-2xl">マッチスキル検索</h2>
+            <p className="mt-1 text-xs text-base-content/70 sm:text-sm">
               検索後にスキルカードを表示します。カードは展開状態で表示されます。
             </p>
           </div>
-          <div className="text-xs opacity-70">
-            {hasSearched
-              ? `表示 ${filtered.length} / 総数 ${skills.length}`
-              : "検索で絞り込んで表示します"}
+          <div className="text-[11px] text-base-content/60 sm:text-xs">
+            {hasSearched ? `表示 ${filtered.length} / 総数 ${skills.length}` : "検索で絞り込んで表示します"}
           </div>
         </div>
 
         {/* Controls */}
-        <form
-          className="mb-4 flex flex-col items-center gap-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch();
-          }}
-        >
-          {/* 上段：検索欄＋ボタン＋スコープ */}
-          <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-center gap-3">
-            <div className="flex w-full sm:max-w-[600px] items-center gap-2">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-base-300 bg-base-100">
-                <IconSearch className="h-4 w-4 opacity-70" />
-              </span>
+        <form className="mb-4 space-y-3"
+              onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
+          {/* 上段：検索欄＋ボタン */}
+          <div className="grid w-full max-w-[680px] grid-cols-[1fr_auto] gap-2 mx-auto">
+            <label className="input input-sm h-10 flex items-center gap-2">
+              <IconSearch className="h-4 w-4 opacity-70" />
               <input
                 type="text"
                 autoComplete="off"
@@ -316,95 +257,131 @@ function MatchSkillsList() {
                 onChange={(e) => setQInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="スキル名または詳細で検索（Enterで確定）"
-                className="input input-bordered h-10 w-full"
+                className="grow bg-transparent outline-none"
               />
-              {qInput && (
-                <button
-                  type="button"
-                  className="btn btn-ghost h-10 min-h-10"
-                  onClick={handleClear}
-                  aria-label="クリア"
-                >
+              {!!qInput && (
+                <button type="button" className="btn btn-ghost btn-xs" onClick={handleClear} aria-label="クリア">
                   <IconX className="h-4 w-4" />
                 </button>
               )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="submit"
-                className="btn btn-primary h-10 min-h-10 px-6 shrink-0"
-              >
-                検索
-              </button>
-              <select
-                className="select select-sm w-auto min-w-[120px]"
-                value={searchScope}
-                onChange={(e) => setSearchScope(e.target.value)}
-                aria-label="検索対象"
-              >
-                <option value="both">両方</option>
-                <option value="name">スキル名のみ</option>
-                <option value="detail">スキル詳細のみ</option>
-              </select>
-            </div>
+            </label>
+            <button type="submit" className="btn btn-primary h-10 min-h-10 px-5">検索</button>
           </div>
 
-          {/* 下段：対象人数＋発動者人数 */}
-          <div className="w-full flex flex-col items-center gap-3 sm:flex-row sm:flex-nowrap sm:justify-center sm:gap-4">
+          {/* 下段：プルダウン2つ */}
+          <div className="grid w-full max-w-[680px] grid-cols-2 gap-2 mx-auto">
             <Select
               value={targetCount}
               onChange={setTargetCount}
               placeholder="対象人数（すべて）"
+              options={[1,2,3,4,5].map(n => ({ value: String(n), label: `${n} 人` }))}
+              className="w-full"
             />
-            <Select
-              value={activatorCount}
-              onChange={setActivatorCount}
-              placeholder="発動者人数（すべて）"
-              options={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: `${n} 人` }))}
-            />
+            <select
+              className="select select-sm w-full"
+              value={searchScope}
+              onChange={(e) => setSearchScope(e.target.value)}
+              aria-label="検索対象"
+            >
+              <option value="both">名前＋詳細</option>
+              <option value="name">名前のみ</option>
+              <option value="detail">詳細のみ</option>
+            </select>
           </div>
-          {/* ③ 対象キャラで絞り込み（複数選択可） */}
-          <div className="mt-2">
-            <div className="mb-2 flex items-center justify-between">
-              <div className="text-xs font-semibold opacity-70">対象キャラで絞り込み</div>
-              <div>
-                {targetFilterIds.length > 0 && (
-                  <button type="button" onClick={clearTargetFilter} className="btn btn-xs">
-                    選択クリア ({targetFilterIds.length})
-                  </button>
+
+          {/* 対象キャラモーダル起動＆選択済み表示 */}
+          <div className="w-full max-w-[680px] mx-auto flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => setShowTargetPicker(true)}
+              className="btn btn-sm btn-outline rounded-xl"
+            >
+              対象キャラを選ぶ {targetFilterIds.length > 0 ? `（${targetFilterIds.length}）` : ""}
+            </button>
+            {targetFilterIds.length > 0 && (
+              <div className="flex items-center gap-1 overflow-x-auto">
+                {targetFilterIds.slice(0, 6).map((cid) => (
+                  <CharacterIcon key={`chip-${cid}`} id={cid} size={28} selected />
+                ))}
+                {targetFilterIds.length > 6 && (
+                  <span className="badge badge-ghost text-[10px]">+{targetFilterIds.length - 6}</span>
                 )}
               </div>
-            </div>
-            {/* === 対象キャラフィルタ === */}
-            <div className="flex flex-wrap justify-center gap-2 mt-6">
-              {allTargetIds.map((cid) => {
-                const isSelected = targetFilterIds.includes(cid);
-                const isDisabled = targetFilterIds.length > 0 && !isSelected;
-
-                return (
-                  <button
-                    key={cid}
-                    type="button"
-                    onClick={() => {
-                      if (isDisabled) return;        // 無効時はクリック無視
-                      toggleTargetId(cid);
-                    }}
-                    disabled={isDisabled}            // アクセシビリティ上も無効化
-                    aria-pressed={isSelected}
-                    aria-disabled={isDisabled}
-                    className={`p-0 rounded-xl focus:outline-none ${
-                      isDisabled ? "cursor-not-allowed" : "hover:opacity-80"
-                    }`}
-                    title={cid}
-                  >
-                    <CharacterIcon id={cid} selected={isSelected} disabled={isDisabled} />
-                  </button>
-                );
-              })}
-            </div>
+            )}
           </div>
         </form>
+
+        {/* === モーダル === */}
+        {showTargetPicker && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setShowTargetPicker(false)} />
+            <div className="relative z-10 w-full max-w-[900px] rounded-2xl bg-base-100 shadow-xl border border-base-300">
+              <div className="p-4 border-b border-base-300 flex items-center justify-between">
+                <h3 className="text-base font-semibold">対象キャラで絞り込み</h3>
+                <button className="btn btn-ghost btn-sm" onClick={() => setShowTargetPicker(false)}>
+                  閉じる
+                </button>
+              </div>
+
+              <div className="p-3">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <div className="text-xs opacity-70">
+                    クリックで選択／再クリックで解除。1キャラ選択中は他をグレー表示します。
+                  </div>
+                  {targetFilterIds.length > 0 && (
+                    <button type="button" className="btn btn-xs" onClick={() => setTargetFilterIds([])}>
+                      全解除
+                    </button>
+                  )}
+                </div>
+
+                <div className="max-h-[60vh] overflow-auto">
+                  <div
+                    className="grid grid-cols-[repeat(auto-fill,44px)] justify-center gap-[5px] sm:gap-[5px] md:gap-[5px] p-1"
+                    style={{ gridAutoRows: "44px" }}
+                  >
+
+                    {allTargetIds.map((cid) => {
+                      const isSelected = targetFilterIds.includes(cid);
+                      const isDisabled = targetFilterIds.length > 0 && !isSelected;
+                      return (
+                        <button
+                          key={`picker-${cid}`}
+                          type="button"
+                          onClick={() => { if (!isDisabled) toggleTargetId(cid); }}
+                          disabled={isDisabled}
+                          aria-pressed={isSelected}
+                          className={`p-0 rounded-xl ${isDisabled ? "cursor-not-allowed" : "hover:opacity-80"}`}
+                          title={cid}
+                        >
+                          <CharacterIcon id={cid} selected={isSelected} disabled={isDisabled} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 border-t border-base-300 flex items-center justify-end gap-2">
+                <button className="btn btn-ghost btn-sm" onClick={() => setShowTargetPicker(false)}>
+                  キャンセル
+                </button>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => {
+                    if (targetFilterIds.length > 0 && !hasSearched) {
+                      setHasSearched(true);
+                      setQApplied((prev) => (prev ?? qInput).trim());
+                    }
+                    setShowTargetPicker(false);
+                  }}
+                >
+                  適用
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* === リスト === */}
         {!hasSearched && targetFilterIds.length === 0 && (
@@ -416,38 +393,24 @@ function MatchSkillsList() {
         {hasSearched && (
           <>
             {pageItems.length === 0 ? (
-            <div className="mt-10 text-center text-sm opacity-70">
-              {targetFilterIds.length > 0
-                ? "選択した対象キャラをすべて含むスキルは見つかりませんでした。"
-                : "条件に合致するスキルが見つかりませんでした。"}
-            </div>
+              <div className="mt-10 text-center text-sm opacity-70">
+                {targetFilterIds.length > 0
+                  ? "選択した対象キャラをすべて含むスキルは見つかりませんでした。"
+                  : "条件に合致するスキルが見つかりませんでした。"}
+              </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {pageItems.map((s) => {
                   const isOpen = expanded.has(s.id);
                   return (
-                    <article
-                      key={s._key}
-                      className="card border border-base-300 bg-base-100 shadow hover:shadow-md transition"
-                    >
-                      <button
-                        className="text-left"
-                        onClick={() => toggleExpand(s.id)}
-                        aria-expanded={isOpen}
-                      >
+                    <article key={s._key} className="card border border-base-300 bg-base-100 shadow hover:shadow-md transition">
+                      <button className="text-left" onClick={() => toggleExpand(s.id)} aria-expanded={isOpen}>
                         <div className="card-body p-4">
                           <div className="mb-2 flex items-start justify-between gap-3">
-                            <h3 className="text-base font-semibold leading-tight">
-                              {s.name}
-                            </h3>
+                            <h3 className="text-base font-semibold leading-tight">{s.name}</h3>
                             <IconChevronUpDown className="h-4 w-4 shrink-0 opacity-50" />
                           </div>
-                          <div
-                            className={
-                              "text-sm text-base-content/90 leading-relaxed whitespace-pre-line " +
-                              (isOpen ? "" : "line-clamp-6")
-                            }
-                          >
+                          <div className={"text-sm text-base-content/90 leading-relaxed whitespace-pre-line " + (isOpen ? "" : "line-clamp-6")}>
                             {s.detail}
                           </div>
                         </div>
@@ -458,14 +421,10 @@ function MatchSkillsList() {
                           <div className="divider my-3"></div>
                           <div className="space-y-4">
                             <section>
-                              <div className="mb-2 text-xs font-semibold opacity-70">
-                                発動対象
-                              </div>
+                              <div className="mb-2 text-xs font-semibold opacity-70">発動対象</div>
                               {s.targets.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
-                                  {s.targets.map((cid) => (
-                                    <CharacterIcon key={cid} id={cid} />
-                                  ))}
+                                  {s.targets.map((cid) => <CharacterIcon key={cid} id={cid} />)}
                                 </div>
                               ) : (
                                 <div className="text-xs opacity-60">情報なし</div>
@@ -473,14 +432,10 @@ function MatchSkillsList() {
                             </section>
 
                             <section>
-                              <div className="mb-2 text-xs font-semibold opacity-70">
-                                発動者
-                              </div>
+                              <div className="mb-2 text-xs font-semibold opacity-70">発動者</div>
                               {s.activators.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
-                                  {s.activators.map((cid) => (
-                                    <CharacterIcon key={cid} id={cid} />
-                                  ))}
+                                  {s.activators.map((cid) => <CharacterIcon key={cid} id={cid} />)}
                                 </div>
                               ) : (
                                 <div className="text-xs opacity-60">情報なし</div>
@@ -492,6 +447,15 @@ function MatchSkillsList() {
                     </article>
                   );
                 })}
+              </div>
+            )}
+
+            {/* Load more */}
+            {page < pageCount && (
+              <div className="mt-6 flex justify-center">
+                <button className="btn btn-sm" onClick={() => setPage((p) => Math.min(p + 1, pageCount))}>
+                  さらに表示 ({page * PAGE} / {filtered.length})
+                </button>
               </div>
             )}
           </>
