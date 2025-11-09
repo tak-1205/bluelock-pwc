@@ -386,7 +386,7 @@ function MatchSkillsList() {
         {/* === リスト === */}
         {!hasSearched && targetFilterIds.length === 0 && (
           <div className="mt-10 text-center text-sm opacity-70">
-            検索語を入力して「検索」するか、下の<span className="font-semibold">対象キャラのアイコン</span>を選択してください。
+            検索語を入力して「検索」するか、<span className="font-semibold">対象キャラを選ぶ</span>から選択してください。
           </div>
         )}
 
