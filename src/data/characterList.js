@@ -89,6 +89,7 @@ export const characterList = [
 { id: 'B032-04', name: '氷織羊【X 自分にできる武器】',rarity: '4',type: '賢さ'},
 { id: 'B033-01', name: '雪宮剣優【1on1エンペラー】',rarity: '3',type: 'キック'},
 { id: 'B033-02', name: '雪宮剣優【ストリート・スタイル】',rarity: '3',type: 'キック'},
+{ id: 'B033-03', name: '雪宮剣優【一瞬に見出す極限】',rarity: '4',type: 'スピード'},
 { id: 'B034-01', name: '清羅刃【ボーダーライナー】',rarity: '3',type: '賢さ'},
 { id: 'B035-01', name: '七星虹郎【天然記念物】',rarity: '3',type: 'スピード'},
 { id: 'B035-02', name: '七星虹郎【X トレッキング・トレーニング】',rarity: '4',type: 'テクニック'},
