@@ -15,7 +15,9 @@ const norm = (s) => String(s || "").trim().toUpperCase();
 const allChars = Array.isArray(characterListData) ? characterListData : [];
 
 // ID判定
-const isSupportId = (s) => /^SP-(?:UR|SSR|EX)\d{3}$/i.test(String(s || ""));
+// SP-UR*** / SP-SSR*** / SP-EX***（互換用）/ EXSP-UR*** / EXSP-SSR*** をサポート
+const isSupportId = (s) =>
+  /^(?:SP-(?:UR|SSR|EX)\d{3}|EXSP-(?:UR|SSR)\d{3})$/i.test(String(s || ""));
 const isCharId = (s) => /^[A-Z]\d{3}(?:-\d{2})?$/i.test(String(s || ""));
 
 // 参照マップ（名前→ID）
