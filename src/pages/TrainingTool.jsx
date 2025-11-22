@@ -167,17 +167,17 @@ function CloseDot({ onClick, title = "外す" }) {
 }
 function RarityBadgeMini({ rarity }) {
   const color = rarity === "UR" ? "bg-orange-400" : rarity === "SSR" ? "bg-purple-500" : "bg-emerald-500";
-  return <div className={`absolute top-0.5 left-0.5 ${color} text-white text-[9px] font-black px-1 rounded`}>{rarity}</div>;
+  return <div className={`absolute top-0.5 left-0.5 ${color} text-white text-[9px] font-black px-0.5 rounded`}>{rarity}</div>;
 }
 function TypeBadgeMini({ type }) {
   return <div className="absolute bottom-0.5 left-0.5 text-[9px] px-1 py-[1px] rounded bg-base-100/80 border border-base-200">{type}</div>;
 }
 
 /* ====== 定数（サイズ統一） ====== */
-const CARD_TILE_W = 84;         // ダイアログ/編成欄のカード外枠の幅
-const CARD_TILE_PAD = 2;        // 外枠のpadding
-const SLOT_TILE_W = 84;         // 編成欄のカード外枠の幅（=94で据え置き）
-const SLOT_TILE_PAD = 2;
+const CARD_TILE_W = 80;         // ダイアログ/編成欄のカード外枠の幅
+const CARD_TILE_PAD = 0;        // 外枠のpadding
+const SLOT_TILE_W = 80;         // 編成欄のカード外枠の幅（=94で据え置き）
+const SLOT_TILE_PAD = 0;
 
 /* === 小型サムネ（カード/選手） ===================================== */
 // 内側は枠線なし。fillで親幅にフィットさせ、外枠のpadding分だけ均等余白にする
@@ -202,17 +202,17 @@ function SupportCardThumb({ card, showName = false, width, fill = false }) {
         }}
       >
         <SupportImg id={id} alt={name} />
-        <div style={{ position: "absolute", top: 2, left: 2 }}>
+        <div style={{ position: "absolute", top: 2, left: 1 }}>
           <RarityBadgeMini rarity={rarity} />
         </div>
         <div
           style={{
             position: "absolute",
             top: 2,
-            right: 2,
+            right: 1,
             fontSize: 9,
             lineHeight: 1,
-            padding: "2px 4px",
+            padding: "2px 1px",
             borderRadius: 4,
             background: "rgba(255,255,255,0.9)",
             border: "1px solid rgba(0,0,0,0.1)",
@@ -572,7 +572,7 @@ function ExSupportPicker({ pool, selectedId, onChange }) {
   return (
     <div className="space-y-2">
       <div className="text-xs opacity-70">現在 {selectedId ? 1 : 0} / 1</div>
-      <ul style={{ display: "flex", flexWrap: "wrap", gap: 8, listStyle: "none", padding: 0, margin: 0 }}>
+      <ul style={{ display: "flex", flexWrap: "wrap", gap: 4, listStyle: "none", padding: 0, margin: 0 }}>
         {pool.map((card) => {
           const isSelected = selectedId === card.id;
           return (
