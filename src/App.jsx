@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import ScrollManager from "./components/ScrollManager.jsx";
 
 // ページ
-import Home from "./pages/Home.jsx";
+import Home from "./pages/HomeScreen.jsx";
 import Privacy from "./pages/Privacy.jsx";
 import Ranking from "./pages/Ranking.jsx";
 import Tool from "./pages/Tool.jsx";
