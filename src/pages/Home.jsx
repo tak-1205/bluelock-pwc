@@ -68,6 +68,24 @@ export default function Home() {
 
                 <li className="py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-11-23</time>
+                    <p className="text-sm sm:text-base">
+                      <a href="/training">EXサポートカード UR 新しい遺伝子、UR 反射で視る世界を追加しました。</a>
+                    </p>
+                  </div>
+                </li>
+
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
+                    <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-11-14</time>
+                    <p className="text-sm sm:text-base">
+                      <a href="/character/B033-03">雪宮剣優【一瞬に見出す極限】を追加しました。</a>
+                    </p>
+                  </div>
+                </li>
+
+                <li className="py-3 sm:py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-4">
                     <time className="text-sm tabular-nums text-base-content/70 shrink-0">2025-11-08</time>
                     <p className="text-sm sm:text-base">
                       <a href="/training">UR 本とメガネとエゴイストを追加しました。</a>
