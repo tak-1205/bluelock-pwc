@@ -3,9 +3,14 @@
 /**
  * スプレッドシート→JS書き出しを「1リスト」で管理する前提の定義。
  * - 入力（SOURCE_ROWS）：{ supportcard_id, supportcard_name, type }
- * - 出力（supportCards）：{ id, name, type, rarity, kind }
+ * - 出力（supportCards）：{ id, name, type, type2, rarity, kind }
  *     rarity: 'UR' | 'SSR' | 'EX'       ← IDから自動判定
- *     kind:   'support' | 'ex'          ← rarity が EX のとき 'ex'、それ以外は 'support'
+ *       - 通常サポート: SP-UR*** / SP-SSR***
+ *       - 旧EX:         SP-EX***        （互換用）
+ *       - 新EXサポ:     EXSP-UR*** / EXSP-SSR***（レアリティは UR / SSR）
+ *     kind:   'support' | 'ex'
+ *       - id が EXサポ（SP-EX*** / EXSP-***）なら 'ex'
+ *       - それ以外は 'support'
  *
  * 既存コード互換：
  *   import { supportCards } from "@/data/supportCards.js"
@@ -14,21 +19,42 @@
  */
 
 /** ===== ヘルパ（必ず1回だけ定義 & export） ===== */
+
+// EXサポートID判定：旧 SP-EX*** と 新 EXSP-UR***/EXSP-SSR*** を含む
 export function isExSupportId(id) {
-  return /^SP-EX\d{3}$/i.test(String(id || ""));
+  const s = String(id || "");
+  return /^(?:SP-EX\d{3}|EXSP-(?:UR|SSR)\d{3})$/i.test(s);
 }
+
+// UR / SSR の通常サポート（SP-UR*** / SP-SSR*** のみ）
 export function isSupportId(id) {
-  // UR / SSR の通常サポート
   return /^SP-(?:UR|SSR)\d{3}$/i.test(String(id || ""));
 }
+
+// ID からレアリティ文字列を取得
 export function parseRarity(id = "") {
-  if (isExSupportId(id)) return "EX";
-  if (/^SP-UR\d{3}$/i.test(id)) return "UR";
-  if (/^SP-SSR\d{3}$/i.test(id)) return "SSR";
+  const s = String(id || "");
+
+  // 新EXサポ（EXSP-UR*** / EXSP-SSR***）
+  if (/^EXSP-UR\d{3}$/i.test(s)) return "UR";
+  if (/^EXSP-SSR\d{3}$/i.test(s)) return "SSR";
+
+  // 旧EX（互換用）
+  if (/^SP-EX\d{3}$/i.test(s)) return "EX";
+
+  // 通常サポ
+  if (/^SP-UR\d{3}$/i.test(s)) return "UR";
+  if (/^SP-SSR\d{3}$/i.test(s)) return "SSR";
+
   // 想定外フォーマットは SSR 扱い（必要に応じて変更）
   return "SSR";
 }
-export function rarityToKind(rarity) {
+
+// kind 判定：基本は ID で EX かどうかを見る
+export function rarityToKind(rarity, id) {
+  const s = String(id || "");
+  if (s && isExSupportId(s)) return "ex";
+  // 旧フォーマット互換（SP-EX*** の場合）
   return rarity === "EX" ? "ex" : "support";
 }
 
@@ -56,12 +82,14 @@ function normalizeRow(row) {
   const type = String(row.type || "").trim();
   const type2 = String(row.type2 || "").trim();
   const rarity = parseRarity(id);
-  const kind = rarityToKind(rarity);
+  const kind = rarityToKind(rarity, id); // id も渡して EX 判定する
   return { id, name, type, type2, rarity, kind };
 }
 
 /** ========== ここにスプレッドシート書き出し結果を追記 ========== */
 const SOURCE_ROWS = [
+{ supportcard_id: 'EXSP-UR001', supportcard_name: '新しい遺伝子',type:'テクニック',type2:''},
+{ supportcard_id: 'SP-UR019', supportcard_name: '反射で視る世界',type:'賢さ',type2:''},
 { supportcard_id: 'SP-UR018', supportcard_name: '本とメガネとエゴイスト',type:'賢さ',type2:'フィジカル'},
 { supportcard_id: 'SP-UR017', supportcard_name: '怪物への変身',type:'スピード',type2:'賢さ'},
 { supportcard_id: 'SP-UR016', supportcard_name: '悪夢へ誘う魔王',type:'賢さ',type2:'テクニック'},
@@ -83,16 +111,16 @@ const SOURCE_ROWS = [
 
 { supportcard_id: 'SP-SSR113', supportcard_name: '公共の場で泳ぐな',type:'フィジカル',type2:''},
 
-{ supportcard_id: 'SP-EX010', supportcard_name: '独裁の王',type:'フィジカル',type2:''},
-{ supportcard_id: 'SP-EX009', supportcard_name: '今の俺の現在地',type:'スピード',type2:''},
-{ supportcard_id: 'SP-EX008', supportcard_name: '悪魔参戦',type:'キック',type2:''},
-{ supportcard_id: 'SP-EX007', supportcard_name: 'お前は一生俺に勝てないのポーズだ',type:'賢さ',type2:''},
-{ supportcard_id: 'SP-EX006', supportcard_name: 'ARRIVAL STAGE',type:'テクニック',type2:''},
-{ supportcard_id: 'SP-EX005', supportcard_name: '殺し屋と忍者',type:'テクニック',type2:''},
-{ supportcard_id: 'SP-EX004', supportcard_name: '奪い返す',type:'賢さ',type2:'フィジカル'},
-{ supportcard_id: 'SP-EX003', supportcard_name: '俺のエゴはなんだ？',type:'テクニック',type2:'スピード'},
-{ supportcard_id: 'SP-EX002', supportcard_name: '死んでも嫌っすね',type:'キック',type2:'賢さ'},
-{ supportcard_id: 'SP-EX001', supportcard_name: '俄然',type:'スタミナ',type2:'賢さ'},
+{ supportcard_id: 'EXSP-SSR010', supportcard_name: '独裁の王',type:'フィジカル',type2:''},
+{ supportcard_id: 'EXSP-SSR009', supportcard_name: '今の俺の現在地',type:'スピード',type2:''},
+{ supportcard_id: 'EXSP-SSR008', supportcard_name: '悪魔参戦',type:'キック',type2:''},
+{ supportcard_id: 'EXSP-SSR007', supportcard_name: 'お前は一生俺に勝てないのポーズだ',type:'賢さ',type2:''},
+{ supportcard_id: 'EXSP-SSR006', supportcard_name: 'ARRIVAL STAGE',type:'テクニック',type2:''},
+{ supportcard_id: 'EXSP-SSR005', supportcard_name: '殺し屋と忍者',type:'テクニック',type2:''},
+{ supportcard_id: 'EXSP-SSR004', supportcard_name: '奪い返す',type:'賢さ',type2:'フィジカル'},
+{ supportcard_id: 'EXSP-SSR003', supportcard_name: '俺のエゴはなんだ？',type:'テクニック',type2:'スピード'},
+{ supportcard_id: 'EXSP-SSR002', supportcard_name: '死んでも嫌っすね',type:'キック',type2:'賢さ'},
+{ supportcard_id: 'EXSP-SSR001', supportcard_name: '俄然',type:'スタミナ',type2:'賢さ'},
 ];
 
 /** ========== ここから下は触らない運用でOK ========== */

@@ -15,7 +15,9 @@ const norm = (s) => String(s || "").trim().toUpperCase();
 const allChars = Array.isArray(characterListData) ? characterListData : [];
 
 // ID判定
-const isSupportId = (s) => /^SP-(?:UR|SSR|EX)\d{3}$/i.test(String(s || ""));
+// SP-UR*** / SP-SSR*** / SP-EX***（互換用）/ EXSP-UR*** / EXSP-SSR*** をサポート
+const isSupportId = (s) =>
+  /^(?:SP-(?:UR|SSR|EX)\d{3}|EXSP-(?:UR|SSR)\d{3})$/i.test(String(s || ""));
 const isCharId = (s) => /^[A-Z]\d{3}(?:-\d{2})?$/i.test(String(s || ""));
 
 // 参照マップ（名前→ID）
@@ -165,17 +167,17 @@ function CloseDot({ onClick, title = "外す" }) {
 }
 function RarityBadgeMini({ rarity }) {
   const color = rarity === "UR" ? "bg-orange-400" : rarity === "SSR" ? "bg-purple-500" : "bg-emerald-500";
-  return <div className={`absolute top-0.5 left-0.5 ${color} text-white text-[9px] font-black px-1 rounded`}>{rarity}</div>;
+  return <div className={`absolute top-0.5 left-0.5 ${color} text-white text-[9px] font-black px-0.5 rounded`}>{rarity}</div>;
 }
 function TypeBadgeMini({ type }) {
   return <div className="absolute bottom-0.5 left-0.5 text-[9px] px-1 py-[1px] rounded bg-base-100/80 border border-base-200">{type}</div>;
 }
 
 /* ====== 定数（サイズ統一） ====== */
-const CARD_TILE_W = 94;         // ダイアログ/編成欄のカード外枠の幅
-const CARD_TILE_PAD = 2;        // 外枠のpadding
-const SLOT_TILE_W = 94;         // 編成欄のカード外枠の幅（=94で据え置き）
-const SLOT_TILE_PAD = 2;
+const CARD_TILE_W = 80;         // ダイアログ/編成欄のカード外枠の幅
+const CARD_TILE_PAD = 0;        // 外枠のpadding
+const SLOT_TILE_W = 80;         // 編成欄のカード外枠の幅（=94で据え置き）
+const SLOT_TILE_PAD = 0;
 
 /* === 小型サムネ（カード/選手） ===================================== */
 // 内側は枠線なし。fillで親幅にフィットさせ、外枠のpadding分だけ均等余白にする
@@ -200,17 +202,17 @@ function SupportCardThumb({ card, showName = false, width, fill = false }) {
         }}
       >
         <SupportImg id={id} alt={name} />
-        <div style={{ position: "absolute", top: 2, left: 2 }}>
+        <div style={{ position: "absolute", top: 2, left: 1 }}>
           <RarityBadgeMini rarity={rarity} />
         </div>
         <div
           style={{
             position: "absolute",
             top: 2,
-            right: 2,
+            right: 1,
             fontSize: 9,
             lineHeight: 1,
-            padding: "2px 4px",
+            padding: "2px 1px",
             borderRadius: 4,
             background: "rgba(255,255,255,0.9)",
             border: "1px solid rgba(0,0,0,0.1)",
@@ -292,7 +294,7 @@ function CharacterThumb({ id, muted = false, width = 70 }) {
 function CharacterSlot({ id, onClick, onRemove }) {
   const name = id ? getCharNameById(id) : "";
   return (
-    <div className="relative w-[76px] h-[76px] rounded-xl border shadow-sm bg-base-100 border-base-300">
+    <div className="relative w-[70px] h-[70px] rounded-xl border shadow-sm bg-base-100 border-base-300">
       <button
         type="button"
         className="w-full h-full flex items-center justify-center rounded-xl"
@@ -301,7 +303,7 @@ function CharacterSlot({ id, onClick, onRemove }) {
         aria-label={id ? name : "選手を追加"}
       >
         {id ? (
-          <CharImg id={id} alt={name} size={76} className="rounded-xl" />
+          <CharImg id={id} alt={name} size={70} className="rounded-xl" />
         ) : (
           <div className="flex flex-col items-center justify-center text-base-content/60">
             <div className="w-8 h-8 rounded-xl bg-base-200 flex items-center justify-center text-lg">＋</div>
@@ -430,10 +432,11 @@ function collectTypes(pool) {
 // daisyUIで作るフィルタバー
 function TypeFilterBar({ items, value, onChange }) {
   return (
-    <div className="pt-5">
+    <div className="pt-2">
       <div className="text-sm mb-2">タイプで絞り込み</div>
         <div className="mt-2 text-xs text-base-content/70">
-           ボタンをクリックすると、各タイプのカードのみ表示されます。タイプは練習メニューの内容で表示されます。
+          ボタンをクリックすると、各タイプのカードのみ表示されます。タイプは練習メニューの内容で表示されます。<br />
+          ※ 現在選択できるスペシャルサポートカードは効果量の高いURとSSR「公共の場で泳ぐな」のみです。
         </div>
       <div className="flex flex-wrap gap-2 pt-5">
         <button
@@ -569,7 +572,7 @@ function ExSupportPicker({ pool, selectedId, onChange }) {
   return (
     <div className="space-y-2">
       <div className="text-xs opacity-70">現在 {selectedId ? 1 : 0} / 1</div>
-      <ul style={{ display: "flex", flexWrap: "wrap", gap: 8, listStyle: "none", padding: 0, margin: 0 }}>
+      <ul style={{ display: "flex", flexWrap: "wrap", gap: 4, listStyle: "none", padding: 0, margin: 0 }}>
         {pool.map((card) => {
           const isSelected = selectedId === card.id;
           return (
@@ -736,7 +739,7 @@ export default function TrainingTool() {
   /* ================= Render ================= */
   return (
     <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
-      <section className="p-4 max-w-5xl mx-auto space-y-6">
+      <section className="max-w-5xl mx-auto space-y-6">
         {/* 見出し */}
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold">トレーニングスキル確認ツール</h1>
@@ -748,7 +751,7 @@ export default function TrainingTool() {
             <div className="font-semibold">サポート編成</div>
           </div>
 
-        <div className="p-4 space-y-6">
+        <div className="p-3 space-y-6">
           {/* 育成選手 */}
           <section>
             <div className="flex items-center justify-between mb-2">
@@ -770,7 +773,7 @@ export default function TrainingTool() {
               <h3 className="font-semibold">サポート選手</h3>
               <button className="btn btn-xs" onClick={() => charDialogRef.current?.showModal()}>＋ 選ぶ</button>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-1">
               {Array.from({ length: 5 }).map((_, i) => {
                 const id = selectedChars[i];
                 return (
@@ -783,9 +786,6 @@ export default function TrainingTool() {
                 );
               })}
             </div>
-            <div className="mt-2 text-xs text-base-content/70">
-              ※ 育成選手はダイアログ上でグレー表示＆クリック不可（同名も不可）です。
-            </div>
           </section>
 
           {/* スペシャルサポートカード（4） */}
@@ -794,7 +794,7 @@ export default function TrainingTool() {
               <h3 className="font-semibold">スペシャルサポートカード</h3>
               <button className="btn btn-xs" onClick={() => supportDialogRef.current?.showModal()}>＋ 追加</button>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {Array.from({ length: 4 }).map((_, i) => {
                 const id = selectedSupports[i];
                 return (
@@ -807,9 +807,6 @@ export default function TrainingTool() {
                 );
               })}
             </div>
-            <div className="mt-2 text-xs text-base-content/70">
-                ※ 現在選択できるスペシャルサポートカードは効果量の高いURとSSR「公共の場で泳ぐな」のみです。
-            </div>
           </section>
 
           {/* EXサポートカード（1） */}
@@ -818,7 +815,7 @@ export default function TrainingTool() {
               <h3 className="font-semibold">EXサポートカード</h3>
               <button className="btn btn-xs" onClick={() => exDialogRef.current?.showModal()}>＋ 追加</button>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               <SupportCardSlot
                 id={selectedExSupport || null}
                 onClick={() => exDialogRef.current?.showModal()}
@@ -961,7 +958,7 @@ export default function TrainingTool() {
           {/* ★ 追加：タイプ絞り込みバー */}
           <TypeFilterBar items={supportTypeItems} value={supportTypeKey} onChange={setSupportTypeKey} />
 
-          <div className="mt-3" style={{ overflowY: "auto", padding: "5px", flex: "1 1 auto" }}>
+          <div className="mt-3" style={{ overflowY: "auto", padding: "0px", flex: "1 1 auto" }}>
             <SupportCardPicker
               pool={filteredNormalCards} // ← 絞り込み後のプール
               max={4}
