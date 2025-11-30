@@ -64,6 +64,7 @@ export const characterList = [
 { id: 'B021-05', name: '糸師凛【蹴り描く放物線】',rarity: '3',type: 'キック'},
 { id: 'B021-06', name: '糸師凛【破壊者】',rarity: '4',type: 'スピード'},
 { id: 'B021-07', name: '糸師凛【SEASIDE EGOIST】',rarity: '4',type: 'キック'},
+{ id: 'B021-08', name: '糸師凛【X 相性最悪のクリスマス】',rarity: '4',type: 'テクニック'},
 { id: 'B022-02', name: '蟻生十兵衛【反則級の特級身体】',rarity: '3',type: 'フィジカル'},
 { id: 'B022-03', name: '蟻生十兵衛【No.1オシャ】',rarity: '3',type: 'テクニック'},
 { id: 'B023-02', name: '時光青志【フィジカルモンスター】',rarity: '3',type: 'スタミナ'},
