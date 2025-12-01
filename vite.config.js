@@ -5,25 +5,22 @@ import PluginCritical from 'rollup-plugin-critical'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-// ESM で __dirname を再現
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const isProd = process.env.NODE_ENV === 'production'
+const isVercel = process.env.VERCEL === '1'      // ★ Vercel のビルド環境では "1" になる
+const enableCritical = isProd && !isVercel      // ★ 本番かつローカルのときだけ有効
 
 export default defineConfig({
   plugins: [
     react(),
-    // クリティカルCSSは本番ビルド時のみ
-    isProd &&
+    // クリティカルCSSは「ローカル本番ビルドのときだけ」
+    enableCritical &&
       PluginCritical({
-        // ★ dist/ のように末尾に / を付ける
         criticalUrl: 'dist/',
         criticalBase: 'dist/',
-        // => dist/ + 'index.html' = dist/index.html を読む
-        criticalPages: [
-          { uri: 'index.html', template: 'index' },
-        ],
+        criticalPages: [{ uri: 'index.html', template: 'index' }],
         criticalConfig: {
           inline: true,
           extract: false,
