@@ -108,4 +108,5 @@ export const characterList = [
 { id: 'B902-01', name: '本田圭佑【永遠の挑戦者】',rarity: '3',type: 'キック'},
 ];
 
+
 export default characterList;

@@ -124,6 +124,7 @@ const SOURCE_ROWS = [
 { supportcard_id: 'EXSP-SSR001', supportcard_name: '俄然',type:'スタミナ',type2:'賢さ'},
 ];
 
+
 /** ========== ここから下は触らない運用でOK ========== */
 export const supportCards = SOURCE_ROWS.map(normalizeRow);
 
