@@ -15,28 +15,24 @@ export default defineConfig({
   plugins: [
     react(),
     // クリティカルCSSは本番ビルド時のみ
-    isProd && PluginCritical({
-      // ファイルパス or URL。SPAなので dist を基点にする
-      criticalUrl: 'dist',
-      criticalBase: 'dist',
-      // 処理するページ（SPA なら index.html のみでOK）
-      criticalPages: [
-        { uri: 'index.html', template: 'index' }, // => dist/index.html を処理
-      ],
-      // critical パッケージに渡す設定
-      criticalConfig: {
-        inline: true,          // ← 生成したクリティカルCSSを index.html にインライン
-        extract: false,        // 非クリティカルCSSの抽出はまず無効で安全運用
-        width: 412,            // モバイル計測に合わせたビューポート
-        height: 780,
-        // Tailwindのクラスが飛びづらいよう “必ず含める” セレクタを軽く指定（任意）
-        include: [
-          '.navbar', '.page-header', '.collapse-title'
+    isProd &&
+      PluginCritical({
+        // ★ dist/ のように末尾に / を付ける
+        criticalUrl: 'dist/',
+        criticalBase: 'dist/',
+        // => dist/ + 'index.html' = dist/index.html を読む
+        criticalPages: [
+          { uri: 'index.html', template: 'index' },
         ],
-        // JS ブロックをオフ（SPA では initial HTML のみを対象にする）
-        penthouse: { blockJSRequests: false }
-      }
-    })
+        criticalConfig: {
+          inline: true,
+          extract: false,
+          width: 412,
+          height: 780,
+          include: ['.navbar', '.page-header', '.collapse-title'],
+          penthouse: { blockJSRequests: false },
+        },
+      }),
   ].filter(Boolean),
 
   resolve: {
