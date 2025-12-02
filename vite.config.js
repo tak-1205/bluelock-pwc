@@ -5,38 +5,31 @@ import PluginCritical from 'rollup-plugin-critical'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-// ESM で __dirname を再現
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const isProd = process.env.NODE_ENV === 'production'
+const isVercel = process.env.VERCEL === '1'      // ★ Vercel のビルド環境では "1" になる
+const enableCritical = isProd && !isVercel      // ★ 本番かつローカルのときだけ有効
 
 export default defineConfig({
   plugins: [
     react(),
-    // クリティカルCSSは本番ビルド時のみ
-    isProd && PluginCritical({
-      // ファイルパス or URL。SPAなので dist を基点にする
-      criticalUrl: 'dist',
-      criticalBase: 'dist',
-      // 処理するページ（SPA なら index.html のみでOK）
-      criticalPages: [
-        { uri: 'index.html', template: 'index' }, // => dist/index.html を処理
-      ],
-      // critical パッケージに渡す設定
-      criticalConfig: {
-        inline: true,          // ← 生成したクリティカルCSSを index.html にインライン
-        extract: false,        // 非クリティカルCSSの抽出はまず無効で安全運用
-        width: 412,            // モバイル計測に合わせたビューポート
-        height: 780,
-        // Tailwindのクラスが飛びづらいよう “必ず含める” セレクタを軽く指定（任意）
-        include: [
-          '.navbar', '.page-header', '.collapse-title'
-        ],
-        // JS ブロックをオフ（SPA では initial HTML のみを対象にする）
-        penthouse: { blockJSRequests: false }
-      }
-    })
+    // クリティカルCSSは「ローカル本番ビルドのときだけ」
+    enableCritical &&
+      PluginCritical({
+        criticalUrl: 'dist/',
+        criticalBase: 'dist/',
+        criticalPages: [{ uri: 'index.html', template: 'index' }],
+        criticalConfig: {
+          inline: true,
+          extract: false,
+          width: 412,
+          height: 780,
+          include: ['.navbar', '.page-header', '.collapse-title'],
+          penthouse: { blockJSRequests: false },
+        },
+      }),
   ].filter(Boolean),
 
   resolve: {

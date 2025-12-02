@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build", 
     "preview": "vite preview",
     "precompute:all": "node scripts/build-combos.mjs ALL=1 && node scripts/build-anchor-hints.mjs",
     "precompute:anchors": "node scripts/build-combos.mjs",
