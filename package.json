@@ -7,7 +7,6 @@
     "dev": "vite",
     "build": "vite build", 
     "preview": "vite preview",
-
     "precompute:all": "node scripts/build-combos.mjs ALL=1 && node scripts/build-anchor-hints.mjs",
     "precompute:anchors": "node scripts/build-combos.mjs",
     "precompute:changed": "DIFF=1 node scripts/build-combos.mjs"

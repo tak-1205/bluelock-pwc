@@ -865,7 +865,7 @@ export default function TrainingTool() {
           </div>
         </section>
 
-        <div class="divider mt-20"></div>
+        <div className="divider mt-20"></div>
 
         {/* 似た組み合わせのスキル（未発動・全枠が埋まった時のみ） */}
         {allSlotsFilled ? (
