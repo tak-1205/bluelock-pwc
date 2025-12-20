@@ -56,6 +56,7 @@ export const characterList = [
 { id: 'B019-06', name: '御影玲王【X 狙撃手パス】',rarity: '3',type: 'スピード'},
 { id: 'B019-07', name: '御影玲王【自負と決意の『複写』】',rarity: '3',type: 'スタミナ'},
 { id: 'B019-08', name: '御影玲王【X SEASIDE EGOIST】',rarity: '4',type: 'テクニック'},
+{ id: 'B019-09', name: '御影玲王【万能のカメレオン】',rarity: '4',type: 'フィジカル'},
 { id: 'B020-02', name: '剣城斬鉄【名誉返上の守備】',rarity: '3',type: 'スピード'},
 { id: 'B020-03', name: '剣城斬鉄【俺の”領域”】',rarity: '3',type: 'スピード'},
 { id: 'B021-02', name: '糸師凛【一瞬に懸ける命】',rarity: '3',type: '賢さ'},
@@ -64,6 +65,7 @@ export const characterList = [
 { id: 'B021-05', name: '糸師凛【蹴り描く放物線】',rarity: '3',type: 'キック'},
 { id: 'B021-06', name: '糸師凛【破壊者】',rarity: '4',type: 'スピード'},
 { id: 'B021-07', name: '糸師凛【SEASIDE EGOIST】',rarity: '4',type: 'キック'},
+{ id: 'B021-08', name: '糸師凛【X 相性最悪のクリスマス】',rarity: '4',type: 'テクニック'},
 { id: 'B022-02', name: '蟻生十兵衛【反則級の特級身体】',rarity: '3',type: 'フィジカル'},
 { id: 'B022-03', name: '蟻生十兵衛【No.1オシャ】',rarity: '3',type: 'テクニック'},
 { id: 'B023-02', name: '時光青志【フィジカルモンスター】',rarity: '3',type: 'スタミナ'},
@@ -106,5 +108,6 @@ export const characterList = [
 { id: 'B901-05', name: '三笘薫【受け止めた勝利】',rarity: '4',type: 'フィジカル'},
 { id: 'B902-01', name: '本田圭佑【永遠の挑戦者】',rarity: '3',type: 'キック'},
 ];
+
 
 export default characterList;

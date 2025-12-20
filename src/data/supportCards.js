@@ -89,6 +89,9 @@ function normalizeRow(row) {
 /** ========== ここにスプレッドシート書き出し結果を追記 ========== */
 const SOURCE_ROWS = [
 { supportcard_id: 'EXSP-UR001', supportcard_name: '新しい遺伝子',type:'テクニック',type2:''},
+{ supportcard_id: 'SP-UR022', supportcard_name: '複写変化',type:'フィジカル',type2:''},
+{ supportcard_id: 'SP-UR021', supportcard_name: '俺たち二人で',type:'キック',type2:''},
+{ supportcard_id: 'SP-UR020', supportcard_name: 'クリスマス・プロモーション',type:'テクニック',type2:'キック'},
 { supportcard_id: 'SP-UR019', supportcard_name: '反射で視る世界',type:'賢さ',type2:''},
 { supportcard_id: 'SP-UR018', supportcard_name: '本とメガネとエゴイスト',type:'賢さ',type2:'フィジカル'},
 { supportcard_id: 'SP-UR017', supportcard_name: '怪物への変身',type:'スピード',type2:'賢さ'},
@@ -122,6 +125,7 @@ const SOURCE_ROWS = [
 { supportcard_id: 'EXSP-SSR002', supportcard_name: '死んでも嫌っすね',type:'キック',type2:'賢さ'},
 { supportcard_id: 'EXSP-SSR001', supportcard_name: '俄然',type:'スタミナ',type2:'賢さ'},
 ];
+
 
 /** ========== ここから下は触らない運用でOK ========== */
 export const supportCards = SOURCE_ROWS.map(normalizeRow);
