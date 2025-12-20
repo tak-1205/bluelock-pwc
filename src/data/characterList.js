@@ -56,6 +56,7 @@ export const characterList = [
 { id: 'B019-06', name: '御影玲王【X 狙撃手パス】',rarity: '3',type: 'スピード'},
 { id: 'B019-07', name: '御影玲王【自負と決意の『複写』】',rarity: '3',type: 'スタミナ'},
 { id: 'B019-08', name: '御影玲王【X SEASIDE EGOIST】',rarity: '4',type: 'テクニック'},
+{ id: 'B019-09', name: '御影玲王【万能のカメレオン】',rarity: '4',type: 'フィジカル'},
 { id: 'B020-02', name: '剣城斬鉄【名誉返上の守備】',rarity: '3',type: 'スピード'},
 { id: 'B020-03', name: '剣城斬鉄【俺の”領域”】',rarity: '3',type: 'スピード'},
 { id: 'B021-02', name: '糸師凛【一瞬に懸ける命】',rarity: '3',type: '賢さ'},
