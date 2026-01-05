@@ -28,7 +28,6 @@
 
     <script>
     (function(){
-      // PC（右レール）…現状OKなので維持
       function findRightRailAside(){
         const cands = [
           'aside.hidden.xl\\:block.sticky.top-4.self-start.space-y-4',
@@ -37,7 +36,7 @@
         ];
         for (const sel of cands) {
           const el = document.querySelector(sel);
-          if (el && !el.classList.contains('border-r')) return el; // 左カラム除外
+          if (el && !el.classList.contains('border-r')) return el; 
         }
         return null;
       }
@@ -60,19 +59,15 @@
         return true;
       }
 
-      // ── SP：「Sponsored」ラベルを含む .card-body を見つけ、その直前に挿入
       function findSpSponsoredSlot(){
-        // ご提示の外枠を優先
         const root = document.querySelector('div.mt-6.xl\\:hidden') || document;
         const bodies = root.querySelectorAll('.card .card-body');
         for (const body of bodies) {
-          // 子要素の中からテキストが "Sponsored" の要素を探す（セレクタに[]を使わない）
           const kids = Array.from(body.children);
           for (const el of kids) {
             const txt = (el.textContent || '').trim();
             if (/^Sponsored$/i.test(txt)) return { body, label: el };
           }
-          // 子で見つからなくても body 全体に "Sponsored" が含まれるなら対象にする
           if (/Sponsored/i.test(body.textContent || '')) return { body, label: null };
         }
         return null;
@@ -93,7 +88,6 @@
         f.style.margin = '0 auto 12px';
         f.src = '/u/sp-unit.html';
 
-        // 「Sponsored」ラベルの直前に差し込み（見つからなければ先頭）
         if (target.label) {
           target.body.insertBefore(f, target.label);
         } else {

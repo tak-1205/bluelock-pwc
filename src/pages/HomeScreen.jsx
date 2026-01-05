@@ -1,25 +1,75 @@
 // src/pages/HomeScreen.jsx
 import React from "react";
 import SideMenu from "@/layouts/SideMenu.jsx";
+import HomeHeader from "@/layouts/HomeHeader.jsx";
+import HomeFooter from "@/layouts/HomeFooter.jsx";
+
+// ここに「一旦非表示にしたい番号」を書く
+// 例: 14 と 19 を非表示 → new Set([14, 19])
+const HIDDEN_NUMBERS = new Set([3, 4, 6, 7, 8, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 25]);
+
+function Slot({ no, children }) {
+  const key = Number(no); // 文字列でも確実に判定できるように
+  if (HIDDEN_NUMBERS.has(key)) return null;
+  return <>{children}</>;
+}
 
 function HomeScreen() {
-  const background = "/images/bg3.jpg";
+  const BACKGROUNDS = [
+    "/images/bg/char-bg1.png",
+    "/images/bg/char-bg2.png",
+  ];
+
+  const [bgIndex, setBgIndex] = React.useState(0);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  const hasMultiple = BACKGROUNDS.length > 1;
+
+  // 自動スライド（2枚以上のときのみ）
+  React.useEffect(() => {
+    if (!hasMultiple) return;
+
+    const id = window.setInterval(() => {
+      setBgIndex((i) => (i + 1) % BACKGROUNDS.length);
+    }, 6000);
+
+    return () => window.clearInterval(id);
+  }, [hasMultiple, BACKGROUNDS.length]);
+
+  // 手動スライド
+  const slidePrev = () => {
+    if (!hasMultiple) return;
+    setBgIndex((i) => (i - 1 + BACKGROUNDS.length) % BACKGROUNDS.length);
+  };
+
+  const slideNext = () => {
+    if (!hasMultiple) return;
+    setBgIndex((i) => (i + 1) % BACKGROUNDS.length);
+  };
 
   return (
     <div className="relative min-h-[100dvh] text-white overflow-hidden font-sans">
       {/* 背景 */}
-      <BackgroundLayer src={background} />
+      <BackgroundLayer
+        srcList={BACKGROUNDS}
+        index={bgIndex}
+        onPrev={slidePrev}
+        onNext={slideNext}
+      />
 
       {/* ヘッダー */}
-      <Header onOpenMenu={() => setIsMenuOpen(true)} />
+      <HomeHeader
+        Slot={Slot}
+        onOpenMenu={() => setIsMenuOpen(true)}
+        SquareIconButton={SquareIconButton}
+      />
 
       {/* フッター */}
-      <Footer />
+      <HomeFooter Slot={Slot} />
 
       {/* メイン */}
       <main
-        className="relative"
+        className="relative z-10"
         style={{
           paddingTop: "calc(56px + env(safe-area-inset-top, 0px))",
           paddingBottom: "calc(72px + env(safe-area-inset-bottom, 0px))",
@@ -31,46 +81,89 @@ function HomeScreen() {
           <CenterBlock />
         </div>
       </main>
-
-      {/* ハンバーガーメニュー（PC/スマホ共通） */}
-      <div className="fixed inset-0 z-[80] pointer-events-none">
-        {/* オーバーレイ（フェード） */}
-        <div
-          className={`absolute inset-0 bg-black/40 transition-opacity duration-200 ${
-            isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
-          onClick={() => setIsMenuOpen(false)}
-        />
-        {/* 左からスライドインするメニュー本体 */}
-        <aside
-          className={`relative z-[90] h-full w-72 bg-base-200 border-r border-base-300 transform transition-transform duration-200 pointer-events-auto ${
-            isMenuOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          <a href="/">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-base-300">
-              <img src="/images/icon.png" alt="icon" width={100} height={100} />
-              <span className="font-semibold text-base-content">PWC EGOIST</span>
-            </div>
-          </a>
-          <nav className="menu p-4 text-base-content">
-            <SideMenu />
-          </nav>
-        </aside>
-      </div>
     </div>
   );
 }
 
-/* ───────── 背景 ───────── */
+function BackgroundLayer({ srcList, index, onPrev, onNext }) {
+  const hasMultiple = srcList.length > 1;
 
-function BackgroundLayer({ src }) {
+  const startXRef = React.useRef(null);
+  const isDraggingRef = React.useRef(false);
+
+  const THRESHOLD_PX = 50; // これ以上動いたらスワイプ判定
+
+  const onPointerDown = (e) => {
+    if (!hasMultiple) return;
+    // 左クリック or タッチのみ
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    isDraggingRef.current = true;
+    startXRef.current = e.clientX;
+
+    // 途中で pointer が外れても拾えるように
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
+  };
+
+  const onPointerUp = (e) => {
+    if (!hasMultiple) return;
+    if (!isDraggingRef.current) return;
+
+    const startX = startXRef.current;
+    const dx = startX == null ? 0 : e.clientX - startX;
+
+    isDraggingRef.current = false;
+    startXRef.current = null;
+
+    if (Math.abs(dx) < THRESHOLD_PX) return;
+
+    // 右にドラッグ → 前へ（好みで逆でもOK）
+    if (dx > 0) onPrev?.();
+    else onNext?.();
+  };
+
+  const onPointerCancel = () => {
+    isDraggingRef.current = false;
+    startXRef.current = null;
+  };
+
   return (
-    <div className="absolute inset-0 -z-10">
-      <img src={src} alt="" className="w-full h-full object-cover" />
+    <div className="absolute inset-0 -z-10 overflow-hidden">
+      {/* 背景画像 */}
+      {srcList.map((src, i) => (
+        <img
+          key={src}
+          src={src}
+          alt=""
+          className={[
+            "absolute inset-0 w-full h-full object-cover",
+            "transition-opacity duration-1000",
+            i === index ? "opacity-100" : "opacity-0",
+          ].join(" ")}
+          draggable={false}
+        />
+      ))}
+
+      {/* スワイプ判定用の透明レイヤー（ヘッダー/フッターを邪魔しない） */}
+      {hasMultiple && (
+        <div
+          className="absolute left-0 right-0"
+          style={{ 
+            top: "calc(56px + env(safe-area-inset-top,0px))", 
+            bottom: "calc(72px + env(safe-area-inset-bottom,0px))", 
+            touchAction:"pan-y", userSelect:"none" 
+          }}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+        />
+      )}
     </div>
   );
 }
+
 
 /* ───────── 正方形ボタン ───────── */
 
@@ -91,108 +184,20 @@ function SquareIconButton({ icon, label, imageSrc, onClick }) {
   );
 }
 
-/* ───────── ヘッダー ───────── */
-
-function Header({ onOpenMenu }) {
-  return (
-    <header
-      className="fixed inset-x-0 z-50"
-      style={{ paddingTop: "env(safe-area-inset-top,0px)" }}
-    >
-      <div className="mt-2 h-[56px] flex items-center px-2 gap-2">
-        {/* 1: メニュー（ハンバーガー） */}
-        <SquareIconButton icon="☰" label="メニュー" onClick={onOpenMenu} />
-
-        {/* 2: ロゴ（背景なし・角丸・64px） */}
-        <button
-          type="button"
-          data-no="2"
-          className="w-16 h-16 rounded-xl flex items-center justify-center overflow-hidden"
-        >
-          <img
-            src="/images/icon.png"
-            alt="PWCロゴ"
-            className="w-16 h-16 object-contain"
-          />
-        </button>
-
-        {/* 右側：ジェム / 総戦力 / X */}
-        <div className="ml-auto flex items-center gap-2">
-          {/* 3/4: ジェム・総戦力（縦30px × 横64px / 間4px） */}
-          <div className="flex flex-col gap-[4px]">
-            <div className="w-16 h-[30px] flex items-center justify-center rounded-full bg-[#285e8c]/80 border border-white/30 text-[11px]">
-              ジェム
-            </div>
-            <div className="w-16 h-[30px] flex items-center justify-center rounded-full bg-[#285e8c]/80 border border-white/30 text-[11px]">
-              総戦力
-            </div>
-          </div>
-
-          {/* 5: X共有（64px × 64px） */}
-          <button
-            type="button"
-            className="w-16 h-16 rounded-xl bg-[#285e8c]/80 border border-white/20 flex items-center justify-center shadow-md"
-            data-no="5"
-          >
-            <span className="text-2xl leading-none">𝕏</span>
-          </button>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-/* ───────── フッター ───────── */
-
-function Footer() {
-  return (
-    <footer
-      className="fixed bottom-0 inset-x-0 z-50"
-      style={{ paddingBottom: "env(safe-area-inset-bottom,0px)" }}
-    >
-      <div className="h-[72px] flex items-center px-2">
-        <div className="w-full grid grid-cols-5 gap-2">
-          <FooterTab icon="🏠" label="ホーム" active href="/" />
-          <FooterTab icon="👥" label="チーム" href="/tool" />
-          <FooterTab icon="👤" label="キャラ" href="/characters" />
-          <FooterTab icon="⚡" label="マッチ" href="/skills" />
-          <FooterTab
-            icon="🛒"
-            label="ショップ"
-            future
-            href="/support-amazon"
-          />
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function FooterTab({ icon, label, active, future, href }) {
-  const base =
-    "flex items-center justify-center h-12 rounded-xl px-2 gap-1 whitespace-nowrap text-[10px]";
-  const style = future
-    ? "bg-white/20 text-white/50 border border-white/30"
-    : active
-    ? "bg-emerald-400/90 text-black font-semibold"
-    : "bg-[#285e8c]/80 border border-white/20 text-white";
-
-  return (
-    <a href={href} className={`${base} ${style}`}>
-      <span className="text-lg">{icon}</span>
-      <span>{label}</span>
-    </a>
-  );
-}
-
 /* ───────── 左サイドレール ───────── */
 
 function LeftRail() {
   return (
     <aside className="absolute inset-y-0 left-2 pt-16 flex flex-col gap-2">
-      <SquareIconButton icon="📋" label="ミッション" />
-      <SquareIconButton icon="👥" label="コミュニティ" />
-      <SquareIconButton icon="⭐" label="注目の選手" />
+      <Slot no={6}>
+        <SquareIconButton icon="📋" label="ミッション" />
+      </Slot>
+      <Slot no={7}>
+        <SquareIconButton icon="👥" label="コミュニティ" />
+      </Slot>
+      <Slot no={8}>
+        <SquareIconButton icon="⭐" label="注目の選手" />
+      </Slot>
     </aside>
   );
 }
@@ -202,10 +207,18 @@ function LeftRail() {
 function RightRail() {
   return (
     <aside className="absolute inset-y-0 right-2 pt-16 flex flex-col gap-2">
-      <SquareIconButton icon="ℹ️" label="お知らせ" />
-      <SquareIconButton icon="🎁" label="プレゼント" />
-      <SquareIconButton icon="💸" label="SALE" />
-      <SquareIconButton icon="🎫" label="PASS" />
+      <Slot no={9}>
+        <SquareIconButton icon="ℹ️" label="お知らせ" />
+      </Slot>
+      <Slot no={10}>
+        <SquareIconButton icon="🎁" label="プレゼント" />
+      </Slot>
+      <Slot no={11}>
+        <SquareIconButton icon="💸" label="SALE" />
+      </Slot>
+      <Slot no={12}>
+        <SquareIconButton icon="🎫" label="PASS" />
+      </Slot>
     </aside>
   );
 }
@@ -219,18 +232,34 @@ function CenterBlock() {
         <div className="flex gap-3">
           {/* 左カラム：13,15,17,18 */}
           <div className="flex-1 flex flex-col gap-2">
-            <ModeCard title="ランキング" />
-            <ModeCard title="リーグマッチ（大会）" />
-            <ModeCard title="リーグマッチ（シーズン）" />
-            <ModeCard title="イベント（スライド）" />
+            <Slot no={13}>
+              <ModeCard title="ランキング" />
+            </Slot>
+            <Slot no={15}>
+              <ModeCard title="リーグマッチ（大会）" />
+            </Slot>
+            <Slot no={17}>
+              <ModeCard title="リーグマッチ（シーズン）" />
+            </Slot>
+            <Slot no={18}>
+              <ModeCard title="イベント（スライド）" />
+            </Slot>
           </div>
 
           {/* 右カラム：14,16,19,20 */}
           <div className="flex-1 flex flex-col gap-2">
-            <ModeCard title="ご支援バナー" />
-            <ModeCard title="トレーニング" />
-            <ModeCard title="ランクマッチ" />
-            <ModeCard title="ライバルリーバトル" />
+            <Slot no={14}>
+              <ModeCard title="ご支援バナー" />
+            </Slot>
+            <Slot no={16}>
+              <ModeCard title="トレーニング" />
+            </Slot>
+            <Slot no={19}>
+              <ModeCard title="ランクマッチ" />
+            </Slot>
+            <Slot no={20}>
+              <ModeCard title="ライバルリーバトル" />
+            </Slot>
           </div>
         </div>
       </div>
