@@ -90,6 +90,7 @@ function normalizeRow(row) {
 const SOURCE_ROWS = [
 { supportcard_id: 'EXSP-UR002', supportcard_name: '一発勝負だ',type:'キック',type2:''},
 { supportcard_id: 'EXSP-UR001', supportcard_name: '新しい遺伝子',type:'テクニック',type2:''},
+{ supportcard_id: 'SP-UR025', supportcard_name: '3周年記念Ver.潔＆蜂楽',type:'賢さ',type2:'スピード'},
 { supportcard_id: 'SP-UR024', supportcard_name: 'ふたりの元旦',type:'スピード',type2:'キック'},
 { supportcard_id: 'SP-UR023', supportcard_name: 'クリスマス・デコレーション',type:'賢さ',type2:''},
 { supportcard_id: 'SP-UR022', supportcard_name: '複写変化',type:'フィジカル',type2:''},
