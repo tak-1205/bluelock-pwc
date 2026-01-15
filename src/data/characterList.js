@@ -103,6 +103,7 @@ export const characterList = [
 { id: 'B037-02', name: '閃堂秋人【エースの意地】',rarity: '3',type: 'スピード'},
 { id: 'B038-01', name: '糸師冴【『美しく壊す』哲学】',rarity: '4',type: 'テクニック'},
 { id: 'B038-02', name: '糸師冴【SEASIDE EGOIST】',rarity: '4',type: 'スピード'},
+{ id: 'B039-01', name: '黒名蘭世【小柄なシャーク】',rarity: '4',type: 'テクニック'},
 { id: 'B901-01', name: '三笘薫【電光石火】',rarity: '3',type: 'テクニック'},
 { id: 'B901-02', name: '三笘薫【勝利への執念】',rarity: '3',type: 'スピード'},
 { id: 'B901-03', name: '三笘薫【独走のワールドストライカー】',rarity: '3',type: '賢さ'},
