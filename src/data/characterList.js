@@ -101,6 +101,7 @@ export const characterList = [
 { id: 'B036-02', name: 'オリヴァ・愛空【オールMAXで視える世界】',rarity: '4',type: 'フィジカル'},
 { id: 'B037-01', name: '閃堂秋人【U-20日本代表エース】',rarity: '3',type: 'キック'},
 { id: 'B037-02', name: '閃堂秋人【エースの意地】',rarity: '3',type: 'スピード'},
+{ id: 'B037-03', name: '閃堂秋人【世界基準の欲望】',rarity: '4',type: 'フィジカル'},
 { id: 'B038-01', name: '糸師冴【『美しく壊す』哲学】',rarity: '4',type: 'テクニック'},
 { id: 'B038-02', name: '糸師冴【SEASIDE EGOIST】',rarity: '4',type: 'スピード'},
 { id: 'B038-03', name: '糸師冴【次の景色を見せてやる】',rarity: '4',type: 'テクニック'},
