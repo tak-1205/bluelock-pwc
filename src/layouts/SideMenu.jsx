@@ -20,17 +20,20 @@ export default function SideMenu({ prepend = null, append = null, children = nul
 
   // 親ページ用の一覧（rootIdごとに1件）
   const roots = React.useMemo(() => {
-    const set = new Set((characterList || []).map(c => rootIdOf(c.id)));
+    const set = new Set((characterList || []).map((c) => rootIdOf(c.id)));
     return Array.from(set)
       .sort()
-      .map(r => {
+      .map((r) => {
         const prof = getProfileByRootId(r);
         return { rootId: r, label: prof?.name || r };
       });
   }, []);
 
-  // プルダウン開閉（details/summaryは使わない）
+  // キャラ一覧のプルダウン開閉（details/summaryは使わない）
   const [open, setOpen] = React.useState(false);
+
+  // 追加：運営（応援）セクションの開閉（主張を弱くするためデフォルト閉）
+  const [openSupport, setOpenSupport] = React.useState(false);
 
   return (
     <>
@@ -65,10 +68,7 @@ export default function SideMenu({ prepend = null, append = null, children = nul
         {/* 「キャラ別一覧」リンク + 右側に開閉ボタン（クリック領域を分離） */}
         <li className={liClass}>
           <div className="flex items-center gap-2">
-            <NavLink
-              to="/characters"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
+            <NavLink to="/characters" className={({ isActive }) => (isActive ? "active" : "")}>
               キャラ別一覧
             </NavLink>
             <button
@@ -76,7 +76,7 @@ export default function SideMenu({ prepend = null, append = null, children = nul
               aria-expanded={open}
               aria-controls="character-root-dropdown"
               className="ml-auto btn btn-ghost btn-xs shrink-0"
-              onClick={() => setOpen(v => !v)}
+              onClick={() => setOpen((v) => !v)}
             >
               {open ? "▾" : "▸"}
             </button>
@@ -89,7 +89,7 @@ export default function SideMenu({ prepend = null, append = null, children = nul
             >
               {/* ← .menu を使わず縦並びを強制 */}
               <ul className="p-1 flex flex-col gap-1">
-                {roots.map(it => (
+                {roots.map((it) => (
                   <li key={it.rootId}>
                     <NavLink
                       to={`/characters/${it.rootId}`}
@@ -104,10 +104,63 @@ export default function SideMenu({ prepend = null, append = null, children = nul
           )}
         </li>
 
+        {/* ===== 運営について：主張を弱くして、必要な人だけ開く導線に ===== */}
         <li className={liClass}>
-          <NavLink to="/support-amazon" className={({ isActive }) => (isActive ? "active" : "")}>
-            『PWC EGOIST』ご支援のお願い
-          </NavLink>
+          <div className="flex items-center gap-2">
+            {/* 「お願い」→「運営について」へ変更（広告感を下げる） */}
+            <NavLink
+              to="/support-amazon"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              運営について（応援・お問い合わせ）
+            </NavLink>
+
+            {/* サブ項目を開く（任意。邪魔にならないよう小さく） */}
+            <button
+              type="button"
+              aria-expanded={openSupport}
+              aria-controls="support-dropdown"
+              className="ml-auto btn btn-ghost btn-xs shrink-0"
+              onClick={() => setOpenSupport((v) => !v)}
+              title="サブメニューを開く"
+            >
+              {openSupport ? "▾" : "▸"}
+            </button>
+          </div>
+
+          {openSupport && (
+            <div
+              id="support-dropdown"
+              className="mt-1 rounded-md border border-base-300"
+            >
+              <ul className="p-1 flex flex-col gap-1">
+                <li>
+                  <NavLink
+                    to="/support-amazon"
+                    className="block px-3 py-2 hover:bg-base-200 rounded text-sm"
+                  >
+                    応援する（Amazonギフト券）
+                  </NavLink>
+                </li>
+
+                {/* もし /contact があるなら有効化。なければ Pending のままでOK */}
+                <li>
+                  <NavLink
+                    to="/contact"
+                    className="block px-3 py-2 hover:bg-base-200 rounded text-sm"
+                  >
+                    不具合・要望を送る
+                  </NavLink>
+                </li>
+
+                {/* 連絡ページが未実装ならこれに置き換え
+                <li className="px-3 py-2 text-sm">
+                  <Pending label="不具合・要望を送る" />
+                </li>
+                */}
+              </ul>
+            </div>
+          )}
         </li>
 
         {children}

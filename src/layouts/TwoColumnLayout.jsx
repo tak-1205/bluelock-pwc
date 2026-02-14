@@ -74,7 +74,7 @@ export default function TwoColumnLayout({
            <main className="min-w-0">
              {children}
              {/* 全ページ共通：Amazon投げ銭バナー（環境変数でON/OFF） */}
-             {(import.meta.env.VITE_FEATURE_SUPPORT_BANNER ?? "on") === "on" && (
+             {(import.meta.env.VITE_FEATURE_SUPPORT_BANNER ?? "on") === "off" && (
                <SupportAmazonBanner />
              )}
              {hasRight && (

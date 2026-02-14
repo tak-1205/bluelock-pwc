@@ -8,7 +8,7 @@ import { onAdsRefresh } from "../lib/adBus.js";
 export default function RightAds({ items, slots = {} }) {
   // 広告（adstir）は index.html 側の iframe 挿入に一本化。
   // ここではアフィリエイト枠のみを扱う。
-  const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "on";
+  const SHOW_AFF = import.meta.env.VITE_FEATURE_AFF === "off";
   const location = useLocation();
 
   const effectiveItems =
