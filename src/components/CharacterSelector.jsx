@@ -1,5 +1,5 @@
 // src/components/CharacterSelector.jsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import { characterList } from '../data/characterList';
 
 // URLに ?debug=true が含まれるか判定
@@ -11,11 +11,18 @@ const isDebugMode = new URLSearchParams(window.location.search).get('debug') ===
  * - lockedSelectedIds: 「選択済みとして表示し、かつクリック不可」にするID配列。
  *    例）サポート選手ダイアログで育成選手のIDを渡す → グレー＋選択不可で表示。
  */
-function CharacterSelector({
-  selectedCharacters,
+export default function CharacterSelector({
+  selectedCharacters = [],
   onSelectCharacter,
   maxSelectable = 5,
   lockedSelectedIds = [],
+  // 追加: TrainingTool から渡される絞り込みキー（デフォルト: ALL）
+  typeKey = "ALL",
+  // 追加: レアリティ絞り込みキー（'ALL' または '3'/'4' など）
+  rarityKey = "ALL",
+  // 追加: 全選手データを props で受け取る（渡されなければ空配列）
+  allChars = [],
+  ...props
 }) {
   const selectedIds = new Set(selectedCharacters.map((c) => c.id));
   const lockedIdSet = new Set(lockedSelectedIds);
@@ -73,6 +80,41 @@ function CharacterSelector({
     alert('CSV形式でコピーしました');
   };
 
+  // 簡易正規化
+  const normLocal = (s) => String(s || "").trim().toUpperCase();
+
+  // card1/card2/card3 のみ参照する絞り込みロジック（TrainingTool と整合）
+  const TYPE_KEYS_LOCAL = ["card1", "card2", "card3", "カード1", "カード2", "カード3"];
+  const getTypeValues = (item) => {
+    const res = [];
+    for (const k of TYPE_KEYS_LOCAL) {
+      if (item && Object.prototype.hasOwnProperty.call(item, k)) {
+        const v = String(item[k] ?? "").trim();
+        if (!v) continue;
+        res.push(normLocal(v));
+      }
+    }
+    return Array.from(new Set(res));
+  };
+  const matchesTypeLocal = (item, selectedKey) => {
+    if (!selectedKey || selectedKey === "ALL") return true;
+    const keyNorm = normLocal(selectedKey);
+    return getTypeValues(item).some((t) => t === keyNorm);
+  };
+
+  // レアリティマッチ（AND条件の一部）
+  const matchesRarity = (item, selectedRarity) => {
+    if (!selectedRarity || selectedRarity === "ALL") return true;
+    return String(item?.rarity ?? "") === String(selectedRarity);
+  };
+
+  // 表示プールは props の allChars を typeKey / rarityKey でフィルタしたものを利用する
+  const characterPool = React.useMemo(() => {
+    return (Array.isArray(allChars) ? allChars : []).filter(
+      (c) => matchesTypeLocal(c, typeKey) && matchesRarity(c, rarityKey)
+    );
+  }, [allChars, typeKey, rarityKey]);
+
   return (
     <div>
       <h2>キャラクター選択（最大{maxSelectable}名、同名不可）</h2>
@@ -85,7 +127,7 @@ function CharacterSelector({
       )}
 
       <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', listStyle: 'none', padding: 0 }}>
-        {characterList.map((character) => {
+        {characterPool.map((character) => {
           const root = nameOnly(character.name);
           const isLocked = lockedIdSet.has(character.id);
           const isSelectedByState = selectedIds.has(character.id);
@@ -161,5 +203,3 @@ function CharacterSelector({
     </div>
   );
 }
-
-export default CharacterSelector;

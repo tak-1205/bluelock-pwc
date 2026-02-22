@@ -183,39 +183,50 @@ const SLOT_TILE_PAD = 0;
 // 内側は枠線なし。fillで親幅にフィットさせ、外枠のpadding分だけ均等余白にする
 function SupportCardThumb({ card, showName = false, width, fill = false }) {
   const { id, name, rarity, type } = card;
-  const WRAP_W = fill ? "100%" : (width ?? 70);
+  const W = typeof width === "number" ? width : Number(width) || 70;
   const NAME_FONT_SIZE = 10;
   const NAME_LINES = 2;
   const NAME_LINE_HEIGHT = 1.2;
   const NAME_BOX_PX = Math.round(NAME_FONT_SIZE * NAME_LINE_HEIGHT * NAME_LINES);
 
+  const src = `/images/supportcard/${id}.png`;
+
   return (
-    <div style={{ width: WRAP_W, textAlign: "center" }} title={name}>
+    <div style={{ width: fill ? "100%" : W, textAlign: "center" }} title={name}>
       <div
         style={{
-          position: "relative",
-          width: "100%",
-          aspectRatio: "499 / 640",
-          overflow: "hidden",
+          width: fill ? "100%" : W,
+          height: W,
           borderRadius: 8,
+          overflow: "hidden",
           background: "#fff",
+          display: "inline-block",
+          position: "relative",
+          border: "1px solid rgba(0,0,0,0.06)",
         }}
       >
-        <SupportImg id={id} alt={name} />
-        <div style={{ position: "absolute", top: 2, left: 1 }}>
+        <img
+          src={src}
+          alt={name}
+          onError={(e) => { e.currentTarget.src = "/images/placeholder.png"; }}
+          loading="lazy"
+          decoding="async"
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+        <div style={{ position: "absolute", top: 4, left: 6 }}>
           <RarityBadgeMini rarity={rarity} />
         </div>
         <div
           style={{
             position: "absolute",
-            top: 2,
-            right: 1,
+            top: 4,
+            right: 6,
             fontSize: 9,
             lineHeight: 1,
-            padding: "2px 1px",
+            padding: "2px 4px",
             borderRadius: 4,
-            background: "rgba(255,255,255,0.9)",
-            border: "1px solid rgba(0,0,0,0.1)",
+            background: "rgba(255,255,255,0.88)",
+            border: "1px solid rgba(0,0,0,0.06)",
             fontWeight: 700,
             whiteSpace: "nowrap",
           }}
@@ -223,11 +234,12 @@ function SupportCardThumb({ card, showName = false, width, fill = false }) {
           {type}
         </div>
       </div>
-      {showName && (
+
+      {showName && !fill ? (
         <div
           style={{
             fontSize: NAME_FONT_SIZE,
-            marginTop: 4,
+            marginTop: 6,
             lineHeight: NAME_LINE_HEIGHT,
             height: NAME_BOX_PX,
             overflow: "hidden",
@@ -240,20 +252,21 @@ function SupportCardThumb({ card, showName = false, width, fill = false }) {
         >
           {name}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
 
-// 選手の小型タイル（画像 + 名前）
-function CharacterThumb({ id, muted = false, width = 70 }) {
+// 選手の小型タイル（画像 + 名前）。showName=false で名前領域を非表示にする
+function CharacterThumb({ id, muted = false, width = 70, showName = true }) {
   const c = getCharById(id);
   const name = (c?.name || c?.title || "") || "";
-  const IMG_SIZE = width;
+  const IMG_SIZE = typeof width === "number" ? width : Number(width) || 70;
   const NAME_FONT_SIZE = 10;
   const NAME_LINES = 2;
   const NAME_LINE_HEIGHT = 1.2;
   const NAME_BOX_PX = Math.round(NAME_FONT_SIZE * NAME_LINE_HEIGHT * NAME_LINES);
+  const src = `/images/${id}.png`;
 
   return (
     <div className={muted ? "opacity-60" : ""} style={{ width: IMG_SIZE, textAlign: "center" }} title={name}>
@@ -263,31 +276,71 @@ function CharacterThumb({ id, muted = false, width = 70 }) {
           height: IMG_SIZE,
           borderRadius: 8,
           overflow: "hidden",
-          border: "1px solid rgba(0,0,0,0.08)",
+          border: "1px solid rgba(0,0,0,0.06)",
           background: "#fff",
+          display: "inline-block",
         }}
       >
-        <CharImg id={id} alt={name} size={IMG_SIZE} className="rounded-none" />
+        <img
+          src={src}
+          alt={name}
+          onError={(e) => { e.currentTarget.src = "/images/placeholder.png"; }}
+          loading="lazy"
+          decoding="async"
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
       </div>
-      <div
-        style={{
-          fontSize: NAME_FONT_SIZE,
-          marginTop: 4,
-          lineHeight: NAME_LINE_HEIGHT,
-          height: NAME_BOX_PX,
-          overflow: "hidden",
-          display: "-webkit-box",
-          WebkitLineClamp: NAME_LINES,
-          WebkitBoxOrient: "vertical",
-          wordBreak: "break-word",
-          whiteSpace: "normal",
-        }}
-      >
-        {name}
-      </div>
+
+      {showName ? (
+        <div
+          style={{
+            fontSize: NAME_FONT_SIZE,
+            marginTop: 6,
+            lineHeight: NAME_LINE_HEIGHT,
+            height: NAME_BOX_PX,
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: NAME_LINES,
+            WebkitBoxOrient: "vertical",
+            wordBreak: "break-word",
+            whiteSpace: "normal",
+          }}
+        >
+          {name}
+        </div>
+      ) : null}
     </div>
   );
 }
+
+/* === ターゲットタイル（選手 or カード） — 固定ボックスに統一 ================== */
+function TargetTile({ id, muted = false, width = 70, showName = true }) {
+  const W = typeof width === "number" ? width : Number(width) || 70;
+  const isChar = !!getCharById(id);
+  if (isChar) return (
+    <div style={{ width: W }}>
+      <CharacterThumb id={id} muted={muted} width={W} showName={showName} />
+    </div>
+  );
+
+  const card = getSupportById(id);
+  if (card) return (
+    <div style={{ width: W }}>
+      <SupportCardThumb card={card} showName={showName} width={W} />
+    </div>
+  );
+
+  return (
+    <div
+      className={`badge badge-outline ${muted ? "opacity-60" : ""}`}
+      title="不明な対象"
+      style={{ width: W, height: W, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
+    >
+      （不明な対象）
+    </div>
+  );
+}
+
 /* =================================================================== */
 
 /* ====== ここから：CharacterSlot ====== */
@@ -342,103 +395,162 @@ function TrainingSkillCard({ ts, missing, selectedSupports, selectedExSupport })
     [ts, missing, selectedSupports, selectedExSupport]
   );
 
+  const targets = ts.targets || [];
+  const effects = ts.effects || [];
+  const missingSet = new Set((missing || []).map((m) => norm(m)));
+
   return (
-    <div className="card bg-base-100 shadow-sm border border-base-300 rounded-2xl">
-      <div className="card-body p-4 space-y-4">
+    <article
+      className="rounded-lg border border-base-200 bg-white shadow-sm"
+      style={{ overflow: "visible", display: "flex", flexDirection: "column" }}
+    >
+      <div className="p-3 space-y-4 flex-1">
         {/* 組み合わせ */}
         <div>
-          <div className="text-sm opacity-70">組み合わせ</div>
-          <div className="mt-2 flex flex-wrap gap-3 items-start">
-            {(ts.targets || []).map((id) => <TargetTile key={id} id={id} />)}
-          </div>
-        </div>
-
-        {/* 効果 */}
-        <div>
-          <div className="text-sm opacity-70 mb-1">発揮されるスキル効果</div>
-          <div className="space-y-2">
-            {(ts.effects || []).map((e, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between rounded-xl border-2 border-primary/30 bg-base-100 px-3 py-2"
-                style={{ boxShadow: "0 1px 0 rgba(0,0,0,0.02)" }}
-              >
-                <div className="min-w-0">
-                  <div className="font-medium text-sm">{e.effect || "(効果名不明)"}</div>
-                  {e.detail ? <div className="text-xs opacity-70">{e.detail}</div> : null}
+          <div className="text-sm font-medium mb-2">組み合わせ</div>
+          <div className="flex gap-3 overflow-x-auto py-1">
+            {targets.map((id) => (
+              <div key={id} className="shrink-0 flex flex-col items-center" style={{ width: 72 }}>
+                {/* 枠線・透過を削除して画像を枠内に収める（見た目の崩れを防止） */}
+                <div className="rounded-md overflow-hidden" style={{ width: 72, height: 72 }}>
+                  <TargetTile id={id} />
                 </div>
-                <div className="font-black tabular-nums ml-3">{e.value || "-"}</div>
+                <div className="text-[11px] text-center text-base-content/70 mt-1" style={{ width: 72 }}>
+                  {getCharNameById(id) || getSupportName(id) || ""}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 入れ替え（未発動時のみ） */}
+        {/* 効果：テキスト幅を十分に確保するレイアウトに変更 */}
+        <div>
+          <div className="text-xs opacity-70 mb-2">発揮されるスキル効果</div>
+          <div className="space-y-2">
+            {effects.map((e, i) => (
+              <div
+                key={i}
+                className="p-3 rounded-md bg-base-100"
+                style={{ boxShadow: "0 1px 0 rgba(0,0,0,0.03)" }}
+              >
+                {/* gridで値列を auto にして、効果名/詳細は十分な幅(1fr)を確保 */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "start" }}>
+                  <div>
+                    <div className="text-sm font-medium">{e.effect || ""}</div>
+                    {e.detail ? (
+                      <div className="text-xs opacity-70 mt-1 whitespace-pre-wrap leading-tight">{e.detail}</div>
+                    ) : null}
+                  </div>
+                  <div className="ml-3 text-sm font-semibold tabular-nums flex-shrink-0 text-right">
+                    {e.value || "-"}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 入れ替え候補（表示は候補があるときのみ） */}
         {Array.isArray(missing) && missing.length > 0 && swapList.length > 0 && (
           <div>
-            <div className="text-xs opacity-70 mb-2">入れ替え</div>
-            <div className="flex flex-col gap-2">
+            <div className="text-xs opacity-70 mb-2">入れ替え候補</div>
+            <div className="flex flex-wrap gap-3 items-center">
               {swapList.map(({ outId, inId }, idx) => (
-                <div key={`${outId}->${inId}-${idx}`} className="flex items-center gap-3">
-                  <div className="shrink-0"><TargetTile id={outId} /></div>
-                  <div className="shrink-0" style={{ width: 24, textAlign: "center" }}>→</div>
-                  <div className="shrink-0"><TargetTile id={inId} /></div>
+                <div
+                  key={`${outId}->${inId}-${idx}`}
+                  className="flex items-center gap-4 bg-base-100 px-3 py-2 rounded-md"
+                  title={`${getSupportName(outId) || getCharNameById(outId) || outId} → ${getSupportName(inId) || getCharNameById(inId) || inId}`}
+                >
+                  {/* 出る側：画像＋下に名前（標準サイズで分かりやすく） */}
+                  <div className="flex flex-col items-center" style={{ width: 72 }}>
+                    <div className="w-[72px] h-[72px] overflow-hidden rounded-md">
+                      <TargetTile id={outId} width={72} showName={true} />
+                    </div>
+                    <div className="text-[11px] text-center text-base-content/70 mt-2 truncate" style={{ width: 72 }}>
+                      {getSupportName(outId) || getCharNameById(outId) || ""}
+                    </div>
+                  </div>
+
+                  {/* 大きめの矢印で A → B を明確に */}
+                  <div className="text-lg text-base-content/60 mx-1" aria-hidden>→</div>
+
+                  {/* 入れる側：画像＋下に名前 */}
+                  <div className="flex flex-col items-center" style={{ width: 72 }}>
+                    <div className="w-[72px] h-[72px] overflow-hidden rounded-md">
+                      <TargetTile id={inId} width={72} showName={true} />
+                    </div>
+                    <div className="text-[11px] text-center text-base-content/70 mt-2 truncate" style={{ width: 72 }}>
+                      {getSupportName(inId) || getCharNameById(inId) || ""}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
       </div>
-    </div>
+    </article>
   );
 }
 
-/* ====== （新規）タイプ絞り込み：type / type2（他の別名キーも） ====== */
-// カードからタイプ候補をすべて取得（正規化済みと表示用のペア）
-const TYPE_KEYS = ["type", "type2", "Type", "Type2", "タイプ", "タイプ2", "subtype", "SubType", "サブタイプ"];
-function getTypeValues(card) {
+/* ====== （新規）タイプ絞り込みユーティリティ（汎用化） ====== */
+// 汎用：keys 配列で参照するフィールドを切り替えられるようにする
+function getTypeValuesFrom(item, keys) {
   const results = [];
-  for (const k of TYPE_KEYS) {
-    if (card && Object.prototype.hasOwnProperty.call(card, k)) {
-      const label = String(card[k] ?? "").trim();
-      if (!label) continue;
-      const key = norm(label);
-      // 重複除去（key単位）
-      if (!results.some((x) => x.key === key)) {
-        results.push({ key, label });
-      }
+  for (const k of keys) {
+    if (item && Object.prototype.hasOwnProperty.call(item, k)) {
+      const raw = String(item[k] ?? "").trim();
+      if (!raw) continue;
+      const key = norm(raw);
+      if (!results.some((x) => x === key)) results.push(key);
     }
   }
-  return results; // 例: [{key:'テクニック', label:'テクニック'}, {key:'賢さ', label:'賢さ'}]
+  return results; // 例: ['賢さ','スピード']
 }
 
-// 選択されたタイプにマッチするか（type または type2 などの候補いずれか一致）
-const matchesType = (card, selectedKey) => {
+// 選択されたタイプにマッチするか（渡された keys のいずれか一致）
+const matchesType = (item, selectedKey, keys) => {
   if (!selectedKey || selectedKey === "ALL") return true;
-  return getTypeValues(card).some((t) => t.key === selectedKey);
+  if (!Array.isArray(keys) || keys.length === 0) return true;
+  const vals = getTypeValuesFrom(item, keys);
+  return vals.some((v) => v === norm(selectedKey));
 };
 
-// プールからタイプ一覧を動的抽出（初出の表示ラベルを採用）
-function collectTypes(pool) {
-  const map = new Map(); // key: 正規化キー, value: label
-  for (const c of pool || []) {
-    for (const t of getTypeValues(c)) {
-      if (!map.has(t.key)) map.set(t.key, t.label);
+// プールからタイプ一覧を動的抽出（"ALL" はここで付けない。UI側のボタンと重複するため）
+function collectTypes(pool, keys) {
+  const map = new Map();
+  for (const item of pool || []) {
+    const vals = getTypeValuesFrom(item, keys);
+    for (const rawKey of vals) {
+      if (!map.has(rawKey)) map.set(rawKey, rawKey);
     }
   }
-  return Array.from(map, ([key, label]) => ({ key, label }));
+  // TypeFilterBar は先頭に「すべて」を自前で出すのでここでは追加しない
+  const items = [];
+  for (const [key, label] of map.entries()) {
+    items.push({ key, label }); // label = key（表示は大文字化済みで問題あれば元ラベルを渡す実装に変更可）
+  }
+  return items;
 }
 
-// daisyUIで作るフィルタバー
-function TypeFilterBar({ items, value, onChange }) {
+// プールからレアリティ一覧を抽出（表示ラベルは ★n、降順で表示）
+function collectRarities(pool) {
+  const set = new Set();
+  for (const item of pool || []) {
+    if (item && (item.rarity !== undefined && item.rarity !== null && String(item.rarity).trim() !== "")) {
+      set.add(String(item.rarity).trim());
+    }
+  }
+  const arr = Array.from(set).sort((a, b) => Number(b) - Number(a)); // 降順（例: '4','3'）
+  return arr.map((r) => ({ key: r, label: `★${r}` }));
+}
+
+/* daisyUIで作るフィルタバー */
+function TypeFilterBar({ items, value, onChange, heading = null }) {
   return (
     <div className="pt-2">
-      <div className="text-sm mb-2">タイプで絞り込み</div>
-        <div className="mt-2 text-xs text-base-content/70">
-          ボタンをクリックすると、各タイプのカードのみ表示されます。タイプは練習メニューの内容で表示されます。<br />
-          ※ 現在選択できるスペシャルサポートカードは効果量の高いURとSSR「公共の場で泳ぐな」のみです。
-        </div>
-      <div className="flex flex-wrap gap-2 pt-5">
+      {heading ? <div className="text-sm mb-2">{heading}</div> : null}
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           className={`btn btn-sm ${!value || value === "ALL" ? "btn-active" : "btn-ghost"}`}
@@ -460,17 +572,6 @@ function TypeFilterBar({ items, value, onChange }) {
       </div>
     </div>
   );
-}
-
-/* === ターゲットタイル（選手 or カード）— 幅70px固定 ================== */
-function TargetTile({ id, muted = false }) {
-  const isChar = !!getCharById(id);
-  if (isChar) return <CharacterThumb id={id} muted={muted} width={70} />;
-
-  const card = getSupportById(id);
-  if (card) return <SupportCardThumb card={card} showName width={70} />;
-
-  return <div className={`badge badge-outline ${muted ? "opacity-60" : ""}`} title="不明な対象">（不明な対象）</div>;
 }
 
 /* ====== ダイアログ用タイル/ピッカー ===================== */
@@ -606,12 +707,32 @@ export default function TrainingTool() {
 
   // 育成選手（UIのみ）
   const [selectedTraineeId, setSelectedTraineeId] = useState(null);
-
+  // スマホ用プレビュー表示制御
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  
   const selectedCharObjects = useMemo(
     () => selectedChars.map((id) => allChars.find((c) => norm(c.id) === norm(id))).filter(Boolean),
     [selectedChars]
   );
 
+  // 育成/サポート選手ダイアログ用のソート：プレフィックス(B001等)昇順、同プレフィックス内はサフィックス(03,04,10...)を降順に
+  const sortedAllCharsForDialogs = useMemo(() => {
+    const parseId = (id) => {
+      const s = String(id || "");
+      const [pref = s, suf = "0"] = s.split("-");
+      const sufNum = parseInt(String(suf).replace(/\D/g, ""), 10) || 0;
+      return { pref, sufNum };
+    };
+    return [...allChars].sort((a, b) => {
+      const A = parseId(a.id);
+      const B = parseId(b.id);
+      if (A.pref < B.pref) return -1;
+      if (A.pref > B.pref) return 1;
+      // 同プレフィックスならサフィックス数値を降順
+      return B.sufNum - A.sufNum;
+    });
+  }, [allChars]);
+  
   const onSelectTraineeFromDialog = (list) => setSelectedTraineeId(list[0]?.id || null);
   const onSelectSupportCharsFromDialog = (list) => {
     const uniq = Array.from(new Set(list.map((c) => c.id))).slice(0, 5);
@@ -632,16 +753,35 @@ export default function TrainingTool() {
   // （新規）タイプ絞り込み state と候補一覧
   const [supportTypeKey, setSupportTypeKey] = useState("ALL");
   const [exTypeKey, setExTypeKey] = useState("ALL");
-  const supportTypeItems = useMemo(() => collectTypes(normalCards), [normalCards]);
-  const exTypeItems = useMemo(() => collectTypes(exCards), [exCards]);
+  // 追加：育成選手 / サポート選手 用のタイプ絞り込み state
+  const [traineeTypeKey, setTraineeTypeKey] = useState("ALL");
+  const [charTypeKey, setCharTypeKey] = useState("ALL");
+  // 追加：レアリティ絞り込み state（育成選手 / サポート選手）
+  const [traineeRarityKey, setTraineeRarityKey] = useState("ALL");
+  const [charRarityKey, setCharRarityKey] = useState("ALL");
+  // サポートカードは card.type / type2 系を参照（従来の挙動）
+  const SUPPORT_TYPE_KEYS = [
+    "type", "type2", "Type", "Type2",
+    "タイプ", "タイプ2",
+    "subtype", "SubType", "サブタイプ"
+  ];
+  // キャラクターは card1/card2/card3 を参照
+  const CHAR_TYPE_KEYS = ["card1", "card2", "card3", "カード1", "カード2", "カード3"];
 
+  const supportTypeItems = useMemo(() => collectTypes(normalCards, SUPPORT_TYPE_KEYS), [normalCards]);
+  const exTypeItems = useMemo(() => collectTypes(exCards, SUPPORT_TYPE_KEYS), [exCards]);
+  const traineeTypeItems = useMemo(() => collectTypes(allChars, CHAR_TYPE_KEYS), [allChars]);
+  // 共通：育成/サポート用レアリティ候補（例: {key:'3', label:'★3'}）
+  const rarityItems = useMemo(() => collectRarities(allChars), [allChars]);
+  const charTypeItems = traineeTypeItems;
+ 
   // （新規）絞り込み後プール（type / type2 などのいずれか一致）
   const filteredNormalCards = useMemo(
-    () => (normalCards || []).filter((c) => matchesType(c, supportTypeKey)),
+    () => (normalCards || []).filter((c) => matchesType(c, supportTypeKey, SUPPORT_TYPE_KEYS)),
     [normalCards, supportTypeKey]
   );
   const filteredExCards = useMemo(
-    () => (exCards || []).filter((c) => matchesType(c, exTypeKey)),
+    () => (exCards || []).filter((c) => matchesType(c, exTypeKey, SUPPORT_TYPE_KEYS)),
     [exCards, exTypeKey]
   );
 
@@ -832,36 +972,236 @@ export default function TrainingTool() {
         </div>
 
         {/* 発動（合計ボックス＋一覧） */}
-        <section className="space-y-3">
-          <h2 className="text-xl font-semibold">発動スキル（{activatedWithTrainee.length}）</h2>
+        <section className="space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-semibold">発動スキル（{activatedWithTrainee.length}）</h2>
+              <div className="mt-1 text-xs text-base-content/70">
+                ※ 表示はレベルMAX想定。レベルで発動数・効果量が変動します。
+              </div>
+            </div>
+          </div>
 
-            <div className="mt-2 text-xs text-base-content/70">
-                ※ 表示されるスキルはレベルMAXの内容です。レベルによって発動スキル数、効果量が異なります。
+          <div className="mt-3 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-6">
+            {/* 左：結果一覧（縦リスト） */}
+            <div>
+              {/* 合計バッジ（カード風） */}
+              {activatedEffectTotalsByEffect.size > 0 && (
+                <div className="mb-4 p-4 rounded-lg border border-base-300 bg-base-200/40">
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold">発動スキルの効果合計</div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-xs btn-outline"
+                        onClick={() =>
+                          navigator.clipboard.writeText(
+                            Array.from(activatedEffectTotalsByEffect.entries()).map(([k, v]) => `${k}: ${v}%`).join("\n")
+                          )
+                        }
+                      >
+                        コピー
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {Array.from(activatedEffectTotalsByEffect.entries()).map(([effect, total]) => (
+                      <div key={effect} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">
+                        {effect}: {total}%
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* スキルカード一覧（縦に並べて見やすく） */}
+              <div className="flex flex-col gap-4">
+                {activatedWithTrainee.length > 0 ? (
+                  activatedWithTrainee.map((ts) => (
+                    <div key={ts.key} className="w-full">
+                      <TrainingSkillCard
+                        ts={ts}
+                        selectedSupports={selectedSupports}
+                        selectedExSupport={selectedExSupport}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm opacity-70">該当なし</div>
+                )}
+              </div>
             </div>
 
-          {activatedEffectTotalsByEffect.size > 0 && (
-            <div className="text-sm p-3 rounded bg-base-200/50 border border-base-300">
-              <div className="font-semibold mb-1">発動スキルの効果合計</div>
-              <ul className="flex flex-wrap gap-2">
-                {Array.from(activatedEffectTotalsByEffect.entries()).map(([effect, total]) => (
-                  <li key={effect} className="badge badge-outline">
-                    {effect}: {total}%
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            {/* 右：集計 / 編成プレビュー（sticky） */}
+            <aside className="hidden md:block prose-sm sticky top-24 self-start rounded-lg p-4"
+              style={{ border: "1px solid rgba(59,130,246,0.12)", background: "rgba(59,130,246,0.03)" }}>
+              <div className="mb-3">
+                <div className="text-sm font-medium">現在の編成</div>
+                <div className="mt-3 space-y-2 text-sm">
+                  {/* 育成選手（サムネ） */}
+                  <div>
+                    <div className="text-xs opacity-70 mb-1">育成選手</div>
+                    <div className="flex items-center gap-2">
+                      {selectedTraineeId ? (
+                        <div style={{ width: 48 }}>
+                          <CharImg id={selectedTraineeId} alt={getCharNameById(selectedTraineeId)} size={48} />
+                        </div>
+                      ) : (
+                        <div className="text-xs opacity-60">未選択</div>
+                      )}
+                      {/* 育成選手のID表示を削除（画像のみ表示） */}
+                    </div>
+                  </div>
 
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-            {activatedWithTrainee.map((ts) => (
-              <TrainingSkillCard
-                key={ts.key}
-                ts={ts}
-                selectedSupports={selectedSupports}
-                selectedExSupport={selectedExSupport}
-              />
-            ))}
-            {activatedWithTrainee.length === 0 && <div className="text-sm opacity-70">該当なし</div>}
+                  {/* サポート選手（小サムネ横並び） */}
+                  <div>
+                    <div className="text-xs opacity-70 mb-1">サポート選手</div>
+                    <div className="flex items-center gap-2">
+                      {selectedChars.length > 0 ? (
+                        selectedChars.map((id) => (
+                          <div key={id} style={{ width: 40 }}>
+                            <CharImg id={id} alt={getCharNameById(id)} size={40} />
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-xs opacity-60">未選択</div>
+                      )}
+                    </div>
+                    <div className="text-xs opacity-60 mt-1">{selectedChars.length} / 5</div>
+                  </div>
+
+                  {/* スペシャルサポートカード（小サムネ） */}
+                  <div>
+                    <div className="text-xs opacity-70 mb-1">スペシャルサポートカード</div>
+                    <div className="flex items-center gap-2">
+                      {selectedSupports.length > 0 ? (
+                        selectedSupports.map((id) => (
+                          <div key={id} style={{ width: 48 }}>
+                            <SupportImg id={id} alt={getSupportName(id)} className="rounded-sm" />
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-xs opacity-60">未選択</div>
+                      )}
+                    </div>
+                    <div className="text-xs opacity-60 mt-1">{selectedSupports.length} / 4</div>
+                  </div>
+
+                  {/* EXサポートカード */}
+                  <div>
+                    <div className="text-xs opacity-70 mb-1">EXサポートカード</div>
+                    <div className="flex items-center gap-2">
+                      {selectedExSupport ? (
+                        <div style={{ width: 48 }}>
+                          <SupportImg id={selectedExSupport} alt={getSupportName(selectedExSupport)} className="rounded-sm" />
+                        </div>
+                      ) : (
+                        <div className="text-xs opacity-60">未選択</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                {/* 補足テキストは不要のため削除 */}
+              </div>
+            </aside>
+            {/* --- スマホ用：右下固定プレビューボタン + パネル --- */}
+            <div className="md:hidden">
+              <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm rounded-full shadow-lg"
+                  onClick={() => setMobilePreviewOpen((s) => !s)}
+                  aria-expanded={mobilePreviewOpen}
+                  aria-controls="mobile-preview-panel"
+                  title="現在の編成を表示"
+                >
+                  編成表示
+                </button>
+
+                {mobilePreviewOpen && (
+                  <div
+                    id="mobile-preview-panel"
+                    className="w-72 max-h-[60vh] overflow-y-auto rounded-lg p-3 bg-white border shadow-lg"
+                    role="dialog"
+                    aria-modal="false"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-medium">現在の編成</div>
+                      <button type="button" className="btn btn-ghost btn-xs" onClick={() => setMobilePreviewOpen(false)}>閉じる</button>
+                    </div>
+
+                    <div className="space-y-3 text-sm">
+                      <div>
+                        <div className="text-xs opacity-70 mb-1">育成選手</div>
+                        <div className="flex items-center gap-2">
+                          {selectedTraineeId ? (
+                            <button className="p-0" onClick={() => traineeDialogRef.current?.showModal()}>
+                              <div style={{ width: 56 }}>
+                                <CharImg id={selectedTraineeId} alt={getCharNameById(selectedTraineeId)} size={56} />
+                              </div>
+                            </button>
+                          ) : (
+                            <div className="text-xs opacity-60">未選択</div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-xs opacity-70 mb-1">サポート選手</div>
+                        <div className="flex items-center gap-2">
+                          {selectedChars.length > 0 ? (
+                            selectedChars.map((id) => (
+                              <button key={id} className="p-0" onClick={() => charDialogRef.current?.showModal()}>
+                                <div style={{ width: 40 }}>
+                                  <CharImg id={id} alt={getCharNameById(id)} size={40} />
+                                </div>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="text-xs opacity-60">未選択</div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-xs opacity-70 mb-1">スペシャルサポートカード</div>
+                        <div className="flex items-center gap-2">
+                          {selectedSupports.length > 0 ? (
+                            selectedSupports.map((id) => (
+                              <button key={id} className="p-0" onClick={() => supportDialogRef.current?.showModal()}>
+                                <div style={{ width: 44 }}>
+                                  <SupportImg id={id} alt={getSupportName(id)} className="rounded-sm" />
+                                </div>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="text-xs opacity-60">未選択</div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-xs opacity-70 mb-1">EXサポートカード</div>
+                        <div className="flex items-center gap-2">
+                          {selectedExSupport ? (
+                            <button className="p-0" onClick={() => exDialogRef.current?.showModal()}>
+                              <div style={{ width: 44 }}>
+                                <SupportImg id={selectedExSupport} alt={getSupportName(selectedExSupport)} className="rounded-sm" />
+                              </div>
+                            </button>
+                          ) : (
+                            <div className="text-xs opacity-60">未選択</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -902,17 +1242,47 @@ export default function TrainingTool() {
       {/* ===== モーダル ===== */}
       {/* 育成選手（max 1） */}
       <dialog ref={traineeDialogRef} className="modal">
-        <div className="modal-box max-w-5xl">
-          <h3 className="font-bold text-lg">育成選手を選ぶ（1）</h3>
-          <div className="mt-1 text-xs opacity-70">現在 {selectedTraineeId ? 1 : 0} / 1</div>
-          <div className="mt-4 max-h-[70vh] overflow-y-auto">
-            <CharacterSelector
-              selectedCharacters={selectedTraineeId ? [allChars.find((c) => norm(c.id) === norm(selectedTraineeId))].filter(Boolean) : []}
-              onSelectCharacter={onSelectTraineeFromDialog}
-              maxSelectable={1}
-            />
+        <div className="modal-box max-w-4xl p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="font-bold text-lg">育成選手を選ぶ（1）</h3>
+              <div className="text-xs opacity-70 mt-1">現在 {selectedTraineeId ? 1 : 0} / 1</div>
+            </div>
           </div>
-          <div className="modal-action">
+
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
+            {/* 左: セレクター（スクロール固定領域） */}
+            <div style={{ minHeight: 360, maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
+              <CharacterSelector
+                selectedCharacters={selectedTraineeId ? [allChars.find((c) => norm(c.id) === norm(selectedTraineeId))].filter(Boolean) : []}
+                onSelectCharacter={onSelectTraineeFromDialog}
+                maxSelectable={1}
+                typeKey={traineeTypeKey}
+                rarityKey={traineeRarityKey}
+                allChars={sortedAllCharsForDialogs}
+              />
+            </div>
+
+            {/* 右: フィルターカード */}
+            <div
+              className="rounded-lg p-4"
+              style={{
+                border: "1px solid rgba(59,130,246,0.12)", // primary-ish thin border
+                background: "rgba(59,130,246,0.03)",     // subtle primary-tint background
+              }}
+            >
+              <div className="mb-3">
+                <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
+                <TypeFilterBar items={traineeTypeItems} value={traineeTypeKey} onChange={setTraineeTypeKey} />
+              </div>
+              <div>
+                <div className="text-sm font-medium mb-2">レアリティ</div>
+                <TypeFilterBar items={rarityItems} value={traineeRarityKey} onChange={setTraineeRarityKey} />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-action mt-4">
             <button type="button" className="btn btn-ghost" onClick={() => setSelectedTraineeId(null)}>未選択</button>
             <form method="dialog"><button className="btn">閉じる</button></form>
             <button type="button" className="btn btn-primary" onClick={() => traineeDialogRef.current?.close()}>決定</button>
@@ -920,21 +1290,48 @@ export default function TrainingTool() {
         </div>
         <form method="dialog" className="modal-backdrop"><button>close</button></form>
       </dialog>
-
+      
       {/* サポート選手 */}
       <dialog ref={charDialogRef} className="modal">
-        <div className="modal-box max-w-5xl">
-          <h3 className="font-bold text-lg">サポート選手を選ぶ（最大5）</h3>
-          <div className="mt-1 text-xs opacity-70">現在 {selectedChars.length} / 5</div>
-          <div className="mt-4 max-h-[70vh] overflow-y-auto">
-            <CharacterSelector
-              selectedCharacters={selectedCharObjects}
-              onSelectCharacter={onSelectSupportCharsFromDialog}
-              maxSelectable={5}
-              lockedSelectedIds={selectedTraineeId ? [selectedTraineeId] : []}
-            />
+        <div className="modal-box max-w-4xl p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="font-bold text-lg">サポート選手を選ぶ（最大5）</h3>
+              <div className="text-xs opacity-70 mt-1">現在 {selectedChars.length} / 5</div>
+            </div>
           </div>
-          <div className="modal-action">
+
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
+            <div style={{ minHeight: 360, maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
+              <CharacterSelector
+                selectedCharacters={selectedCharObjects}
+                onSelectCharacter={onSelectSupportCharsFromDialog}
+                maxSelectable={5}
+                lockedSelectedIds={selectedTraineeId ? [selectedTraineeId] : []}
+                typeKey={charTypeKey}
+                rarityKey={charRarityKey}
+                allChars={sortedAllCharsForDialogs}
+              />
+            </div>
+            <div
+              className="rounded-lg p-4"
+              style={{
+                border: "1px solid rgba(59,130,246,0.12)",
+                background: "rgba(59,130,246,0.03)",
+              }}
+            >
+              <div className="mb-3">
+                <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
+                <TypeFilterBar items={charTypeItems} value={charTypeKey} onChange={setCharTypeKey} />
+              </div>
+              <div>
+                <div className="text-sm font-medium mb-2">レアリティ</div>
+                <TypeFilterBar items={rarityItems} value={charRarityKey} onChange={setCharRarityKey} />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-action mt-4">
             <button type="button" className="btn btn-ghost" onClick={() => setSelectedChars([])}>全解除</button>
             <form method="dialog"><button className="btn">閉じる</button></form>
             <button type="button" className="btn btn-primary" onClick={() => charDialogRef.current?.close()}>決定</button>
@@ -945,40 +1342,36 @@ export default function TrainingTool() {
 
       {/* スペシャルサポートカード（UR/SSR 4枚まで） */}
       <dialog ref={supportDialogRef} className="modal">
-        <div
-          className="modal-box max-w-5xl"
-          style={{ display: "flex", flexDirection: "column", maxHeight: "80vh", paddingBottom: 0 }}
-        >
-          <h3 className="font-bold text-lg pt-4">スペシャルサポートカードを選ぶ（最大4）</h3>
-
-          <div className="mt-2 text-xs text-base-content/70">
-            
+        <div className="modal-box max-w-4xl p-6" style={{ maxHeight: "80vh", display: "flex", flexDirection: "column" }}>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-lg">スペシャルサポートカードを選ぶ（最大4）</h3>
+            <div className="text-xs opacity-70">現在 {selectedSupports.length} / 4</div>
           </div>
 
-          {/* ★ 追加：タイプ絞り込みバー */}
-          <TypeFilterBar items={supportTypeItems} value={supportTypeKey} onChange={setSupportTypeKey} />
+          <div className="mt-2 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
+            <div style={{ minHeight: 360, maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
+              <SupportCardPicker
+                pool={filteredNormalCards}
+                max={4}
+                selectedIds={selectedSupports}
+                onChange={(nextIds) => setSelectedSupports(nextIds.slice(0, 4))}
+              />
+              <div style={{ height: 12 }} />
+            </div>
 
-          <div className="mt-3" style={{ overflowY: "auto", padding: "0px", flex: "1 1 auto" }}>
-            <SupportCardPicker
-              pool={filteredNormalCards} // ← 絞り込み後のプール
-              max={4}
-              selectedIds={selectedSupports}
-              onChange={(nextIds) => setSelectedSupports(nextIds.slice(0, 4))}
-            />
-            <div style={{ height: 12 }} />
+            <div
+              className="rounded-lg p-4"
+              style={{
+                border: "1px solid rgba(59,130,246,0.12)",
+                background: "rgba(59,130,246,0.03)",
+              }}
+            >
+              <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
+              <TypeFilterBar items={supportTypeItems} value={supportTypeKey} onChange={setSupportTypeKey} />
+            </div>
           </div>
 
-          <div
-            className="modal-action"
-            style={{
-              position: "sticky",
-              bottom: 0,
-              background: "var(--fallback-b1, oklch(var(--b1)))",
-              borderTop: "1px solid rgba(0,0,0,0.08)",
-              padding: "12px 5px",
-              marginTop: 0,
-            }}
-          >
+          <div className="modal-action sticky bottom-0 bg-base-100" style={{ paddingTop: 12 }}>
             <button type="button" className="btn btn-ghost" onClick={() => setSelectedSupports([])}>全解除</button>
             <form method="dialog"><button className="btn">閉じる</button></form>
             <button type="button" className="btn btn-primary" onClick={() => supportDialogRef.current?.close()}>決定</button>
@@ -989,35 +1382,34 @@ export default function TrainingTool() {
 
       {/* EXサポートカード（1枚） */}
       <dialog ref={exDialogRef} className="modal">
-        <div
-          className="modal-box max-w-5xl"
-          style={{ display: "flex", flexDirection: "column", maxHeight: "80vh", paddingBottom: 0 }}
-        >
-          <h3 className="font-bold text-lg pt-4">EXサポートカードを選ぶ（1）</h3>
-
-          {/* ★ 追加：タイプ絞り込みバー */}
-          <TypeFilterBar items={exTypeItems} value={exTypeKey} onChange={setExTypeKey} />
-
-          <div className="mt-3" style={{ overflowY: "auto", padding: "0", flex: "1 1 auto" }}>
-            <ExSupportPicker
-              pool={filteredExCards} // ← 絞り込み後のプール
-              selectedId={selectedExSupport || null}
-              onChange={(id) => setExSupport(id)}
-            />
-            <div style={{ height: 12 }} />
+        <div className="modal-box max-w-4xl p-6" style={{ maxHeight: "80vh", display: "flex", flexDirection: "column" }}>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-lg">EXサポートカードを選ぶ（1）</h3>
           </div>
 
-          <div
-            className="modal-action"
-            style={{
-              position: "sticky",
-              bottom: 0,
-              background: "var(--fallback-b1, oklch(var(--b1)))",
-              borderTop: "1px solid rgba(0,0,0,0.08)",
-              padding: "12px 5px",
-              marginTop: 0,
-            }}
-          >
+          <div className="mt-2 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
+            <div style={{ minHeight: 320, maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
+              <ExSupportPicker
+                pool={filteredExCards}
+                selectedId={selectedExSupport || null}
+                onChange={(id) => setExSupport(id)}
+              />
+              <div style={{ height: 12 }} />
+            </div>
+
+            <div
+              className="rounded-lg p-4"
+              style={{
+                border: "1px solid rgba(59,130,246,0.12)",
+                background: "rgba(59,130,246,0.03)",
+              }}
+            >
+              <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
+              <TypeFilterBar items={exTypeItems} value={exTypeKey} onChange={setExTypeKey} />
+            </div>
+          </div>
+
+          <div className="modal-action sticky bottom-0 bg-base-100" style={{ paddingTop: 12 }}>
             <button type="button" className="btn btn-ghost" onClick={() => setExSupport(null)}>未選択</button>
             <form method="dialog"><button className="btn">閉じる</button></form>
             <button type="button" className="btn btn-primary" onClick={() => exDialogRef.current?.close()}>決定</button>
