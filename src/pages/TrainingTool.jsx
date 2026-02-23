@@ -183,7 +183,7 @@ const SLOT_TILE_PAD = 0;
 // 内側は枠線なし。fillで親幅にフィットさせ、外枠のpadding分だけ均等余白にする
 function SupportCardThumb({ card, showName = false, width, fill = false }) {
   const { id, name, rarity, type } = card;
-  const W = typeof width === "number" ? width : Number(width) || 70;
+  const W = typeof width === "number" ? width : Number(width) || 80;
   const NAME_FONT_SIZE = 10;
   const NAME_LINES = 2;
   const NAME_LINE_HEIGHT = 1.2;
@@ -258,10 +258,10 @@ function SupportCardThumb({ card, showName = false, width, fill = false }) {
 }
 
 // 選手の小型タイル（画像 + 名前）。showName=false で名前領域を非表示にする
-function CharacterThumb({ id, muted = false, width = 70, showName = true }) {
+function CharacterThumb({ id, muted = false, width = 80, showName = true }) {
   const c = getCharById(id);
   const name = (c?.name || c?.title || "") || "";
-  const IMG_SIZE = typeof width === "number" ? width : Number(width) || 70;
+  const IMG_SIZE = typeof width === "number" ? width : Number(width) || 80;
   const NAME_FONT_SIZE = 10;
   const NAME_LINES = 2;
   const NAME_LINE_HEIGHT = 1.2;
@@ -313,9 +313,9 @@ function CharacterThumb({ id, muted = false, width = 70, showName = true }) {
   );
 }
 
-/* === ターゲットタイル（選手 or カード） — 固定ボックスに統一 ================== */
-function TargetTile({ id, muted = false, width = 70, showName = true }) {
-  const W = typeof width === "number" ? width : Number(width) || 70;
+// ターゲットタイル（選手 or カード） — 固定ボックスに統一
+function TargetTile({ id, muted = false, width = 80, showName = true }) {
+  const W = typeof width === "number" ? width : Number(width) || 80;
   const isChar = !!getCharById(id);
   if (isChar) return (
     <div style={{ width: W }}>
@@ -347,7 +347,7 @@ function TargetTile({ id, muted = false, width = 70, showName = true }) {
 function CharacterSlot({ id, onClick, onRemove }) {
   const name = id ? getCharNameById(id) : "";
   return (
-    <div className="relative w-[70px] h-[70px] rounded-xl border shadow-sm bg-base-100 border-base-300">
+    <div className="relative w-[80px] h-[80px] rounded-xl border shadow-sm bg-base-100 border-base-300">
       <button
         type="button"
         className="w-full h-full flex items-center justify-center rounded-xl"
@@ -356,7 +356,7 @@ function CharacterSlot({ id, onClick, onRemove }) {
         aria-label={id ? name : "選手を追加"}
       >
         {id ? (
-          <CharImg id={id} alt={name} size={70} className="rounded-xl" />
+          <CharImg id={id} alt={name} size={80} className="rounded-xl" />
         ) : (
           <div className="flex flex-col items-center justify-center text-base-content/60">
             <div className="w-8 h-8 rounded-xl bg-base-200 flex items-center justify-center text-lg">＋</div>
@@ -464,7 +464,7 @@ function TrainingSkillCard({ ts, missing, selectedSupports, selectedExSupport })
                   {/* 出る側：画像＋下に名前（標準サイズで分かりやすく） */}
                   <div className="flex flex-col items-center" style={{ width: 72 }}>
                     <div className="w-[72px] h-[72px] overflow-hidden rounded-md">
-                      <TargetTile id={outId} width={72} showName={true} />
+                      <TargetTile id={outId} width={72, 72} showName={true} />
                     </div>
                     <div className="text-[11px] text-center text-base-content/70 mt-2 truncate" style={{ width: 72 }}>
                       {getSupportName(outId) || getCharNameById(outId) || ""}
@@ -477,7 +477,7 @@ function TrainingSkillCard({ ts, missing, selectedSupports, selectedExSupport })
                   {/* 入れる側：画像＋下に名前 */}
                   <div className="flex flex-col items-center" style={{ width: 72 }}>
                     <div className="w-[72px] h-[72px] overflow-hidden rounded-md">
-                      <TargetTile id={inId} width={72} showName={true} />
+                      <TargetTile id={inId} width={72, 72} showName={true} />
                     </div>
                     <div className="text-[11px] text-center text-base-content/70 mt-2 truncate" style={{ width: 72 }}>
                       {getSupportName(inId) || getCharNameById(inId) || ""}
@@ -550,7 +550,8 @@ function TypeFilterBar({ items, value, onChange, heading = null }) {
   return (
     <div className="pt-2">
       {heading ? <div className="text-sm mb-2">{heading}</div> : null}
-      <div className="flex flex-wrap gap-2">
+      {/* 折り返しは許容するが見た目を整える */}
+      <div className="type-filter-bar" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }} aria-label={heading ? `${heading} のフィルタ` : "フィルタ"}>
         <button
           type="button"
           className={`btn btn-sm ${!value || value === "ALL" ? "btn-active" : "btn-ghost"}`}
@@ -618,8 +619,11 @@ function SupportCardSlot({ id, onClick, onRemove }) {
 // ダイアログのカードタイル（94px外枠 + 2px padding、内側はfillで100%）
 function SupportCardTile({ card, selected, disabled, onToggle }) {
   const baseStyle = {
-    width: CARD_TILE_W,
-    padding: CARD_TILE_PAD,
+    width: CARD_TILE_W,                 // 固定幅（px）
+    minWidth: CARD_TILE_W,
+    maxWidth: CARD_TILE_W,
+    boxSizing: "border-box",            // padding/border を幅に含める
+    padding: CARD_TILE_PAD,             // 0 にして余白は内側で制御
     borderRadius: 8,
     border: "2px solid",
     borderColor: selected ? "#3b82f6" : "#d1d5db",
@@ -628,6 +632,8 @@ function SupportCardTile({ card, selected, disabled, onToggle }) {
     opacity: disabled && !selected ? 0.4 : 1,
     position: "relative",
     textAlign: "center",
+    display: "inline-block",            // Grid/Flex の影響を受けにくくする
+    verticalAlign: "top",
   };
   return (
     <li key={card.id} onClick={disabled ? undefined : onToggle} style={baseStyle} title={card.name}>
@@ -878,7 +884,9 @@ export default function TrainingTool() {
 
   /* ================= Render ================= */
   return (
-    <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
+    <>
+      <style dangerouslySetInnerHTML={{ __html: _trainingToolSPStyles }} />
+      <TwoColumnLayout sidebar={<SideMenu />} right={<RightAds />}>
       <section className="max-w-5xl mx-auto space-y-6">
         {/* 見出し */}
         <div className="flex items-center gap-3">
@@ -1242,54 +1250,57 @@ export default function TrainingTool() {
       {/* ===== モーダル ===== */}
       {/* 育成選手（max 1） */}
       <dialog ref={traineeDialogRef} className="modal">
-        <div className="modal-box max-w-4xl p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h3 className="font-bold text-lg">育成選手を選ぶ（1）</h3>
-              <div className="text-xs opacity-70 mt-1">現在 {selectedTraineeId ? 1 : 0} / 1</div>
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
-            {/* 左: セレクター（スクロール固定領域） */}
-            <div style={{ minHeight: 360, maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
-              <CharacterSelector
-                selectedCharacters={selectedTraineeId ? [allChars.find((c) => norm(c.id) === norm(selectedTraineeId))].filter(Boolean) : []}
-                onSelectCharacter={onSelectTraineeFromDialog}
-                maxSelectable={1}
-                typeKey={traineeTypeKey}
-                rarityKey={traineeRarityKey}
-                allChars={sortedAllCharsForDialogs}
-              />
-            </div>
-
-            {/* 右: フィルターカード */}
-            <div
-              className="rounded-lg p-4"
-              style={{
-                border: "1px solid rgba(59,130,246,0.12)", // primary-ish thin border
-                background: "rgba(59,130,246,0.03)",     // subtle primary-tint background
-              }}
-            >
-              <div className="mb-3">
-                <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
-                <TypeFilterBar items={traineeTypeItems} value={traineeTypeKey} onChange={setTraineeTypeKey} />
-              </div>
-              <div>
-                <div className="text-sm font-medium mb-2">レアリティ</div>
-                <TypeFilterBar items={rarityItems} value={traineeRarityKey} onChange={setTraineeRarityKey} />
-              </div>
-            </div>
-          </div>
-
-          <div className="modal-action mt-4">
-            <button type="button" className="btn btn-ghost" onClick={() => setSelectedTraineeId(null)}>未選択</button>
-            <form method="dialog"><button className="btn">閉じる</button></form>
-            <button type="button" className="btn btn-primary" onClick={() => traineeDialogRef.current?.close()}>決定</button>
-          </div>
-        </div>
-        <form method="dialog" className="modal-backdrop"><button>close</button></form>
-      </dialog>
+        <div
+          className="modal-box max-w-4xl p-6"
+          style={{ maxHeight: "calc(100vh - 120px)", display: "flex", flexDirection: "column" }}
+        >
+           <div className="flex items-start justify-between gap-4">
+             <div>
+               <h3 className="font-bold text-lg">育成選手を選ぶ（1）</h3>
+               <div className="text-xs opacity-70 mt-1">現在 {selectedTraineeId ? 1 : 0} / 1</div>
+             </div>
+           </div>
+ 
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4" style={{ flex: 1, minHeight: 0 }}>
+            {/* 左: セレクター（スクロール領域：flexで伸縮、上限は親の maxHeight に従う） */}
+            <div className="char-selector-override" style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 6 }}>
+               <CharacterSelector
+                 selectedCharacters={selectedTraineeId ? [allChars.find((c) => norm(c.id) === norm(selectedTraineeId))].filter(Boolean) : []}
+                 onSelectCharacter={onSelectTraineeFromDialog}
+                 maxSelectable={1}
+                 typeKey={traineeTypeKey}
+                 rarityKey={traineeRarityKey}
+                 allChars={sortedAllCharsForDialogs}
+               />
+             </div>
+ 
+             {/* 右: フィルターカード */}
+             <div
+               className="rounded-lg p-4"
+               style={{
+                 border: "1px solid rgba(59,130,246,0.12)", // primary-ish thin border
+                 background: "rgba(59,130,246,0.03)",     // subtle primary-tint background
+               }}
+             >
+               <div className="mb-3">
+                 <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
+                 <TypeFilterBar items={traineeTypeItems} value={traineeTypeKey} onChange={setTraineeTypeKey} />
+               </div>
+               <div>
+                 <div className="text-sm font-medium mb-2">レアリティ</div>
+                 <TypeFilterBar items={rarityItems} value={traineeRarityKey} onChange={setTraineeRarityKey} />
+               </div>
+             </div>
+           </div>
+ 
+          <div className="modal-action mt-4" style={{ marginTop: 12 }}>
+             <button type="button" className="btn btn-ghost" onClick={() => setSelectedTraineeId(null)}>未選択</button>
+             <form method="dialog"><button className="btn">閉じる</button></form>
+             <button type="button" className="btn btn-primary" onClick={() => traineeDialogRef.current?.close()}>決定</button>
+           </div>
+         </div>
+         <form method="dialog" className="modal-backdrop"><button>close</button></form>
+       </dialog>
       
       {/* サポート選手 */}
       <dialog ref={charDialogRef} className="modal">
@@ -1417,6 +1428,78 @@ export default function TrainingTool() {
         </div>
         <form method="dialog" className="modal-backdrop"><button>close</button></form>
       </dialog>
-    </TwoColumnLayout>
+
+      {/* ===== ファイル末尾の閉じタグと SP 用スタイル ===== */}
+      </TwoColumnLayout>
+    </>
   );
 }
+
+/* SP: CharacterSelector を確実に 5 列化。モーダル内一覧は内側だけスクロール、フッタは常に表示 */
+const _trainingToolSPStyles = `
+@media (max-width: 768px) {
+  /* 5列化済み：グリッドのアイテム幅を強制して devtools の style (width:75px 等) を上書き */
+  .char-selector-override [class*="grid"] > * ,
+  .char-selector-override .char-grid > * {
+    width: ${CARD_TILE_W}px !important;
+    min-width: ${CARD_TILE_W}px !important;
+    max-width: ${CARD_TILE_W}px !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    display: inline-block !important;
+    vertical-align: top !important;
+  }
+
+  .char-selector-override [class*="grid"],
+  .char-selector-override .grid,
+  .char-selector-override ul[class*="grid"],
+  .char-selector-override .char-grid {
+    grid-template-columns: repeat(5, ${CARD_TILE_W}px) !important;
+    gap: 6px !important;
+    justify-items: stretch !important;
+    align-items: start !important;
+    grid-auto-rows: minmax(0, auto) !important;
+  }
+
+  .char-selector-override [class*="grid"] > *,
+  .char-selector-override ul[class*="grid"] > * {
+    box-sizing: border-box;
+    padding: 4px !important;
+  }
+  .char-selector-override img {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: cover !important;
+  }
+
+  /* 既存の modal / typefilter 等のスタイルはそのまま */
+  .type-filter-bar { display: flex !important; gap: 6px !important; flex-wrap: wrap !important; align-items: center; justify-content: flex-start; }
+  .type-filter-bar button { padding: 6px 8px !important; font-size: 13px !important; border-radius: 8px !important; min-width: 0; }
+
+  .modal-box { box-sizing: border-box; padding: 8px !important; max-height: calc(100vh - 64px) !important; display: flex; flex-direction: column; padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important; }
+
+  .modal-box > .mt-4,
+  .modal-box > .mt-2 {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .modal-box .modal-action {
+    position: sticky;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,1) 60%);
+    margin-top: 8px;
+  }
+
+  .modal-box .modal-action .btn-primary { min-width: 88px; }
+  .modal-box.p-6 { padding: 8px !important; padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important; }
+}
+`;
