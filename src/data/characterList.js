@@ -79,6 +79,7 @@ export const characterList = [
 { id: 'B026-04', name: '士道龍聖【Halloween Demon】',rarity: '3',type: 'キック',card1: 'キック',card2: '',card3: ''},
 { id: 'B026-05', name: '士道龍聖【龍聖・直下蹴弾】',rarity: '3',type: 'キック',card1: 'キック',card2: 'スピード',card3: ''},
 { id: 'B026-06', name: '士道龍聖【歓喜の”誕生”】',rarity: '4',type: 'キック',card1: 'キック',card2: 'フィジカル',card3: ''},
+{ id: 'B026-07', name: '士道龍聖【アンストッパブル・デーモン】',rarity: '4',type: 'キック',card1: 'キック',card2: 'フィジカル',card3: ''},
 { id: 'B027-02', name: 'ダダ・シウバ【重戦車】',rarity: '3',type: 'スタミナ',card1: 'フィジカル',card2: 'キック',card3: ''},
 { id: 'B028-02', name: 'アダム・ブレイク【GGジャンキー】',rarity: '3',type: 'フィジカル',card1: 'フィジカル',card2: 'キック',card3: ''},
 { id: 'B029-02', name: 'レオナルド・ルナ【レ・アールの貴公子】',rarity: '3',type: 'テクニック',card1: 'テクニック',card2: '賢さ',card3: ''},
