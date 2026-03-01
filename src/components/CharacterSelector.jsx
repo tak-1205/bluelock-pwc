@@ -1,6 +1,6 @@
 // src/components/CharacterSelector.jsx
 import React, { useMemo } from 'react';
-import { characterList } from '../data/characterList';
+import characterList from '../data/characterList';
 
 // URLに ?debug=true が含まれるか判定
 const isDebugMode = new URLSearchParams(window.location.search).get('debug') === 'true';
@@ -109,8 +109,10 @@ export default function CharacterSelector({
   };
 
   // 表示プールは props の allChars を typeKey / rarityKey でフィルタしたものを利用する
+  // allChars が渡されていない場合は characterList を使用
   const characterPool = React.useMemo(() => {
-    return (Array.isArray(allChars) ? allChars : []).filter(
+    const source = (Array.isArray(allChars) && allChars.length > 0) ? allChars : characterList;
+    return source.filter(
       (c) => matchesTypeLocal(c, typeKey) && matchesRarity(c, rarityKey)
     );
   }, [allChars, typeKey, rarityKey]);

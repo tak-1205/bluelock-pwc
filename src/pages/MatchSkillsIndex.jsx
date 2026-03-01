@@ -7,6 +7,7 @@ import RightAds from "@/layouts/RightAds.jsx";
 import PageHeader from "@/components/PageHeader.jsx";
 // import { matchSkills as RAW_MATCH_SKILLS } from "@/data/matchSkills.js";
 import { matchSkills as RAW_MATCH_SKILLS } from "@/data/matchSkills.cleaned.js";
+import { characterList } from "@/data/characterList.js";
 
 /* ---------- icons (inline) ---------- */
 const Icon = ({ children, className = "", size = 16 }) => (
@@ -143,12 +144,10 @@ function MatchSkillsList() {
   const [targetFilterIds, setTargetFilterIds] = useState([]); // string[]
   const [showTargetPicker, setShowTargetPicker] = useState(false);
 
-  // 対象キャラ候補（targets からユニーク抽出）
+  // 対象キャラ候補（characterList から取得）
   const allTargetIds = useMemo(() => {
-    const set = new Set();
-    for (const s of skills) for (const t of s.targets || []) set.add(t);
-    return Array.from(set).sort((a, b) => a.localeCompare(b, "ja"));
-  }, [skills]);
+    return (characterList || []).map(c => c.id).sort((a, b) => a.localeCompare(b, "ja"));
+  }, []);
 
   // アイコンのトグル（1人固定）
   const toggleTargetId = useCallback((cid) => {
