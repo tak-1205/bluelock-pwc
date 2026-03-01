@@ -1250,20 +1250,27 @@ export default function TrainingTool() {
       {/* ===== モーダル ===== */}
       {/* 育成選手（max 1） */}
       <dialog ref={traineeDialogRef} className="modal">
-        <div
-          className="modal-box max-w-4xl p-6"
-          style={{ maxHeight: "calc(100vh - 120px)", display: "flex", flexDirection: "column" }}
-        >
-           <div className="flex items-start justify-between gap-4">
-             <div>
-               <h3 className="font-bold text-lg">育成選手を選ぶ（1）</h3>
-               <div className="text-xs opacity-70 mt-1">現在 {selectedTraineeId ? 1 : 0} / 1</div>
-             </div>
+        <div className="modal-box max-w-4xl p-4 max-h-[90vh] flex flex-col">
+           <div className="mb-3">
+             <h3 className="font-bold text-lg">育成選手を選ぶ（1）</h3>
+             <div className="text-xs opacity-70 mt-1">現在 {selectedTraineeId ? 1 : 0} / 1</div>
            </div>
  
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4" style={{ flex: 1, minHeight: 0 }}>
-            {/* 左: セレクター（スクロール領域：flexで伸縮、上限は親の maxHeight に従う） */}
-            <div className="char-selector-override" style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 6 }}>
+          <div className="flex-1 min-h-0 grid grid-cols-1 gap-3">
+            <div className="rounded-lg p-3 border border-base-300 bg-base-100">
+              <div className="space-y-3">
+                <div>
+                  <div className="text-xs font-medium mb-1">タイプ</div>
+                  <TypeFilterBar items={traineeTypeItems} value={traineeTypeKey} onChange={setTraineeTypeKey} />
+                </div>
+                <div>
+                  <div className="text-xs font-medium mb-1">レアリティ</div>
+                  <TypeFilterBar items={rarityItems} value={traineeRarityKey} onChange={setTraineeRarityKey} />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
                <CharacterSelector
                  selectedCharacters={selectedTraineeId ? [allChars.find((c) => norm(c.id) === norm(selectedTraineeId))].filter(Boolean) : []}
                  onSelectCharacter={onSelectTraineeFromDialog}
@@ -1273,27 +1280,9 @@ export default function TrainingTool() {
                  allChars={sortedAllCharsForDialogs}
                />
              </div>
- 
-             {/* 右: フィルターカード */}
-             <div
-               className="rounded-lg p-4"
-               style={{
-                 border: "1px solid rgba(59,130,246,0.12)", // primary-ish thin border
-                 background: "rgba(59,130,246,0.03)",     // subtle primary-tint background
-               }}
-             >
-               <div className="mb-3">
-                 <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
-                 <TypeFilterBar items={traineeTypeItems} value={traineeTypeKey} onChange={setTraineeTypeKey} />
-               </div>
-               <div>
-                 <div className="text-sm font-medium mb-2">レアリティ</div>
-                 <TypeFilterBar items={rarityItems} value={traineeRarityKey} onChange={setTraineeRarityKey} />
-               </div>
-             </div>
            </div>
  
-          <div className="modal-action mt-4" style={{ marginTop: 12 }}>
+          <div className="modal-action mt-3 sticky bottom-0 bg-base-100 pt-3 border-t border-base-300 px-4 pb-[env(safe-area-inset-bottom)]">
              <button type="button" className="btn btn-ghost" onClick={() => setSelectedTraineeId(null)}>未選択</button>
              <form method="dialog"><button className="btn">閉じる</button></form>
              <button type="button" className="btn btn-primary" onClick={() => traineeDialogRef.current?.close()}>決定</button>
@@ -1304,16 +1293,27 @@ export default function TrainingTool() {
       
       {/* サポート選手 */}
       <dialog ref={charDialogRef} className="modal">
-        <div className="modal-box max-w-4xl p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h3 className="font-bold text-lg">サポート選手を選ぶ（最大5）</h3>
-              <div className="text-xs opacity-70 mt-1">現在 {selectedChars.length} / 5</div>
-            </div>
+        <div className="modal-box max-w-4xl p-4 max-h-[90vh] flex flex-col">
+          <div className="mb-3">
+            <h3 className="font-bold text-lg">サポート選手を選ぶ（最大5）</h3>
+            <div className="text-xs opacity-70 mt-1">現在 {selectedChars.length} / 5</div>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
-            <div style={{ minHeight: 360, maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
+          <div className="flex-1 min-h-0 grid grid-cols-1 gap-3">
+            <div className="rounded-lg p-3 border border-base-300 bg-base-100">
+              <div className="space-y-3">
+                <div>
+                  <div className="text-xs font-medium mb-1">タイプ</div>
+                  <TypeFilterBar items={charTypeItems} value={charTypeKey} onChange={setCharTypeKey} />
+                </div>
+                <div>
+                  <div className="text-xs font-medium mb-1">レアリティ</div>
+                  <TypeFilterBar items={rarityItems} value={charRarityKey} onChange={setCharRarityKey} />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
               <CharacterSelector
                 selectedCharacters={selectedCharObjects}
                 onSelectCharacter={onSelectSupportCharsFromDialog}
@@ -1324,25 +1324,9 @@ export default function TrainingTool() {
                 allChars={sortedAllCharsForDialogs}
               />
             </div>
-            <div
-              className="rounded-lg p-4"
-              style={{
-                border: "1px solid rgba(59,130,246,0.12)",
-                background: "rgba(59,130,246,0.03)",
-              }}
-            >
-              <div className="mb-3">
-                <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
-                <TypeFilterBar items={charTypeItems} value={charTypeKey} onChange={setCharTypeKey} />
-              </div>
-              <div>
-                <div className="text-sm font-medium mb-2">レアリティ</div>
-                <TypeFilterBar items={rarityItems} value={charRarityKey} onChange={setCharRarityKey} />
-              </div>
-            </div>
           </div>
 
-          <div className="modal-action mt-4">
+          <div className="modal-action mt-3 sticky bottom-0 bg-base-100 pt-3 border-t border-base-300 px-4 pb-[env(safe-area-inset-bottom)]">
             <button type="button" className="btn btn-ghost" onClick={() => setSelectedChars([])}>全解除</button>
             <form method="dialog"><button className="btn">閉じる</button></form>
             <button type="button" className="btn btn-primary" onClick={() => charDialogRef.current?.close()}>決定</button>
@@ -1353,36 +1337,29 @@ export default function TrainingTool() {
 
       {/* スペシャルサポートカード（UR/SSR 4枚まで） */}
       <dialog ref={supportDialogRef} className="modal">
-        <div className="modal-box max-w-4xl p-6" style={{ maxHeight: "80vh", display: "flex", flexDirection: "column" }}>
-          <div className="flex items-center justify-between mb-3">
+        <div className="modal-box max-w-4xl p-4 max-h-[90vh] flex flex-col">
+          <div className="mb-3">
             <h3 className="font-bold text-lg">スペシャルサポートカードを選ぶ（最大4）</h3>
-            <div className="text-xs opacity-70">現在 {selectedSupports.length} / 4</div>
+            <div className="text-xs opacity-70 mt-1">現在 {selectedSupports.length} / 4</div>
           </div>
 
-          <div className="mt-2 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
-            <div style={{ minHeight: 360, maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
+          <div className="flex-1 min-h-0 grid grid-cols-1 gap-3">
+            <div className="rounded-lg p-3 border border-base-300 bg-base-100">
+              <div className="text-xs font-medium mb-1">タイプで絞り込み</div>
+              <TypeFilterBar items={supportTypeItems} value={supportTypeKey} onChange={setSupportTypeKey} />
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
               <SupportCardPicker
                 pool={filteredNormalCards}
                 max={4}
                 selectedIds={selectedSupports}
                 onChange={(nextIds) => setSelectedSupports(nextIds.slice(0, 4))}
               />
-              <div style={{ height: 12 }} />
-            </div>
-
-            <div
-              className="rounded-lg p-4"
-              style={{
-                border: "1px solid rgba(59,130,246,0.12)",
-                background: "rgba(59,130,246,0.03)",
-              }}
-            >
-              <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
-              <TypeFilterBar items={supportTypeItems} value={supportTypeKey} onChange={setSupportTypeKey} />
             </div>
           </div>
 
-          <div className="modal-action sticky bottom-0 bg-base-100" style={{ paddingTop: 12 }}>
+          <div className="modal-action mt-3 sticky bottom-0 bg-base-100 pt-3 border-t border-base-300 px-4 pb-[env(safe-area-inset-bottom)]">
             <button type="button" className="btn btn-ghost" onClick={() => setSelectedSupports([])}>全解除</button>
             <form method="dialog"><button className="btn">閉じる</button></form>
             <button type="button" className="btn btn-primary" onClick={() => supportDialogRef.current?.close()}>決定</button>
@@ -1393,34 +1370,27 @@ export default function TrainingTool() {
 
       {/* EXサポートカード（1枚） */}
       <dialog ref={exDialogRef} className="modal">
-        <div className="modal-box max-w-4xl p-6" style={{ maxHeight: "80vh", display: "flex", flexDirection: "column" }}>
-          <div className="flex items-center justify-between mb-3">
+        <div className="modal-box max-w-4xl p-4 max-h-[90vh] flex flex-col">
+          <div className="mb-3">
             <h3 className="font-bold text-lg">EXサポートカードを選ぶ（1）</h3>
           </div>
 
-          <div className="mt-2 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
-            <div style={{ minHeight: 320, maxHeight: "60vh", overflowY: "auto", paddingRight: 6 }}>
+          <div className="flex-1 min-h-0 grid grid-cols-1 gap-3">
+            <div className="rounded-lg p-3 border border-base-300 bg-base-100">
+              <div className="text-xs font-medium mb-1">タイプで絞り込み</div>
+              <TypeFilterBar items={exTypeItems} value={exTypeKey} onChange={setExTypeKey} />
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
               <ExSupportPicker
                 pool={filteredExCards}
                 selectedId={selectedExSupport || null}
                 onChange={(id) => setExSupport(id)}
               />
-              <div style={{ height: 12 }} />
-            </div>
-
-            <div
-              className="rounded-lg p-4"
-              style={{
-                border: "1px solid rgba(59,130,246,0.12)",
-                background: "rgba(59,130,246,0.03)",
-              }}
-            >
-              <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
-              <TypeFilterBar items={exTypeItems} value={exTypeKey} onChange={setExTypeKey} />
             </div>
           </div>
 
-          <div className="modal-action sticky bottom-0 bg-base-100" style={{ paddingTop: 12 }}>
+          <div className="modal-action mt-3 sticky bottom-0 bg-base-100 pt-3 border-t border-base-300 px-4 pb-[env(safe-area-inset-bottom)]">
             <button type="button" className="btn btn-ghost" onClick={() => setExSupport(null)}>未選択</button>
             <form method="dialog"><button className="btn">閉じる</button></form>
             <button type="button" className="btn btn-primary" onClick={() => exDialogRef.current?.close()}>決定</button>

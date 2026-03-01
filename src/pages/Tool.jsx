@@ -312,12 +312,26 @@ export default function Tool() {
 
           {/* モーダル：選手選択 */}
           <dialog ref={selectorDialogRef} className="modal">
-            <div className="modal-box max-w-5xl">
-              <h3 className="font-bold text-lg">選手を選ぶ</h3>
+            <div className="modal-box max-w-5xl p-4 max-h-[90vh] flex flex-col">
+              <h3 className="font-bold text-lg mb-3">選手を選ぶ</h3>
               
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4">
-                {/* 左：キャラクター一覧 */}
-                <div className="max-h-[70vh] overflow-y-auto">
+              <div className="flex-1 min-h-0 grid grid-cols-1 gap-3">
+                {/* フィルター（モバイルは上部に配置） */}
+                <div className="rounded-lg p-3 border border-base-300 bg-base-100">
+                  <div className="space-y-3">
+                    <div>
+                      <div className="text-xs font-medium mb-1">タイプ</div>
+                      <TypeFilterBar items={charTypeItems} value={charTypeKey} onChange={setCharTypeKey} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium mb-1">レアリティ</div>
+                      <TypeFilterBar items={rarityItems} value={charRarityKey} onChange={setCharRarityKey} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* キャラクター一覧 */}
+                <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
                   <Suspense fallback={<div className="p-6 text-sm opacity-70">読込中…</div>}>
                     <CharacterSelector
                       selectedCharacters={selectedCharacters}
@@ -328,21 +342,9 @@ export default function Tool() {
                     />
                   </Suspense>
                 </div>
-
-                {/* 右：フィルター */}
-                <div className="rounded-lg p-4 border border-base-300 bg-base-100">
-                  <div className="mb-4">
-                    <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
-                    <TypeFilterBar items={charTypeItems} value={charTypeKey} onChange={setCharTypeKey} />
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium mb-2">レアリティ</div>
-                    <TypeFilterBar items={rarityItems} value={charRarityKey} onChange={setCharRarityKey} />
-                  </div>
-                </div>
               </div>
 
-              <div className="modal-action">
+              <div className="modal-action mt-3 sticky bottom-0 bg-base-100 pt-3 border-t border-base-300 px-4 pb-[env(safe-area-inset-bottom)]">
                 <form method="dialog">
                   <button className="btn">閉じる</button>
                 </form>
@@ -350,8 +352,8 @@ export default function Tool() {
                   type="button"
                   className="btn btn-primary"
                   onClick={() => {
-                    handleApply();          // 中央の処理（ログ/提案/インライン広告 adKey）
-                    triggerAdsRefresh();    // ★ 右カラムにも「更新して」と合図
+                    handleApply();
+                    triggerAdsRefresh();
                     selectorDialogRef.current?.close();
                   }}
                 >
