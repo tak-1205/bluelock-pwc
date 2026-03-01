@@ -1,5 +1,5 @@
 // src/pages/Tool.jsx
-import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef } from "react";
+import React, { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 import PageHeader from "../components/PageHeader.jsx";
@@ -19,8 +19,61 @@ import SkillCard from "../components/tool/SkillCard.jsx";
 import { Row, Section, Select, Toggle, Button, Badge, Chip, Pill } from "../components/UiBits.jsx";
 import { triggerAdsRefresh } from "../lib/adBus.js"; // ★ 右カラム更新イベント
 import { buildImageCandidates, makeImageFallbackHandler } from "../lib/imagePath";
+import characterList from "../data/characterList.js";
+
+// フィルターバーコンポーネント
+function TypeFilterBar({ items, value, onChange }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <button
+        type="button"
+        className={`btn btn-sm ${!value || value === "ALL" ? "btn-active" : "btn-ghost"}`}
+        onClick={() => onChange("ALL")}
+      >
+        すべて
+      </button>
+      {items.map(({ key, label }) => (
+        <button
+          key={key}
+          type="button"
+          className={`btn btn-sm ${value === key ? "btn-active" : "btn-ghost"}`}
+          onClick={() => onChange(key)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function Tool() {
+  // 絞り込み用のstate
+  const [charTypeKey, setCharTypeKey] = useState("ALL");
+  const [charRarityKey, setCharRarityKey] = useState("ALL");
+
+  // タイプとレアリティの候補を抽出
+  const CHAR_TYPE_KEYS = ["card1", "card2", "card3"];
+  
+  const charTypeItems = useMemo(() => {
+    const map = new Map();
+    for (const c of characterList) {
+      for (const k of CHAR_TYPE_KEYS) {
+        const v = String(c[k] || "").trim();
+        if (v) map.set(v.toUpperCase(), v);
+      }
+    }
+    return Array.from(map.entries()).map(([key, label]) => ({ key, label }));
+  }, []);
+
+  const rarityItems = useMemo(() => {
+    const set = new Set();
+    for (const c of characterList) {
+      const r = String(c.rarity || "").trim();
+      if (r) set.add(r);
+    }
+    return Array.from(set).sort((a, b) => Number(b) - Number(a)).map(r => ({ key: r, label: `★${r}` }));
+  }, []);
+
   // ★ まず最初に宣言（これより前で参照しない）
   const selectorDialogRef = useRef(null);
   const location = useLocation();
@@ -261,14 +314,34 @@ export default function Tool() {
           <dialog ref={selectorDialogRef} className="modal">
             <div className="modal-box max-w-5xl">
               <h3 className="font-bold text-lg">選手を選ぶ</h3>
-              <div className="mt-4 max-h-[70vh] overflow-y-auto">
-               <Suspense fallback={<div className="p-6 text-sm opacity-70">読込中…</div>}>
-                 <CharacterSelector
-                   selectedCharacters={selectedCharacters}
-                   onSelectCharacter={handleSelectCharacters}
-                 />
-               </Suspense>
+              
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4">
+                {/* 左：キャラクター一覧 */}
+                <div className="max-h-[70vh] overflow-y-auto">
+                  <Suspense fallback={<div className="p-6 text-sm opacity-70">読込中…</div>}>
+                    <CharacterSelector
+                      selectedCharacters={selectedCharacters}
+                      onSelectCharacter={handleSelectCharacters}
+                      typeKey={charTypeKey}
+                      rarityKey={charRarityKey}
+                      allChars={characterList}
+                    />
+                  </Suspense>
+                </div>
+
+                {/* 右：フィルター */}
+                <div className="rounded-lg p-4 border border-base-300 bg-base-100">
+                  <div className="mb-4">
+                    <div className="text-sm font-medium mb-2">タイプで絞り込み</div>
+                    <TypeFilterBar items={charTypeItems} value={charTypeKey} onChange={setCharTypeKey} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium mb-2">レアリティ</div>
+                    <TypeFilterBar items={rarityItems} value={charRarityKey} onChange={setCharRarityKey} />
+                  </div>
+                </div>
               </div>
+
               <div className="modal-action">
                 <form method="dialog">
                   <button className="btn">閉じる</button>
