@@ -347,7 +347,7 @@ function TargetTile({ id, muted = false, width = 80, showName = true }) {
 function CharacterSlot({ id, onClick, onRemove }) {
   const name = id ? getCharNameById(id) : "";
   return (
-    <div className="relative w-[80px] h-[80px] rounded-xl border shadow-sm bg-base-100 border-base-300">
+    <div className="relative w-full aspect-square rounded-xl border shadow-sm bg-base-100 border-base-300">
       <button
         type="button"
         className="w-full h-full flex items-center justify-center rounded-xl"
@@ -356,7 +356,12 @@ function CharacterSlot({ id, onClick, onRemove }) {
         aria-label={id ? name : "選手を追加"}
       >
         {id ? (
-          <CharImg id={id} alt={name} size={80} className="rounded-xl" />
+          <img
+            src={`/images/${id}.png`}
+            alt={name}
+            onError={(e) => { e.currentTarget.src = "/images/placeholder.png"; }}
+            className="w-full h-full object-cover rounded-xl"
+          />
         ) : (
           <div className="flex flex-col items-center justify-center text-base-content/60">
             <div className="w-8 h-8 rounded-xl bg-base-200 flex items-center justify-center text-lg">＋</div>
@@ -576,42 +581,34 @@ function TypeFilterBar({ items, value, onChange, heading = null }) {
 }
 
 /* ====== ダイアログ用タイル/ピッカー ===================== */
-// 編成欄に置くプレビュー（ダイアログと同じ 94px ベース、fillで均等余白）
+// 編成欄に置くプレビュー（レスポンシブ対応）
 function SupportCardSlot({ id, onClick, onRemove }) {
   const card = id ? getSupportById(id) : null;
 
-  const Outer = ({ children, title }) => (
-    <div style={{ width: SLOT_TILE_W }} title={title}>
-      <div style={{ width: SLOT_TILE_W, padding: SLOT_TILE_PAD, borderRadius: 8, border: "2px solid #d1d5db", background: "#ffffff" }}>
-        {children}
-      </div>
-    </div>
-  );
-
   if (!card) {
     return (
-      <div className="relative">
-        <button type="button" className="rounded-xl block" onClick={onClick} title="サポートカードを追加" aria-label="サポートカードを追加">
-          <Outer title="サポートカードを追加">
-            <div style={{ width: "100%", aspectRatio: "499 / 640", position: "relative", overflow: "hidden", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div className="w-8 h-8 rounded-xl bg-base-200 flex items-center justify-center text-lg">＋</div>
-            </div>
-            <div style={{ fontSize: 10, marginTop: 4, lineHeight: 1.2, whiteSpace: "normal", wordBreak: "break-word", textAlign: "center" }}>card</div>
-          </Outer>
+      <div className="relative w-full" style={{ aspectRatio: "499 / 640" }}>
+        <button type="button" className="w-full h-full rounded-xl border-2 border-base-300 bg-white flex items-center justify-center" onClick={onClick} title="サポートカードを追加" aria-label="サポートカードを追加">
+          <div className="flex flex-col items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-base-200 flex items-center justify-center text-lg">＋</div>
+            <div className="text-[10px] mt-1">card</div>
+          </div>
         </button>
       </div>
     );
   }
 
   return (
-    <div className="relative">
-      <button type="button" className="rounded-xl block" onClick={onClick} title={card.name} aria-label={card.name}>
-        <Outer title={card.name}>
-          {/* 画像側は枠線なし。外枠のみ枠線／内側は100%でフィット */}
-          <SupportCardThumb card={card} showName fill />
-        </Outer>
+    <div className="relative w-full" style={{ aspectRatio: "499 / 640" }}>
+      <button type="button" className="w-full h-full rounded-xl border-2 border-base-300 bg-white overflow-hidden" onClick={onClick} title={card.name} aria-label={card.name}>
+        <img
+          src={`/images/supportcard/${id}.png`}
+          alt={card.name}
+          onError={(e) => { e.currentTarget.src = "/images/placeholder.png"; }}
+          className="w-full h-full object-contain"
+        />
       </button>
-      {id && <div className="absolute -top-2 -right-2"><CloseDot onClick={onRemove} title="カードを外す" /></div>}
+      <div className="absolute -top-2 -right-2"><CloseDot onClick={onRemove} title="カードを外す" /></div>
     </div>
   );
 }
@@ -907,11 +904,13 @@ export default function TrainingTool() {
               <button className="btn btn-xs" onClick={() => traineeDialogRef.current?.showModal()}>＋ 選ぶ</button>
             </div>
             <div className="flex gap-3">
-              <CharacterSlot
-                id={selectedTraineeId}
-                onClick={() => traineeDialogRef.current?.showModal()}
-                onRemove={() => setSelectedTraineeId(null)}
-              />
+              <div style={{ width: 80 }}>
+                <CharacterSlot
+                  id={selectedTraineeId}
+                  onClick={() => traineeDialogRef.current?.showModal()}
+                  onRemove={() => setSelectedTraineeId(null)}
+                />
+              </div>
             </div>
           </section>
 
@@ -921,7 +920,7 @@ export default function TrainingTool() {
               <h3 className="font-semibold">サポート選手</h3>
               <button className="btn btn-xs" onClick={() => charDialogRef.current?.showModal()}>＋ 選ぶ</button>
             </div>
-            <div className="flex flex-wrap gap-1">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "4px", maxWidth: "100%" }}>
               {Array.from({ length: 5 }).map((_, i) => {
                 const id = selectedChars[i];
                 return (
@@ -942,7 +941,7 @@ export default function TrainingTool() {
               <h3 className="font-semibold">スペシャルサポートカード</h3>
               <button className="btn btn-xs" onClick={() => supportDialogRef.current?.showModal()}>＋ 追加</button>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "4px", maxWidth: "100%" }}>
               {Array.from({ length: 4 }).map((_, i) => {
                 const id = selectedSupports[i];
                 return (
@@ -964,11 +963,13 @@ export default function TrainingTool() {
               <button className="btn btn-xs" onClick={() => exDialogRef.current?.showModal()}>＋ 追加</button>
             </div>
             <div className="flex flex-wrap gap-2">
-              <SupportCardSlot
-                id={selectedExSupport || null}
-                onClick={() => exDialogRef.current?.showModal()}
-                onRemove={() => setExSupport(null)}
-              />
+              <div style={{ width: 80 }}>
+                <SupportCardSlot
+                  id={selectedExSupport || null}
+                  onClick={() => exDialogRef.current?.showModal()}
+                  onRemove={() => setExSupport(null)}
+                />
+              </div>
             </div>
           </section>
 

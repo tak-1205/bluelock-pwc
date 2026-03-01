@@ -273,7 +273,7 @@ export default function Tool() {
               <div className="text-m text-base-content/70 mb-2">
                   マッチスキル数: <strong>{resultCount}</strong> 件
               </div>
-               <div className="flex flex-wrap gap-2">
+               <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "8px", maxWidth: "100%" }}>
                     {selectedCharacters.map((c) => {
                         const candidates = buildImageCandidates(c.id);
                         const initialSrc = candidates[0];
@@ -281,13 +281,14 @@ export default function Tool() {
 
                         return (
                         <div key={c.id} className="avatar" title={name}>
-                            <div className="w-20 h-20 rounded-lg ring ring-base-300">
+                            <div className="w-full aspect-square rounded-lg ring ring-base-300">
                             <img
                                 src={initialSrc}
                                 data-idx="0"
                                 alt={name}
                                 onError={makeImageFallbackHandler(candidates)}
                                 loading="lazy"
+                                className="w-full h-full object-cover"
                             />
                             </div>
                         </div>
