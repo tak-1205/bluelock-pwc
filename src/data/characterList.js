@@ -88,6 +88,7 @@ export const characterList = [
 { id: 'B030-03', name: '烏旅人【X 弱点がないなら創るまで】',rarity: '4',type: 'テクニック',card1: 'テクニック',card2: 'スピード',card3: ''},
 { id: 'B031-01', name: '乙夜影汰【忍者の末裔】',rarity: '3',type: 'スピード',card1: 'スピード',card2: 'テクニック',card3: ''},
 { id: 'B031-02', name: '乙夜影汰【最強の飛び道具】',rarity: '3',type: 'テクニック',card1: 'テクニック',card2: 'キック',card3: ''},
+{ id: 'B031-03', name: '乙夜影汰【速攻の忍術】',rarity: '4',type: 'スピード',card1: 'スピード',card2: 'テクニック',card3: ''},
 { id: 'B032-01', name: '氷織羊【はんなりゲーマー】',rarity: '3',type: '賢さ',card1: '賢さ',card2: 'テクニック',card3: ''},
 { id: 'B032-02', name: '氷織羊【冷静な視野】',rarity: '3',type: 'スピード',card1: 'スピード',card2: 'テクニック',card3: ''},
 { id: 'B032-03', name: '氷織羊【桜はんなり】',rarity: '3',type: 'キック',card1: 'キック',card2: 'テクニック',card3: ''},
