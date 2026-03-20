@@ -37,6 +37,7 @@ export const characterProfiles = [
 { char_id: 'B036-01', base_name: 'オリヴァ・愛空',base_name_alphabet:'OLIVER AIKU',character_cv:'日野 聡',birthday:'45838',height:'190cm',introduction:'U-20日本代表主将。センターバック。鉄壁の守備力と豊かな才能を持ち、テクニック・フィジカル・リーダーシップに秀でる。同世代の中でも抜きん出た存在。' },
 { char_id: 'B037-01', base_name: '閃堂 秋人',base_name_alphabet:'SENDOU SHUTO',character_cv:'若山 晃久',birthday:'45937',height:'181cm',introduction:'U-20日本代表のエースCF。ツーブロックとアシメ前髪がトレードマーク。国内1部でレギュラーを務める実力者で、代表戦ではチーム最多得点を誇り信頼も厚い。' },
 { char_id: 'B038-01', base_name: '糸師 冴',base_name_alphabet:'ITOSHI SAE',character_cv:'櫻井 孝宏',birthday:'45940',height:'180cm',introduction:'スペイン名門「レ・アール」の下部組織所属。新世代世界11傑に選ばれるなど世界が注目。日本サッカーを見限っていたが、一時帰国で“青い監獄”の存在を知り興味を持つ。' },
+{ char_id: 'B039-01', base_name: '黒名 蘭世',base_name_alphabet:'KUROMA RANSEI',character_cv:'',birthday:'',height:'',introduction:'' },
 { char_id: 'B901-01', base_name: '三笘 薫',base_name_alphabet:'MITOMA KAORU',character_cv:'三笘 薫',birthday:'45797',height:'178cm',introduction:'技術と緩急を併せ持つ超絶ドリブラー。ユース・大学で磨いたスピードとパワーを武器に日本を代表する選手へ。活躍の場を海外へ移し、世界で戦い続ける。' },
 { char_id: 'B902-01', base_name: '本田 圭佑',base_name_alphabet:'HONDA KEISUKE',character_cv:'本田 圭佑',birthday:'45821',height:'182cm',introduction:'日本サッカーを代表するスーパースター。強烈な左足のシュートで世界で活躍。アグレッシブなスタイルで結果を残し観客を魅了する。“青い監獄”をどう見るのか注目される。' },
 ];
